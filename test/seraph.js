@@ -24,6 +24,40 @@ var db = seraph.db('http://localhost:7474');
 var async = require('async');
 var assert = require('assert');
 
+describe('seraph#call', function() {
+  var originalRequest = seraph.call._request;
+  function setupMock(mock) {
+    seraph.call._request = mock;
+  };
+  afterEach(function() {
+    seraph.call._request = originalRequest;
+  });
+  
+  it('should infer GET request if no data or method supplied', function() {
+    var opts = { endpoint: '' };
+    setupMock(function(opts, callback) {
+      assert.ok(typeof callback === 'function');
+      assert.equal(opts.method, 'GET');
+    });
+    seraph.call(opts, '');
+  });
+
+  it('should infer POST request if data supplied', function() {
+    var opts = { endpoint: '' };
+    var testObject = {
+      foo: 'foo',
+      bar: 10
+    };
+    setupMock(function(opts, callback) {
+      assert.ok(typeof callback === 'function');
+      assert.equal(opts.method, 'POST');
+      assert.deepEqual(opts.json, testObject);
+    });
+    seraph.call(opts, '', testObject);
+  });
+});
+
+/* Not ready for testing yet 
 describe('CRUD Operations', function() {
   //TODO - split this out into each of the functions...
   it('perform a full crud cycle correctly', function(done) {
@@ -78,3 +112,4 @@ describe('CRUD Operations', function() {
     async.waterfall([create, read, update, del], done);
   });
 });
+*/
