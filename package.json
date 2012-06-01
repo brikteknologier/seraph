@@ -1,0 +1,25 @@
+{
+  "author": "BRIK Teknologier <post@brik.no> (http://www.brik.no)",
+  "contributors": [
+    { "name": "Jon Packer", "email": "contact@jonpacker.com" }
+  ],
+  "name": "seraph",
+  "description": "A thin and familiar layer between node and neo4j's REST api.",
+  "version": "0.0.0",
+  "repository": {
+    "url": "https://github.com/brikteknologier/seraph"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha -R spec"
+  },
+  "engines": {
+    "node": "~0.6.11"
+  },
+  "dependencies": {
+    "async": "~0.1.22"
+  },
+  "devDependencies": {
+    "mocha": "~1.1.0"
+  }
+}
