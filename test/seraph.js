@@ -56,7 +56,7 @@ describe('seraph#call', function() {
   });
 
   it('should add /db/data/ to url', function() {
-    opts = endpoint: '';
+    opts = { endpoint: '' };
     obj = {};
     setupMock(function(opts, callback) {
       assert.equal(opts.uri, '/data/db/');
