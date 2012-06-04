@@ -1,5 +1,4 @@
 /**
- *
  * Goal: Seraph 1.0
  * 
  * db.call(path, [method='get'], [data], callback);
@@ -55,9 +54,17 @@ describe('seraph#call', function() {
     });
     seraph.call(opts, '', testObject);
   });
+
+  it('should add /db/data/ to url', function() {
+    opts = endpoint: '';
+    obj = {};
+    setupMock(function(opts, callback) {
+      assert.equal(opts.uri, '/data/db/');
+    });
+    seraph.call(opts, '', obj);
+  });
 });
 
-/* Not ready for testing yet 
 describe('CRUD Operations', function() {
   //TODO - split this out into each of the functions...
   it('perform a full crud cycle correctly', function(done) {
@@ -112,4 +119,3 @@ describe('CRUD Operations', function() {
     async.waterfall([create, read, update, del], done);
   });
 });
-*/
