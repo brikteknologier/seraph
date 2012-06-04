@@ -26,22 +26,23 @@ var assert = require('assert');
 describe('seraph#call', function() {
   var originalRequest = seraph.call._request;
   function setupMock(mock) {
-    seraph.call._request = mock;
+    seraph._request = mock;
   };
   afterEach(function() {
-    seraph.call._request = originalRequest;
+    seraph._request = originalRequest;
   });
   
-  it('should infer GET request if no data or method supplied', function() {
+  it('should infer GET request if no data or method supplied', function(done) {
     var opts = { endpoint: '' };
     setupMock(function(opts, callback) {
       assert.ok(typeof callback === 'function');
       assert.equal(opts.method, 'GET');
+      done();
     });
     seraph.call(opts, '');
   });
 
-  it('should infer POST request if data supplied', function() {
+  it('should infer POST request if data supplied', function(done) {
     var opts = { endpoint: '' };
     var testObject = {
       foo: 'foo',
@@ -51,15 +52,17 @@ describe('seraph#call', function() {
       assert.ok(typeof callback === 'function');
       assert.equal(opts.method, 'POST');
       assert.deepEqual(opts.json, testObject);
+      done();
     });
     seraph.call(opts, '', testObject);
   });
 
-  it('should add /db/data/ to url', function() {
-    opts = { endpoint: '' };
-    obj = {};
+  it('should add /db/data/ to url', function(done) {
+    var opts = { endpoint: '' };
+    var obj = {};
     setupMock(function(opts, callback) {
-      assert.equal(opts.uri, '/data/db/');
+      assert.equal(opts.uri, '/db/data/');
+      done();
     });
     seraph.call(opts, '', obj);
   });
