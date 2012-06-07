@@ -70,7 +70,7 @@ describe('seraph#call', function() {
 
 describe('CRUD Operations', function() {
   //TODO - split this out into each of the functions...
-  it('perform a full crud cycle correctly', function(done) {
+  it('should be able to create and object and read it back', function(done) {
     function create(done) {
       db.save({ name: 'Jon', age: 23 }, function(err, user) {
         assert.ok(!err);
@@ -91,6 +91,20 @@ describe('CRUD Operations', function() {
       });
     }
 
+
+    async.waterfall([create, read], done);
+  });
+
+  it('should perform an update on an object', function(done) {
+    function create(done) {
+      db.save({ name: 'Jan', age: 55 }, function(err, user) {
+        assert.ok(!err);
+        assert.equal(user.name, 'Jan');
+        assert.equal(user.age, 55);
+        done(null, user);
+      });
+    }
+
     function update(user, done) {
       user.name = 'Belinda';
       user.age = 26;
@@ -102,10 +116,24 @@ describe('CRUD Operations', function() {
         assert.equal(user.age, 26);
         db.read(userId, function(err, user) {
           assert.ok(!err);
+          assert.equal(userId, user.id);
           assert.equal(user.name, 'Belinda');
           assert.equal(user.age, 26);
           done(null, user);
         });
+      });
+    }
+
+    async.waterfall([create, update], done);
+  });
+
+  it('should delete an object', function(done) {
+    function create(done) {
+      db.save({ name: 'Neil', age: 61 }, function(err, user) {
+        assert.ok(!err);
+        assert.equal(user.name, 'Neil');
+        assert.equal(user.age, 61);
+        done(null, user);
       });
     }
 
@@ -119,6 +147,75 @@ describe('CRUD Operations', function() {
       });
     }
 
-    async.waterfall([create, read, update, del], done);
+    async.waterfall([create, del], done);
+  });
+
+  it('should batch CRUD operations', function(done) {
+    function createObjs(done) {
+      db.save([{name: 'Jon'}, {name: 'Helge'}], function(err, users) {
+        assert.ok(!err);
+        assert.equal(users[0].name, 'Jon');
+        assert.equal(users[1].name, 'Helge');
+        done(null, users[0], users[1]);
+      });
+    }
+
+    function readObjs(user1, user2, done) {
+      db.read([user1.id, user2.id], function(err, users) {
+        assert.ok(!err);
+        assert.equal(users[0].name, 'Jon');
+        assert.equal(users[1].name, 'Helge');
+        done(null, users[0], users[1]);
+      });
+    }
+
+    function delObjs(user1, user2, done) {
+      db.delete([user1.id, user2.id], function(err) {
+        assert.ok(!err);
+        db.read([user1.id, user2.id], function(err) {
+          assert.ok(!!err);
+        });
+      });
+    }
+
+    async.waterfall([createObjs, readObjs, delObjs], done);
+  });
+
+  it('should link two objects together', function(done) {
+    function createObjs(done) {
+      db.save([{name: 'Jon'}, {name: 'Helge'}], function(err, users) {
+        assert.ok(!err);
+        assert.equal(users[0].name, 'Jon');
+        assert.equal(users[1].name, 'Helge');
+        done(null, users[0], users[1]);
+      });
+    }
+
+    function linkObjs(user1, user2, done) {
+      db.link(user1, 'coworker', user2, function(err, link) {
+        assert.ok(!err);
+        assert.equal(link.start, user1.id);
+        assert.equal(link.end, user2.id);
+        assert.equal(link.type, 'coworker');
+        assert.deepEqual(link.properties, {});
+        assert.ok(link.id);
+        done(null, link);
+      });
+    }
+
+    function readLink(link, done) {
+      var linkId = link.id;
+      db.readLink(link.id, function(err, link) {
+        assert.ok(!err);
+        assert.equal(link.start, user1.id);
+        assert.equal(link.end, user2.id);
+        assert.equal(link.type, 'coworker');
+        assert.deepEqual(link.properties, {});
+        assert.equal(linkId, link.id);
+        done(null);
+      });
+    }
+
+    async.waterfall([createObjs, linkObjs, readLink], done);
   });
 });
