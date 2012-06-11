@@ -1,14 +1,11 @@
 {
   "author": "BRIK Teknologier <post@brik.no> (http://www.brik.no)",
   "contributors": [
-    {
-      "name": "Jon Packer",
-      "email": "contact@jonpacker.com"
-    }
+    "Jon Packer <contact@jonpacker.com>"
   ],
   "name": "seraph",
   "description": "A thin and familiar layer between node and neo4j's REST api.",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "repository": {
     "url": "https://github.com/brikteknologier/seraph"
   },
