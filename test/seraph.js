@@ -174,6 +174,7 @@ describe('CRUD Operations', function() {
         assert.ok(!err);
         db.read([user1.id, user2.id], function(err) {
           assert.ok(!!err);
+          done();
         });
       });
     }
@@ -198,12 +199,12 @@ describe('CRUD Operations', function() {
         assert.equal(link.end, user2.id);
         assert.equal(link.type, 'coworker');
         assert.deepEqual(link.properties, {});
-        assert.ok(link.id);
-        done(null, link);
+        assert.ok(link.id != null);
+        done(null, link, user1, user2);
       });
     }
 
-    function readLink(link, done) {
+    function readLink(link, user1, user2, done) {
       var linkId = link.id;
       db.readLink(link.id, function(err, link) {
         assert.ok(!err);
