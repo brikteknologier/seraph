@@ -88,7 +88,7 @@ describe('seraph#call', function() {
 });
 
 describe('seraph#save, seraph#read', function() {
-  it('should be able to create and object and read it back', function(done) {
+  it('should be able to create an object and read it back', function(done) {
     function create(done) {
       db.save({ name: 'Jon', age: 23 }, function(err, user) {
         assert.ok(!err);
