@@ -1,3 +1,5 @@
+/* -*- Mode: Javascript; js-indent-level: 2 -*- */
+
 /**
  * Goal: Seraph 1.0
  * 
@@ -58,7 +60,8 @@ describe('seraph#call', function() {
       assert.equal(opts.method, 'GET');
       done();
     });
-    seraph.call(opts, '');
+    var op = seraph.operation(opts, '');
+    seraph.call(opts, op);
   });
 
   it('should infer POST request if data supplied', function(done) {
@@ -73,7 +76,8 @@ describe('seraph#call', function() {
       assert.deepEqual(opts.json, testObject);
       done();
     });
-    seraph.call(opts, '', testObject);
+    var op = seraph.operation(opts, '', testObject);
+    seraph.call(opts, op);
   });
 
   it('should add /db/data/ to url', function(done) {
@@ -83,7 +87,8 @@ describe('seraph#call', function() {
       assert.equal(opts.uri, '/db/data/');
       done();
     });
-    seraph.call(opts, '', obj);
+    var op = seraph.operation(opts, '', obj);
+    seraph.call(opts, op);
   });
 });
 
@@ -215,7 +220,7 @@ describe('seraph#delete', function() {
 
     function del(user, done) {
       db.delete(user, function(err) {
-        assert.ok(!err);
+         assert.ok(!err);
         db.read(user, function(err) {
           assert.ok(!!err);
           done();
