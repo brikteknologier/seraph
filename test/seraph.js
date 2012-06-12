@@ -4,8 +4,8 @@
  * x db.call(path, [method='get'], [data], callback);
  * x db.save(obj, [callback]);
  * x db.link(obj|id, linkname, other_obj|id, [props, [callback]]);
- * - db.query(query, [params], callback);
- * db.find(predicate, [indexes], callback);
+ * x db.query(query, [params], callback);
+ * - db.find(predicate, [indexes], callback);
  * x db.delete(obj, [callback]);
  * x db.read(obj|id, callback);
  * db.links(obj|id, [name], [direction], callback);
@@ -350,5 +350,42 @@ describe('seraph#query, seraph#queryRaw', function() {
     }
 
     async.waterfall([createObjs, linkObjs, queryRaw], done);
+  });
+});
+
+describe('seraph#find', function() {
+  it('should find some items based on a predicate', function(done) {
+    var uniqueKey = Date.now() + ''; 
+    function createObjs(done) {
+      var objs = [ {name: 'Jon', age: 23}, 
+                   {name: 'Neil', age: 60},
+                   {name: 'Katie', age: 29} ];
+      for (var index in objs) {
+        objs[index][uniqueKey] = true;
+      }
+      objs[3] = {name: 'Belinda', age: 26};
+      objs[3][uniqueKey] = false;
+
+      db.save(objs, function(err, users) {
+        done();
+      });
+    }
+
+    function findObjs(done) {
+      var predicate = {};
+      predicate[uniqueKey] = true;
+      db.find(predicate, function(err, objs) {
+        assert.ok(!err);
+        assert.equal(objs.length, 3);
+        var names = objs.map(function(o) { return o.name });
+        assert.ok(names.indexOf('Jon') >= 0);
+        assert.ok(names.indexOf('Neil') >= 0);
+        assert.ok(names.indexOf('Katie') >= 0);
+        assert.ok(names.indexOf('Belinda') === -1);
+        done();
+      });
+    }
+
+    async.series([createObjs, findObjs], done);
   })
 });
