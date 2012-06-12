@@ -1,15 +1,15 @@
 /**
  * Goal: Seraph 1.0
  * 
- * db.call(path, [method='get'], [data], callback);
- * db.save(obj, [callback]);
- * db.link(obj|id, linkname, other_obj|id, [props, [callback]]);
- * db.query(query, [params], callback);
+ * x db.call(path, [method='get'], [data], callback);
+ * x db.save(obj, [callback]);
+ * x db.link(obj|id, linkname, other_obj|id, [props, [callback]]);
+ * - db.query(query, [params], callback);
  * db.find(predicate, [indexes], callback);
- * db.delete(obj, [callback]);
- * db.read(obj|id, callback);
+ * x db.delete(obj, [callback]);
+ * x db.read(obj|id, callback);
  * db.links(obj|id, [name], [direction], callback);
- * db.readLink(linkId, callback);
+ * x db.readLink(linkId, callback);
  * db.addIndex(obj|id, indexName, indexKey, indexValue, [callback])
  * db.readIndex(indexName, indexKey, [indexValue], callback)
  * db.indexes(obj|id, callback);
@@ -68,8 +68,7 @@ describe('seraph#call', function() {
   });
 });
 
-describe('CRUD Operations', function() {
-  //TODO - split this out into each of the functions...
+describe('seraph#save, seraph#read', function() {
   it('should be able to create and object and read it back', function(done) {
     function create(done) {
       db.save({ name: 'Jon', age: 23 }, function(err, user) {
@@ -91,10 +90,33 @@ describe('CRUD Operations', function() {
       });
     }
 
-
     async.waterfall([create, read], done);
   });
 
+  it('should take an array of objects to save/read', function(done) {
+    function createObjs(done) {
+      db.save([{name: 'Jon'}, {name: 'Helge'}], function(err, users) {
+        assert.ok(!err);
+        assert.equal(users[0].name, 'Jon');
+        assert.equal(users[1].name, 'Helge');
+        done(null, users[0], users[1]);
+      });
+    }
+
+    function readObjs(user1, user2, done) {
+      db.read([user1.id, user2.id], function(err, users) {
+        assert.ok(!err);
+        assert.equal(users[0].name, 'Jon');
+        assert.equal(users[1].name, 'Helge');
+        done();
+      });
+    }
+
+    async.waterfall([createObjs, readObjs], done);
+  });
+})
+
+describe('seraph#update', function() {
   it('should perform an update on an object', function(done) {
     function create(done) {
       db.save({ name: 'Jan', age: 55 }, function(err, user) {
@@ -127,6 +149,41 @@ describe('CRUD Operations', function() {
     async.waterfall([create, update], done);
   });
 
+  it('should take an array of objects to save/read', function(done) {
+    function createObjs(done) {
+      db.save([{name: 'Jon'}, {name: 'Helge'}], function(err, users) {
+        assert.ok(!err);
+        assert.equal(users[0].name, 'Jon');
+        assert.equal(users[1].name, 'Helge');
+        done(null, users[0], users[1]);
+      });
+    }
+
+    function readObjs(user1, user2, done) {
+      db.read([user1.id, user2.id], function(err, users) {
+        assert.ok(!err);
+        assert.equal(users[0].name, 'Jon');
+        assert.equal(users[1].name, 'Helge');
+        done(null, users[0], users[1]);
+      });
+    }
+
+    function updateObjs(user1, user2, done) {
+      user1.name = 'Bertin';
+      user2.name = 'Erlend';
+      db.save([user1, user2], function(err, users) {
+        assert.ok(!err);
+        assert.equal(users[0].name, 'Bertin');
+        assert.equal(users[1].name, 'Erlend');
+        done();
+      });
+    }
+
+    async.waterfall([createObjs, readObjs, updateObjs], done);
+  });
+});
+
+describe('seraph#delete', function() {
   it('should delete an object', function(done) {
     function create(done) {
       db.save({ name: 'Neil', age: 61 }, function(err, user) {
@@ -150,7 +207,7 @@ describe('CRUD Operations', function() {
     async.waterfall([create, del], done);
   });
 
-  it('should batch CRUD operations', function(done) {
+  it('should take an array of objects to delete', function(done) {
     function createObjs(done) {
       db.save([{name: 'Jon'}, {name: 'Helge'}], function(err, users) {
         assert.ok(!err);
@@ -181,7 +238,9 @@ describe('CRUD Operations', function() {
 
     async.waterfall([createObjs, readObjs, delObjs], done);
   });
+});
 
+describe('seraph#link, seraph#readLink', function() {
   it('should link two objects together', function(done) {
     function createObjs(done) {
       db.save([{name: 'Jon'}, {name: 'Helge'}], function(err, users) {
@@ -219,4 +278,77 @@ describe('CRUD Operations', function() {
 
     async.waterfall([createObjs, linkObjs, readLink], done);
   });
+});
+
+describe('seraph#query, seraph#queryRaw', function() {
+  it('should perform a cypher query', function(done) {
+    function createObjs(done) {
+      db.save([{name: 'Jon', age: 23}, 
+               {name: 'Neil', age: 60},
+               {name: 'Katie', age: 29}], function(err, users) {
+        done(null, users[0], users.slice(1));
+      });
+    }
+
+    function linkObjs(user1, users, done) {
+      db.link(user1, 'knows', users, function(err, links) {
+        done(null, user1);
+      });
+    }
+
+    function query(user, done) {
+      var cypher = "start x = node(" + user.id + ") ";
+      cypher    += "match x -[r]-> n ";
+      cypher    += "return type(r), n.name?, n.age? ";
+      cypher    += "order by n.name";
+      db.query(cypher, function(err, result) {
+        assert.ok(!err);
+        assert.deepEqual([{
+          'TYPE(r)': 'knows',
+          'n.name': 'Katie',
+          'n.age': 29
+        }, {
+          'TYPE(r)': 'knows',
+          'n.name': 'Neil',
+          'n.age': 60
+        }], result);
+        done();
+      });
+    }
+  
+    async.waterfall([createObjs, linkObjs, query], done);
+  });
+
+  it('should perform a cypher query w/o parsing the result', function(done) {
+    function createObjs(done) {
+      db.save([{name: 'Jon', age: 23}, 
+               {name: 'Neil', age: 60},
+               {name: 'Katie', age: 29}], function(err, users) {
+        done(null, users[0], users.slice(1));
+      });
+    }
+
+    function linkObjs(user1, users, done) {
+      db.link(user1, 'knows', users, function(err, links) {
+        done(null, user1);
+      });
+    }
+
+    function queryRaw(user, done) {
+      var cypher = "start x = node(" + user.id + ") ";
+      cypher    += "match x -[r]-> n ";
+      cypher    += "return type(r), n.name?, n.age? ";
+      cypher    += "order by n.name";
+      db.queryRaw(cypher, function(err, result) {
+        assert.ok(!err);
+        assert.deepEqual({
+          data: [['knows', 'Katie', 29], ['knows', 'Neil', 60]],
+          columns: ['TYPE(r)', 'n.name', 'n.age']
+        }, result);
+        done();
+      });
+    }
+
+    async.waterfall([createObjs, linkObjs, queryRaw], done);
+  })
 });
