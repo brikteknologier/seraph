@@ -19,9 +19,28 @@
 
 var seraph = require('../');
 var db = seraph.db('http://localhost:7474');
+var spawn = require('child_process').spawn;
 
 var async = require('async');
 var assert = require('assert');
+var path = require('path')
+
+var neo4j = path.join(__dirname, '../db/bin/neo4j');
+var datapath = path.join(__dirname, '../db/data');
+
+beforeEach(function(done) {
+  async.series([
+    function(next) {
+      spawn(neo4j, ['stop']).on('exit', function() { next(); })
+    },
+    function(next) {
+      spawn('rm', ['-rf', datapath]).on('exit', function() { next(); });
+    },
+    function(next) {
+      spawn(neo4j, ['start']).on('exit', function() { next(); });
+    }
+  ], done);
+});
 
 describe('seraph#call', function() {
   var originalRequest = seraph.call._request;
@@ -304,13 +323,13 @@ describe('seraph#query, seraph#queryRaw', function() {
       db.query(cypher, function(err, result) {
         assert.ok(!err);
         assert.deepEqual([{
-          'TYPE(r)': 'knows',
-          'n.name': 'Katie',
-          'n.age': 29
+          'type(r)': 'knows',
+          'n.name?': 'Katie',
+          'n.age?': 29
         }, {
-          'TYPE(r)': 'knows',
-          'n.name': 'Neil',
-          'n.age': 60
+          'type(r)': 'knows',
+          'n.name?': 'Neil',
+          'n.age?': 60
         }], result);
         done();
       });
@@ -343,7 +362,7 @@ describe('seraph#query, seraph#queryRaw', function() {
         assert.ok(!err);
         assert.deepEqual({
           data: [['knows', 'Katie', 29], ['knows', 'Neil', 60]],
-          columns: ['TYPE(r)', 'n.name', 'n.age']
+          columns: ['type(r)', 'n.name?', 'n.age?']
         }, result);
         done();
       });
@@ -355,7 +374,7 @@ describe('seraph#query, seraph#queryRaw', function() {
 
 describe('seraph#find', function() {
   it('should find some items based on a predicate', function(done) {
-    var uniqueKey = Date.now() + ''; 
+    var uniqueKey = 'test' + Date.now(); 
     function createObjs(done) {
       var objs = [ {name: 'Jon', age: 23}, 
                    {name: 'Neil', age: 60},
