@@ -5,9 +5,9 @@
  * 
  * x db.call(path, [method='get'], [data], callback);
  * x db.save(obj, [callback]);
- * x db.link(obj|id, linkname, other_obj|id, [props, [callback]]);
+ * x db.link(obj|id, linkname, other_obj|id, [props], [callback]);
  * x db.query(query, [params], callback);
- * - db.find(predicate, [indexes], callback);
+ * x db.find(predicate, [indexes], callback);
  * x db.delete(obj, [callback]);
  * x db.read(obj|id, callback);
  * db.links(obj|id, [name], [direction], callback);
@@ -30,7 +30,14 @@ var path = require('path')
 var neo4j = path.join(__dirname, '../db/bin/neo4j');
 var datapath = path.join(__dirname, '../db/data');
 
-beforeEach(function(done) {
+var counter = (function() {
+  var count = Date.now();
+  return function() {
+    return ++count;
+  };
+})();
+
+var refreshDb = function(done) {
   async.series([
     function(next) {
       spawn(neo4j, ['stop']).on('exit', function() { next(); })
@@ -39,10 +46,22 @@ beforeEach(function(done) {
       spawn('rm', ['-rf', datapath]).on('exit', function() { next(); });
     },
     function(next) {
-      spawn(neo4j, ['start']).on('exit', function() { next(); });
+      spawn('mkdir', ['-p', datapath]).on('exit', function() { next(); });
+    },
+    function(next) {
+      var n = spawn(neo4j, ['start'])
+      n.stdout.on('data', function(d) { 
+        process.stdout.write(d.toString()); 
+      })
+      n.on('exit', function() { console.log(''); next(); });
+    }, 
+    function(next) {
+      setTimeout(function() { next(); }, 1000);
     }
   ], done);
-});
+};
+
+before(refreshDb);
 
 describe('seraph#call', function() {
   var originalRequest = seraph.call._request;
@@ -96,7 +115,7 @@ describe('seraph#save, seraph#read', function() {
   it('should be able to create an object and read it back', function(done) {
     function create(done) {
       db.save({ name: 'Jon', age: 23 }, function(err, user) {
-        assert.ok(!err);
+        assert.ok(!err, err);
         assert.ok(typeof user.id !== 'undefined');
         assert.equal(user.name, 'Jon');
         assert.equal(user.age, 23);
@@ -107,7 +126,7 @@ describe('seraph#save, seraph#read', function() {
 
     function read(userId, done) {
       db.read(userId, function(err, user) {
-        assert.ok(!err);
+        assert.ok(!err, err);
         assert.equal(user.name, 'Jon');
         assert.equal(user.age, 23);
         done(null, user);
@@ -120,7 +139,7 @@ describe('seraph#save, seraph#read', function() {
   it('should take an array of objects to save/read', function(done) {
     function createObjs(done) {
       db.save([{name: 'Jon'}, {name: 'Helge'}], function(err, users) {
-        assert.ok(!err);
+        assert.ok(!err, err);
         assert.equal(users[0].name, 'Jon');
         assert.equal(users[1].name, 'Helge');
         done(null, users[0], users[1]);
@@ -129,7 +148,7 @@ describe('seraph#save, seraph#read', function() {
 
     function readObjs(user1, user2, done) {
       db.read([user1.id, user2.id], function(err, users) {
-        assert.ok(!err);
+        assert.ok(!err, err);
         assert.equal(users[0].name, 'Jon');
         assert.equal(users[1].name, 'Helge');
         done();
@@ -290,7 +309,7 @@ describe('seraph#link, seraph#readLink', function() {
     function readLink(link, user1, user2, done) {
       var linkId = link.id;
       db.readLink(link.id, function(err, link) {
-        assert.ok(!err);
+        assert.ok(!err, err);
         assert.equal(link.start, user1.id);
         assert.equal(link.end, user2.id);
         assert.equal(link.type, 'coworker');
@@ -379,7 +398,7 @@ describe('seraph#query, seraph#queryRaw', function() {
 
 describe('seraph#find', function() {
   it('should find some items based on a predicate', function(done) {
-    var uniqueKey = 'test' + Date.now(); 
+    var uniqueKey = 'seraph_find_test' + counter();
     function createObjs(done) {
       var objs = [ {name: 'Jon', age: 23}, 
                    {name: 'Neil', age: 60},
