@@ -97,6 +97,8 @@ Alternatively, `options` can just be the REST API URL as a string.
 
 ---------------------------------------
 
+## `db` Functions
+
 <a name="find" />
 ### find (predicate, any, callback)
 
@@ -206,43 +208,45 @@ Return all people Jon knows:
 
 ---------------------------------------
 
+## `transaction` Functions
+
 <a name="transaction.node.delete" />
-### node.delete (id|object, [callback])
+### transaction node.delete (id|object, [callback])
 
 <img src="http://placekitten.com/200/140">
 
 ---------------------------------------
 
 <a name="transaction.node.read" />
-### node.read (id|object, callback)
+### transaction node.read (id|object, callback)
 
 <img src="http://placekitten.com/200/140">
 
 ---------------------------------------
 
 <a name="transaction.node.save" />
-### node.save (object, callback)
+### transaction node.save (object, callback)
 
 <img src="http://placekitten.com/200/140">
 
 ---------------------------------------
 
 <a name="transaction.relationship.delete" />
-### relationship.delete (object|id, [callback])
+### transaction relationship.delete (object|id, [callback])
 
 <img src="http://placekitten.com/200/140">
 
 ---------------------------------------
 
 <a name="transaction.relationship.read" />
-### relationship.read (object|id, callback)
+### transaction relationship.read (object|id, callback)
 
 <img src="http://placekitten.com/200/140">
 
 ---------------------------------------
 
 <a name="transaction.relationship.save" />
-### relationship.save (firstId|firstObj, name, secondId|secondobj, [props], callback)
+### transaction relationship.save (firstId|firstObj, name, secondId|secondobj, [props], callback)
 
 <img src="http://placekitten.com/200/140">
 
