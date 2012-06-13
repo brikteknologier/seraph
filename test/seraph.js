@@ -1,4 +1,4 @@
-/* -*- Mode: Javascript; js-indent-level: 2 -*- */
+* -*- Mode: Javascript; js-indent-level: 2 -*- */
 
 /**
  * Goal: Seraph 1.0
@@ -63,7 +63,7 @@ var refreshDb = function(done) {
 
 before(refreshDb);
 
-describe('seraph#call', function() {
+describe('seraph#call, seraph#operation', function() {
   var originalRequest = seraph.call._request;
   function setupMock(mock) {
     seraph._request = mock;
