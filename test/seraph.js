@@ -10,7 +10,7 @@
  * x db.find(predicate, [indexes], callback);
  * x db.delete(obj, [callback]);
  * x db.read(obj|id, callback);
- * db.links(obj|id, [name], [direction], callback);
+ * x db.links(obj|id, [name], [direction], callback);
  * x db.readLink(linkId, callback);
  * db.addIndex(obj|id, indexName, indexKey, indexValue, [callback])
  * db.readIndex(indexName, indexKey, [indexValue], callback)
