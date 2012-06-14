@@ -287,7 +287,7 @@ describe('seraph#delete', function() {
   });
 });
 
-describe('seraph#link, seraph#readLink', function() {
+describe('seraph.node#link, seraph.rel#read', function() {
   it('should link two objects together', function(done) {
     function createObjs(done) {
       db.save([{name: 'Jon'}, {name: 'Helge'}], function(err, users) {
@@ -312,7 +312,7 @@ describe('seraph#link, seraph#readLink', function() {
 
     function readLink(link, user1, user2, done) {
       var linkId = link.id;
-      db.readLink(link.id, function(err, link) {
+      db.rel.read(link.id, function(err, link) {
         assert.ok(!err, err);
         assert.equal(link.start, user1.id);
         assert.equal(link.end, user2.id);
@@ -343,7 +343,7 @@ describe('seraph#link, seraph#readLink', function() {
 
     function readLink(link, done) {
       var linkId = link.id;
-      db.readLink(link.id, function(err, link) {
+      db.rel.read(link.id, function(err, link) {
         assert.deepEqual(link.properties, {prop: 'test'});
         done(null);
       });
