@@ -313,7 +313,7 @@ var people = db.find(predicate, function (err, objs) {
 ---------------------------------------
 
 <a name="index.read" />
-### rel.delete (<<<TBD>>>)
+### index.read (<<<TBD>>>)
 
 **Intent: read all (or a subset?) of objects from the given index**
 
