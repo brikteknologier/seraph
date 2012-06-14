@@ -1,322 +1,294 @@
-# Seraph.js
+# SERAF.JS
 
-Binds to the REST API of [neo4j](http://neo4j.org/).  Intended to be
-terse, simple, and idiomatic to [node.js](http://nodejs.org/).
+BINDS T TEH REST API OV [NEO4J](HTTP://NEO4J.ORG/). INTENDED T BE
+TERSE, SIMPLE, AN IDIOMATIC TO [NODE.JS](HTTP://NODEJS.ORG/).
 
-## Quick Example
+## QUICK EXAMPLE
 
-```javascript
-// Insert, then delete an object
-var db = require("seraph").db("http://localhost:7474");
-db.save({ name: "Test-Man", age: 40 }, function (err, data) {
-  if (err) throw err;
-
-  console.log("Test-Man inserted.");
-
-  db.node.delete(data, function (err) {
-    if (err) throw err;
-    console.log("Test-Man away!");
-  }
+```JAVASCRIPT
+// INSERT, THEN DELETE AN OBJECT
+VAR DB = REQUIRE("SERAF").DB("HTTP://LOCALHOST:7474");
+DB.SAVE({ NAME: "TEST-MAN", UJ: 40 }, FUNCSHUN (ERR, DATA) {
+   IF (ERR) THROW ERR; CONSOLE.LOG("TEST-MAN INSERTED.");
+   DB.NODE.DELETE(DATA, FUNCSHUN (ERR) {
+      IF (ERR) THROW ERR; CONSOLE.LOG("TEST-MAN AWAY!");
+   }
 }
 ```
 
-## Documentation
+## DOCUMENTASHUN
 
-<a name="seraph.db_list" />
-### Generic Operations
+< NAME="SERAF.DB_LIST" />
+### GENERIC OPERASHUNS * [DB](#DB)
 
-* [db](#db)
-* [query](#query)
-* [rawQuery](#rawQuery)
-* [traversal](#traversal)
+* [KWEY](#KWEY)
+* [RAWKWEY](#RAWKWEY)
+* [TRAVERSAL](#TRAVERSAL)
 
-### API Communication Operations
+### API COMMUNICASHUN OPERASHUNS
 
-* [operation](#operation)
-* [call](#call)
-* [batch](#batch)
+* [OPERASHUN](#OPERASHUN)
+* [CALL](#CALL)
+* [BATCH](#BATCH) ### NODE OPERASHUNS
+* [SAVE (NODE.SAVE)](#NODE.SAVE)
+* [REDD (NODE.REDD)](#NODE.REDD)
+* [FIN (NODE.FIN)](#NODE.FIN)
+* [DELETE (NODE.DELETE)](#NODE.DELETE)
+* [RELATE (NODE.RELATE)](#NODE.RELATE)
+* [RELASHUNSHIPS (NODE.RELASHUNSHIPS)](#NODE.RELASHUNSHIPS)
+* [INDEX (NODE.INDEX)](#NODE.INDEX)
+* [INDEXES (NODE.INDEXES)](#NODE.INDEXES)
 
-### Node Operations
-* [save (node.save)](#node.save)
-* [read (node.read)](#node.read)
-* [find (node.find)](#node.find)
-* [delete (node.delete)](#node.delete)
-* [relate (node.relate)](#node.relate)
-* [relationships (node.relationships)](#node.relationships)
-* [index (node.index)](#node.index)
-* [indexes (node.indexes)](#node.indexes)
+### RELASHUNSHIP OPERASHUNS
 
-### Relationship Operations
-* [rel.save](#rel.save)
-* [rel.read](#rel.read)
-* [rel.delete](#rel.delete)
+* [REL.SAVE](#REL.SAVE)
+* [REL.REDD](#REL.REDD)
+* [REL.DELETE](#REL.DELETE)
 
-### Index Operations
-* [index.create](#index.create)
-* [index.add](#index.add)
-* [index.read](#index.read)
+### INDEX OPERASHUNS
 
+* [INDEX.CREATE](#INDEX.CREATE)
+* [INDEX.ADD](#INDEX.ADD)
+* [INDEX.REDD](#INDEX.REDD)
 
-You can also access all functions directly on `seraph` (without calling `db()`).
-In this case you must supply an options argument. (See [db](#db) for 
-configuration documentation).  So this:
+YOO CAN ALSO ACCESS ALL FUNCSHUNS DIRECTLY ON `SERAF` (WITHOUT CALLIN `DB()`).
+IN THIS CASE YOO MUST SUPPLY AN OPSHUNS ARGUMENT. (SEE [DB](#DB) FOAR CONFIGURASHUN DOCUMENTASHUN). 
 
-```javascript
-var seraph = require("seraph");
-var db = seraph.db("http://localhost:7474/");
-db.save({x: 3});
+SO THIS:
+
+```JAVASCRIPT
+VAR SERAF = REQUIRE("SERAF");
+VAR DB = SERAF.DB("HTTP://LOCALHOST:7474/");
+DB.SAVE({X: 3});
 ```
 
-Could also be written like this:
+COULD ALSO BE WRITTEN LIEK THIS:
 
-```javascript
-var seraph = require("seraph");
-seraph.save("http://localhost:7474/", {x: 3});
+```JAVASCRIPT
+VAR SERAF = REQUIRE("SERAF");
+SERAF.SAVE("HTTP://LOCALHOST:7474/", {X: 3});
 ```
 
-## Module Functions
+## MODULE FUNCSHUNS
 
-<a name="db" />
-### db (options)
+< NAME="DB" />
+### DB (OPSHUNS)
 
-Returns an object with database access functions.  See
-[seraph.db](#seraph.db_list).
+RETURNS AN OBJECT WITH DATABASE ACCESS FUNCSHUNS. SEE
+[SERAF.DB](#SERAF.DB_LIST). `OPSHUNS` AR AN OBJECT WITH TEH FOLLOWINS ATTRIBUTES:
 
-`options` is an object with the following attributes:
+* `OPSHUNS.ENDPOINT`: OPSHUNAL. DEFAULT="HTTP://LOCALHOST:7474". URL OF NEO4J REST API.
+* `OPSHUNS.ID`: OPSHUNAL. DEFAULT="ID". SAVED OBJECTS WILL HAV THIS PROPERTY SET TO TEH GENERATED DATABASE ID. WHEN UPDATIN OR DELETIN OBJECTS, WILL LOK 4 OBJECT ID IN THIS PROPERTY.
 
-* `options.endpoint`: Optional.  Default="http://localhost:7474". URL of neo4j 
-  REST API.
-* `options.id`: Optional.  Default="id".  Saved objects will have this
-  property set to the generated database ID.  When updating or
-  deleting objects, will look for object ID in this property.
+ALTERNATIVELY, `OPSHUNS` CAN JUS BE TEH DATABASE URL AZ STRIN. ---------------------------------------
 
-Alternatively, `options` can just be the database URL as a string.
+## `DB` FUNCSHUNS
 
----------------------------------------
+< NAME="KWEY" />
+< NAME="RAWKWEY"/>
+### KWEY/RAWKWEY (KWEY, [PARAMS,] CALLBACK)
 
-## `db` Functions
+`RAWKWEY` PERFOARMS CYFR KWEY AN RETURNS TEH RESULTS DIRECTLY FRUM TEH
+REST API. `KWEY` PERFOARMS CYFR KWEY AN MAP TEH COLUMNS AN RESULTS TOGETHR.
 
-<a name="query" /><a name="rawQuery"/>
-### query/rawQuery (query, [params,] callback)
+__ARGUMENTS__
 
-`rawQuery` performs a cypher query and returns the results directly from the
-REST API.  
-`query` performs a cypher query and map the columns and results together.
+* KWEY - CYFR KWEY AZ FOARMAT STRINS.
+* PARAMS - DEFAULT=`{}`. REPLACE `{KEY}` PARTS IN KWEY STRIN. SEE CYFR DOCUMENTASHUN FOAR DETAILS.
+* CALLBACK - FUNCSHUN (ERR, RESULT). RESULT AR TEH AN ARRAY OF OBJECTS.
 
-__Arguments__
+__EXAMPLE__
 
-* query - Cypher query as a format string.
-* params - Default=`{}`. Replace `{key}` parts in query string.  See cypher
-           documentation for details.
-* callback - function (err, result).  Result is an array of objects.
+GIVEN DATABASE: 
 
-__Example__
-
-Given database:
-
-```javascript
-{ name: 'Jon', age: 23, id: 1 }
-{ name: 'Neil', age: 60, id: 2 }
-{ name: 'Katie', age: 29, id: 3 }
-// 1 --knows--> 2
-// 1 --knows--> 3
+```JAVASCRIPT
+{ NAME: JON, UJ: 23, ID: 1 }
+{ NAME: NEIL, UJ: 60, ID: 2 }
+{ NAME: KATIE, UJ: 29, ID: 3 }
+// 1 --KNOWS--> 2
+// 1 --KNOWS--> 3
 ```
 
-Return all people Jon knows:
+RETURN ALL PEOPLE JON KNOWS:
 
-```javascript
-var cypher = "START x = node({id}) "
-           + "MATCH x -[r]-> n "
-           + "RETURN n "
-           + "ORDER BY n.name";
-
-db.query(cypher, {id: 1}, function(err, result) {
-  if (err) throw err;
-  assert.deepEqual(result, [
-    { name: 'Katie', age: 29, id: 3 },
-    { name: 'Neil', age: 60, id: 2 }
-  ]);
+```JAVASCRIPT
+VAR CYFR = "START X = NODE({ID}) " + "MATCH X -[R]-> N " + "RETURN N " + "ORDR BY N.NAME";
+DB.KWEY(CYFR, {ID: 1}, FUNCSHUN(ERR, RESULT) {
+   IF (ERR) THROW ERR;
+   ASSERT.DEEPEQUAL(RESULT, [ { NAME: KATIE, UJ: 29, ID: 3 }, { NAME: NEIL, UJ: 60, ID: 2 } ]);
 };
 
-db.rawQuery(cypher, {id: 3}, function(err, result) {
-  if (err) throw err;
-  // result contains the raw response from neo4j's rest API. See
-  // http://docs.neo4j.org/chunked/milestone/rest-api-cypher.html
-  // for more info
+DB.RAWKWEY(CYFR, {ID: 3}, FUNCSHUN(ERR, RESULT) {
+   IF (ERR) THROW ERR;
+   // RESULT CONTAINS TEH RAW RESPONSE FRUM NEO4JS REST API. SEE
+   // HTTP://DOCS.NEO4J.ORG/CHUNKED/MILESTONE/REST-API-CYFR.HTML
+   // FOR MOAR INFO
 })
 ```
 
-__Note__: if you're performing large queries it may be advantageous to use
-`queryRaw`, since `query` attempts to infer whole nodes and relationships that
-are returned (in order to transform them into a nicer format).
+__NOTE__: IF YOORE PERFORMNG LARGE KWEIES IT MAY BE ADVANTUJOUS TO USE
+`KWEYRAW`, SINCE `KWEY` ATTEMPTS T INFR HOOLE NODES AN RELASHUNSHIPS THAT
+R RETURNED (IN ORDR TO TRANSFOARM THEM INTO NICR FOARMAT).
 
 ---------------------------------------
 
-<a name="traversal" />
-### traversal (traversal, callback)
+< NAME="TRAVERSAL" />
+### TRAVERSAL (TRAVERSAL, CALLBACK)
 
-<img src="http://placekitten.com/200/140">
-
----------------------------------------
-
-<a name="operation" />
-### operation (path, [method='get'], [data])
-
-<img src="http://placekitten.com/200/140">
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/140">
 
 ---------------------------------------
 
-<a name="call" />
-### call (opts, operation, callback)
+< NAME="OPERASHUN" />
+### OPERASHUN (PATH, [METHOD=GET], [DATA])
 
-<img src="http://placekitten.com/200/140">
-
----------------------------------------
-
-<a name="batch" />
-### batch (block|operationArray, callback)
-
-<img src="http://placekitten.com/200/140">
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/140">
 
 ---------------------------------------
 
-<a name="node.save" />
-### save (object, callback)
-**Aliases: __node.save__**
+< NAME="CALL" />
+### CALL (OPTS, OPERASHUN, CALLBACK)
 
-<img src="http://placekitten.com/200/145">
-
----------------------------------------
-
-<a name="node.read" />
-### read (id|object, callback)
-**Aliases: __node.read__**
-
-<img src="http://placekitten.com/200/142">
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/140">
 
 ---------------------------------------
 
-<a name="node.delete" />
-### delete (id|object, [callback])
-**Aliases: __node.delete__**
+< NAME="BATCH" />
+### BATCH (BLOCK|OPERASHUNARRAY, CALLBACK)
 
-<img src="http://placekitten.com/200/140">
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/140">
 
 ---------------------------------------
 
-<a name="node.find" />
-### find (predicate, any, callback)
-**Aliases: __node.find__**
+< NAME="NODE.SAVE" />
+### SAVE (OBJECT, CALLBACK)
+**ALIASES: __NODE.SAVE__**
 
-Perform a query based on a predicate. The predicate is translated to a
-cypher query.
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/145">
 
-__Arguments__
+---------------------------------------
 
-* predicate - Partially defined object.  Will return elements which match
-              the defined attributes of predicate.
-* any - default=false. If true, elements need only match on one attribute.
-        If false, elements must match on all attributes.
+< NAME="NODE.REDD" />
+### REDD (ID|OBJECT, CALLBACK)
+**ALIASES: __NODE.READ__**
 
-__Example__
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/142">
 
-Given database content:
+---------------------------------------
 
-```javascript
-{ name: 'Jon'    , age: 23, australian: true  }
-{ name: 'Neil'   , age: 60, australian: true  }
-{ name: 'Belinda', age: 26, australian: false }
-{ name: 'Katie'  , age: 29, australian: true  }
+< NAME="NODE.DELETE" />
+### DELETE (ID|OBJECT, [CALLBACK])
+**ALIASES: __NODE.DELETE__**
+
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/140">
+
+---------------------------------------
+
+< NAME="NODE.FIN" />
+### FIN (PREDICATE, ANY, CALLBACK)
+**ALIASES: __NODE.FIND__**
+
+PERFURM KWEY BASED ON PREDICATE. TEH PREDICATE AR TRANSLATED TO CYFR KWEY.
+
+__ARGUMENTS__
+
+* PREDICATE - PARTIALLY DEFINED OBJECT. WILL RETURN ELEMENTS WHICH MATCH TEH DEFINED ATTRIBUTES OF PREDICATE.
+* ANY - DEFAULT=FALSE. IF TRUE, ELEMENTS NEED ONLY MATCH ON ONE ATTRIBUTE. IF FALSE, ELEMENTS MUST MATCH ON ALL ATTRIBUTES.
+
+__EXAMPLE__
+
+GIVEN DATABASE CONTENT:
+
+```JAVASCRIPT
+{ NAME: JON , UJ: 23, AUSTRALIAN: TRUE }
+{ NAME: NEIL , UJ: 60, AUSTRALIAN: TRUE }
+{ NAME: BELINDA, UJ: 26, AUSTRALIAN: FALSE }
+{ NAME: KATIE , UJ: 29, AUSTRALIAN: TRUE }
 ```
 
-Retrieve all australians:
+RETRIEVE ALL AUSTRALIANS:
 
-```javascript
-var predicate = { australian: true };
-var people = db.find(predicate, function (err, objs) {
-    if (err) throw err;
-    assert.equals(3, people.length);
+```JAVASCRIPT
+VAR PREDICATE = { AUSTRALIAN: TRUE };
+VAR PEOPLE = DB.FIN(PREDICATE, FUNCSHUN (ERR, OBJS) { IF (ERR) THROW ERR; ASSERT.EQUALS(3, PEOPLE.LENGTH);
 };
 ```
 
 ---------------------------------------
 
-<a name="node.relate" />
-### relate (first, relationshipName, second, [props,] callback)
-**Aliases: __node.relate__**
+< NAME="NODE.RELATE" />
+### RELATE (FIRST, RELASHUNSHIPNAME, SECON, [PROPS,] CALLBACK)
+**ALIASES: __NODE.RELATE__**
 
-<img src="http://placekitten.com/200/140">
-
----------------------------------------
-
-<a name="node.relationships" />
-### relationships (obj, [direction, [relName,]] callback)
-**Aliases: __node.relationships__**
-
-<img src="http://placekitten.com/200/145">
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/140">
 
 ---------------------------------------
 
-<a name="node.index" />
-### index (<<<TBD>>>)
-**Aliases: __node.index__**
+< NAME="NODE.RELASHUNSHIPS" />
+### RELASHUNSHIPS (OBJ, [DIRECSHUN, [RELNAME,]] CALLBACK)
+**ALIASES: __NODE.RELASHUNSHIPS__**
 
-<img src="http://placekitten.com/200/142">
-
----------------------------------------
-
-<a name="node.indexes" />
-### indexes (<<<TBD>>>)
-**Aliases: __node.indexes__**
-
-<img src="http://placekitten.com/200/140">
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/145">
 
 ---------------------------------------
 
-<a name="rel.save" />
-### rel.save (firstId|firstObj, name, secondId|secondobj, [props], callback)
+< NAME="NODE.INDEX" />
+### INDEX (<<<TBD>>>)
+**ALIASES: __NODE.INDEX__**
 
-<img src="http://placekitten.com/200/150">
-
----------------------------------------
-
-<a name="rel.read" />
-### rel.read (object|id, callback)
-
-<img src="http://placekitten.com/200/139">
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/142">
 
 ---------------------------------------
 
-<a name="rel.delete" />
-### rel.delete (object|id, [callback])
+< NAME="NODE.INDEXES" />
+### INDEXES (<<<TBD>>>)
+**ALIASES: __NODE.INDEXES__**
 
-<img src="http://placekitten.com/200/147">
-
----------------------------------------
-
-<a name="index.create" />
-### index.create (<<<TBD>>>)
-
-**Intent: create an index**
-
-<img src="http://placekitten.com/200/150">
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/140">
 
 ---------------------------------------
 
-<a name="index.add" />
-### index.add (<<<TBD>>>)
+< NAME="REL.SAVE" />
+### REL.SAVE (FIRSTID|FIRSTOBJ, NAME, SECONDID|SECONDOBJ, [PROPS], CALLBACK)
 
-**Intent: add an object to the given index**
-
-<img src="http://placekitten.com/200/139">
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/150">
 
 ---------------------------------------
 
-<a name="index.read" />
-### index.read (<<<TBD>>>)
+< NAME="REL.REDD" />
+### REL.REDD (OBJECT|ID, CALLBACK)
 
-**Intent: read all (or a subset?) of objects from the given index**
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/139">
 
-<img src="http://placekitten.com/200/147">
+---------------------------------------
+
+< NAME="REL.DELETE" />
+### REL.DELETE (OBJECT|ID, [CALLBACK])
+
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/147">
+
+---------------------------------------
+
+< NAME="INDEX.CREATE" />
+### INDEX.CREATE (<<<TBD>>>)
+**INTENT: CREATE AN INDEX**
+
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/150">
+
+---------------------------------------
+
+< NAME="INDEX.ADD" />
+### INDEX.ADD (<<<TBD>>>)
+**INTENT: ADD AN OBJECT T TEH GIVEN INDEX**
+
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/139">
+
+---------------------------------------
+
+< NAME="INDEX.REDD" />
+### INDEX.REDD (<<<TBD>>>)
+**INTENT: REDD ALL (OR SUBSET?) OV OBJECTS FRUM TEH GIVEN INDEX**
+
+<IMG SRC="HTTP://PLACEKITTEN.COM/200/147">
 
 ---------------------------------------
