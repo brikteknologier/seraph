@@ -1,4 +1,4 @@
-* -*- Mode: Javascript; js-indent-level: 2 -*- */
+/* -*- Mode: Javascript; js-indent-level: 2 -*- */
 
 /**
  * Goal: Seraph 1.0
@@ -24,8 +24,9 @@ var db = seraph.db('http://localhost:7474');
 var spawn = require('child_process').spawn;
 
 var async = require('async');
+var naan = require('naan');
 var assert = require('assert');
-var path = require('path')
+var path = require('path');
 
 var neo4j = path.join(__dirname, '../db/bin/neo4j');
 var datapath = path.join(__dirname, '../db/data');
@@ -38,6 +39,9 @@ var counter = (function() {
 })();
 
 var refreshDb = function(done) {
+  if (process.env.USE_DIRTY_DATABASE === 'true') {
+    return done();
+  }
   async.series([
     function(next) {
       spawn(neo4j, ['stop']).on('exit', function() { next(); })
@@ -321,7 +325,131 @@ describe('seraph#link, seraph#readLink', function() {
 
     async.waterfall([createObjs, linkObjs, readLink], done);
   });
+
+  it('should link two objects with props on the link', function(done) {
+    function createObjs(done) {
+      db.save([{name: 'Jon'}, {name: 'Helge'}], function(err, users) {
+        done(null, users[0], users[1]);
+      });
+    }
+
+    function linkObjs(user1, user2, done) {
+      db.link(user1, 'coworker', user2, {prop: 'test'}, function(err, link) {
+        assert.ok(!err);
+        assert.deepEqual(link.properties, {prop: 'test'});
+        done(null, link);
+      });
+    }
+
+    function readLink(link, done) {
+      var linkId = link.id;
+      db.readLink(link.id, function(err, link) {
+        assert.deepEqual(link.properties, {prop: 'test'});
+        done(null);
+      });
+    }
+
+    async.waterfall([createObjs, linkObjs, readLink], done);
+  });
 });
+
+describe('seraph#links', function() {
+  function createObjs(done) {
+    var create = naan.curry(db.save, [
+      {name: 'Jon'},
+      {name: 'Helge'},
+      {name: 'Bertin'}
+    ]);
+    var link = function(users, callback) {
+      var knows = naan.curry(db.link, users[0], 'knows', users[1], {
+        since: 'January'
+      });
+      var coworker = naan.curry(db.link, users[0], 'coworker', users[1]);
+      var coworker2 = naan.curry(db.link, users[0], 'coworker', users[2]);
+      var friends = naan.curry(db.link, users[1], 'friends', users[0]);
+      async.series([ knows, coworker, coworker2, friends ], function() {
+        setTimeout(function() { callback(null, users); }, 20);
+      });
+    };
+
+    async.waterfall([create, link], done);
+  }
+
+  it('should retrieve all links for an object', function(done) {
+    createObjs(function(err, users) {
+      db.links(users[0], function(err, links) {
+        assert.ok(!err);
+        var types = links.map(function(link) { return link.type; });
+        assert.ok(types.indexOf('coworker') !== -1);
+        assert.ok(types.indexOf('friends') !== -1);
+        assert.ok(types.indexOf('knows') !== -1);
+        done();
+      });
+    });
+  });
+
+  it('should retreive all incoming links for an object', function(done) {
+    createObjs(function(err, users) {
+      db.links(users[0], 'in', function(err, links) {
+        assert.ok(!err);
+        var types = links.map(function(link) { return link.type; });
+        assert.ok(types.indexOf('coworker') === -1);
+        assert.ok(types.indexOf('friends') !== -1);
+        assert.ok(types.indexOf('knows') === -1);
+        done();
+      });
+    });
+  });
+
+  it('should retrieve all outgoing links for an object', function(done) {
+    createObjs(function(err, users) {
+      db.links(users[0], 'out', function(err, links) {
+        assert.ok(!err);
+        var types = links.map(function(link) { return link.type; });
+        assert.ok(types.indexOf('coworker') !== -1);
+        assert.ok(types.indexOf('friends') === -1);
+        assert.ok(types.indexOf('knows') !== -1);
+        done();
+      });
+    });
+  });
+  
+  it('should fetch links of a certain type', function(done) {
+    createObjs(function(err, users) {
+      db.links(users[0], 'all', 'coworker', function(err, links) {
+        assert.ok(!err);
+        assert.equal(links.length, 2);
+        assert.equal(links[0].start, users[0].id);
+        assert.equal(links[1].start, users[0].id);
+        assert.equal(links[0].type, 'coworker');
+        assert.equal(links[1].type, 'coworker');
+        done();
+      });
+    });
+  });
+
+  it('should fetch properties of links', function(done) {
+    createObjs(function(err, users) {
+      db.links(users[0], 'all', 'knows', function(err, links) {
+        assert.ok(!err);
+        assert.deepEqual(links[0].properties, { since: 'January' });
+        done();
+      });
+    });
+  });
+
+  it('should fetch links for multiple objects', function(done) {
+    createObjs(function(err, users) {
+      db.links(users, 'all', function(err, links) {
+        assert.ok(!err);
+        assert.equal(links[0].length, 4);
+        assert.equal(links[1].length, 3);
+        assert.equal(links[2].length, 1);
+        done();
+      });
+    });
+  });
+})
 
 describe('seraph#query, seraph#queryRaw', function() {
   it('should perform a cypher query', function(done) {
