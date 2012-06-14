@@ -5,12 +5,12 @@
  * 
  * x db.call(path, [method='get'], [data], callback);
  * x db.save(obj, [callback]);
- * x db.link(obj|id, linkname, other_obj|id, [props], [callback]);
+ * x db.relate(obj|id, linkname, other_obj|id, [props], [callback]);
  * x db.query(query, [params], callback);
  * x db.find(predicate, [indexes], callback);
  * x db.delete(obj, [callback]);
  * x db.read(obj|id, callback);
- * x db.links(obj|id, [name], [direction], callback);
+ * x db.relationships(obj|id, [name], [direction], callback);
  * x db.readLink(linkId, callback);
  * db.addIndex(obj|id, indexName, indexKey, indexValue, [callback])
  * db.readIndex(indexName, indexKey, [indexValue], callback)
@@ -299,7 +299,7 @@ describe('seraph.node#link, seraph.rel#read', function() {
     }
 
     function linkObjs(user1, user2, done) {
-      db.link(user1, 'coworker', user2, function(err, link) {
+      db.relate(user1, 'coworker', user2, function(err, link) {
         assert.ok(!err);
         assert.equal(link.start, user1.id);
         assert.equal(link.end, user2.id);
@@ -334,7 +334,7 @@ describe('seraph.node#link, seraph.rel#read', function() {
     }
 
     function linkObjs(user1, user2, done) {
-      db.link(user1, 'coworker', user2, {prop: 'test'}, function(err, link) {
+      db.relate(user1, 'coworker', user2, {prop: 'test'}, function(err, link) {
         assert.ok(!err);
         assert.deepEqual(link.properties, {prop: 'test'});
         done(null, link);
@@ -361,12 +361,12 @@ describe('seraph#links', function() {
       {name: 'Bertin'}
     ]);
     var link = function(users, callback) {
-      var knows = naan.curry(db.link, users[0], 'knows', users[1], {
+      var knows = naan.curry(db.relate, users[0], 'knows', users[1], {
         since: 'January'
       });
-      var coworker = naan.curry(db.link, users[0], 'coworker', users[1]);
-      var coworker2 = naan.curry(db.link, users[0], 'coworker', users[2]);
-      var friends = naan.curry(db.link, users[1], 'friends', users[0]);
+      var coworker = naan.curry(db.relate, users[0], 'coworker', users[1]);
+      var coworker2 = naan.curry(db.relate, users[0], 'coworker', users[2]);
+      var friends = naan.curry(db.relate, users[1], 'friends', users[0]);
       async.series([ knows, coworker, coworker2, friends ], function() {
         setTimeout(function() { callback(null, users); }, 20);
       });
@@ -377,7 +377,7 @@ describe('seraph#links', function() {
 
   it('should retrieve all links for an object', function(done) {
     createObjs(function(err, users) {
-      db.links(users[0], function(err, links) {
+      db.relationships(users[0], function(err, links) {
         assert.ok(!err);
         var types = links.map(function(link) { return link.type; });
         assert.ok(types.indexOf('coworker') !== -1);
@@ -390,7 +390,7 @@ describe('seraph#links', function() {
 
   it('should retreive all incoming links for an object', function(done) {
     createObjs(function(err, users) {
-      db.links(users[0], 'in', function(err, links) {
+      db.relationships(users[0], 'in', function(err, links) {
         assert.ok(!err);
         var types = links.map(function(link) { return link.type; });
         assert.ok(types.indexOf('coworker') === -1);
@@ -403,7 +403,7 @@ describe('seraph#links', function() {
 
   it('should retrieve all outgoing links for an object', function(done) {
     createObjs(function(err, users) {
-      db.links(users[0], 'out', function(err, links) {
+      db.relationships(users[0], 'out', function(err, links) {
         assert.ok(!err);
         var types = links.map(function(link) { return link.type; });
         assert.ok(types.indexOf('coworker') !== -1);
@@ -416,7 +416,7 @@ describe('seraph#links', function() {
   
   it('should fetch links of a certain type', function(done) {
     createObjs(function(err, users) {
-      db.links(users[0], 'all', 'coworker', function(err, links) {
+      db.relationships(users[0], 'all', 'coworker', function(err, links) {
         assert.ok(!err);
         assert.equal(links.length, 2);
         assert.equal(links[0].start, users[0].id);
@@ -430,7 +430,7 @@ describe('seraph#links', function() {
 
   it('should fetch properties of links', function(done) {
     createObjs(function(err, users) {
-      db.links(users[0], 'all', 'knows', function(err, links) {
+      db.relationships(users[0], 'all', 'knows', function(err, links) {
         assert.ok(!err);
         assert.deepEqual(links[0].properties, { since: 'January' });
         done();
@@ -440,7 +440,7 @@ describe('seraph#links', function() {
 
   it('should fetch links for multiple objects', function(done) {
     createObjs(function(err, users) {
-      db.links(users, 'all', function(err, links) {
+      db.relationships(users, 'all', function(err, links) {
         assert.ok(!err);
         assert.equal(links[0].length, 4);
         assert.equal(links[1].length, 3);
@@ -462,7 +462,7 @@ describe('seraph#query, seraph#queryRaw', function() {
     }
 
     function linkObjs(user1, users, done) {
-      db.link(user1, 'knows', users, function(err, links) {
+      db.relate(user1, 'knows', users, function(err, links) {
         done(null, user1);
       });
     }
@@ -500,7 +500,7 @@ describe('seraph#query, seraph#queryRaw', function() {
     }
 
     function linkObjs(user1, users, done) {
-      db.link(user1, 'knows', users, function(err, links) {
+      db.relate(user1, 'knows', users, function(err, links) {
         done(null, user1);
       });
     }
