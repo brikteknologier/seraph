@@ -706,3 +706,74 @@ describe('seraph#find', function() {
     async.series([createObjs, findObjs], done);
   })
 });
+
+describe('seraph.index', function() {
+  it('should be able to create a standard index', function(done) {
+    db.index.create('node', 'testIndex1', function(err) {
+      assert.ok(!err);
+      done();
+    });
+  });
+
+  it('should create an index with inferred type', function(done) {
+    db.index.create('testIndex3', function(err) {
+      assert.ok(!err);
+      done();
+    });
+  });
+
+  it('should create an index with a config', function(done) {
+    db.index.create('node', 'testIndex4', {
+      type: 'fulltext',
+      provider: 'lucene'
+    }, function(err) {
+      assert.ok(!err);
+      done();
+    });
+  });
+
+  it('should create an index for a relationship', function(done) {
+    db.index.create('relationship', 'testIndex5', function(err) {
+      assert.ok(!err);
+      done();
+    });
+  });
+
+  it('should create in index with config and inferred type', function(done) {
+    db.index.create('testIndex6', {
+      type: 'fulltext',
+      provider: 'lucene'
+    }, function(err) {
+      assert.ok(!err);
+      done();
+    });
+  });
+
+  it('should not accept invalid types', function(done) {
+    db.index.create('crazyType', 'testIndex7', function(err) {
+      assert.ok(err);
+      done();
+    });
+  });
+
+  it('should accept an array of indexes to create', function(done) {
+    db.index.create('relationship', ['test2', 'test3', 't34'], function(err) {
+      assert.ok(!err);
+      done();
+    });
+  });
+
+  it('should be aliased on `seraph.node`', function(done) {
+    db.node.index.create('testIndex9', function(err) {
+      assert.ok(!err);
+      done();
+    })
+  });
+
+  it('should be aliased on `seraph.rel`', function(done) {
+    db.rel.index.create('testIndex10', function(err) {
+      assert.ok(!err);
+      done();
+    })
+  });
+});
