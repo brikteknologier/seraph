@@ -564,7 +564,7 @@ describe('seraph#query, seraph#queryRaw', function() {
   
     async.waterfall([createObjs, linkObjs, query], done);
   });
-
+  
   it('should perform a cypher query and return whole objects', function(done) {
     function createObjs(done) {
       db.save([{name: 'Jon', age: 23}, 
@@ -710,7 +710,7 @@ describe('seraph#find', function() {
 describe('seraph.index', function() {
   it('should be able to create a standard index', function(done) {
     db.index.create('node', 'testIndex1', function(err) {
-      assert.ok(!err);
+      assert.ok(!err, err);
       done();
     });
   });
@@ -723,7 +723,7 @@ describe('seraph.index', function() {
   });
 
   it('should create an index with a config', function(done) {
-    db.index.create('node', 'testIndex4', {
+    db.index.create('testIndex4', {
       type: 'fulltext',
       provider: 'lucene'
     }, function(err) {
@@ -775,5 +775,23 @@ describe('seraph.index', function() {
       assert.ok(!err);
       done();
     })
+  });
+
+  it('should add a ndoe to an index', function(done) {
+    db.save({name: 'Jon'}, function(err, node) {
+      db.node.index.add('newTestIndex123', node, 'test', 'sannelig', function(err) {
+        assert.ok(!err);
+        done();
+      });
+    });
+  });
+  
+  it('should alias seraph.index.add as seraph.node.index', function(done) {
+    db.save({name: 'Jon'}, function(err, node) {
+      db.node.index('newTestIndex123', node, 'test', 'sannelig', function(err) {
+        assert.ok(!err);
+        done();
+      });
+    });
   });
 });
