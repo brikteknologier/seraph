@@ -274,7 +274,7 @@ var people = db.find(predicate, function (err, objs) {
 ---------------------------------------
 
 <a name="node.index" />
-### index(<<<TBD>>>)
+### index(node, indexName, key, value, callback)
 **Aliases: __node.index__*
 
 <img src="http://placekitten.com/200/142">
@@ -282,7 +282,7 @@ var people = db.find(predicate, function (err, objs) {
 ---------------------------------------
 
 <a name="node.indexes" />
-### indexes(<<<TBD>>>)
+### indexes(node, callback)
 **Aliases: __node.indexes__*
 
 <img src="http://placekitten.com/200/140">
@@ -318,7 +318,7 @@ var people = db.find(predicate, function (err, objs) {
 ---------------------------------------
 
 <a name="index.create" />
-### index.create(<<<TBD>>>)
+### index.create([type='node'], name, [config,] callback)
 
 *Intent: create an index*
 
@@ -327,7 +327,7 @@ var people = db.find(predicate, function (err, objs) {
 ---------------------------------------
 
 <a name="index.add" />
-### index.add(<<<TBD>>>)
+### index.add([type='node'], node|rel, indexName, key, value, callback);
 
 *Intent: add an object to the given index*
 
@@ -336,7 +336,7 @@ var people = db.find(predicate, function (err, objs) {
 ---------------------------------------
 
 <a name="index.read" />
-### index.read(<<<TBD>>>)
+### index.read([type='node'], node|rel, indexName, key, value, callback);
 
 *Intent: read all (or a subset?) of objects from the given index*
 
