@@ -289,7 +289,7 @@ var people = db.find(predicate, function (err, objs) {
 
 ---------------------------------------
 
-<a name="rel.save" />
+<a name="rel.create" />
 ### rel.create(firstId|firstObj, name, secondId|secondobj, [props], callback)
 
 <img src="http://placekitten.com/200/150">
