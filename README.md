@@ -46,7 +46,8 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [indexes (node.indexes)](#node.indexes) - read the indexes of a node
 
 ### Relationship Operations
-* [rel.save](#rel.save) - create or update a relationship
+* [rel.create](#rel.create) - create a relationship
+* [rel.update](#rel.update) - update the properties of a relationship
 * [rel.read](#rel.read) - read a relationship
 * [rel.delete](#rel.delete) - delete a relationship
 
@@ -288,8 +289,15 @@ var people = db.find(predicate, function (err, objs) {
 
 ---------------------------------------
 
-<a name="rel.save" />
-### rel.save(firstId|firstObj, name, secondId|secondobj, [props], callback)
+<a name="rel.create" />
+### rel.create(firstId|firstObj, name, secondId|secondobj, [props], callback)
+
+<img src="http://placekitten.com/200/150">
+
+---------------------------------------
+
+<a name="rel.update" />
+### rel.update(relationship, callback)
 
 <img src="http://placekitten.com/200/150">
 

@@ -319,7 +319,7 @@ describe('seraph#delete', function() {
   });
 });
 
-describe('seraph.node#link, seraph.rel#read', function() {
+describe('seraph.rel', function() {
   it('should link two objects together', function(done) {
     function createObjs(done) {
       db.save([{name: 'Jon'}, {name: 'Helge'}], function(err, users) {
@@ -331,7 +331,7 @@ describe('seraph.node#link, seraph.rel#read', function() {
     }
 
     function linkObjs(user1, user2, done) {
-      db.relate(user1, 'coworker', user2, function(err, link) {
+      db.rel.create(user1, 'coworker', user2, function(err, link) {
         assert.ok(!err);
         assert.equal(link.start, user1.id);
         assert.equal(link.end, user2.id);
@@ -366,7 +366,9 @@ describe('seraph.node#link, seraph.rel#read', function() {
     }
 
     function linkObjs(user1, user2, done) {
-      db.relate(user1, 'coworker', user2, {prop: 'test'}, function(err, link) {
+      db.rel.create(user1, 'coworker', user2, {
+        prop: 'test'
+      }, function(err, link) {
         assert.ok(!err);
         assert.deepEqual(link.properties, {prop: 'test'});
         done(null, link);
@@ -382,6 +384,47 @@ describe('seraph.node#link, seraph.rel#read', function() {
     }
 
     async.waterfall([createObjs, linkObjs, readLink], done);
+  });
+
+  it('should update the properties of a link', function(done) {
+    function createObjs(done) {
+      db.save([{name: 'Jon'}, {name: 'Helge'}], function(err, users) {
+        done(null, users[0], users[1]);
+      });
+    }
+
+    function linkObjs(user1, user2, done) {
+      db.rel.create(user1, 'coworker', user2, {
+        prop: 'test',
+        anotherProp: 'test2',
+        thirdProp: 'test3'
+      }, function(err, link) {
+        done(null, link);
+      });
+    }
+
+    function updateLink(link, done) {
+      link.properties.newProp = 'test4';
+      delete link.properties.thirdProp;
+      db.rel.update(link, function(err) {
+        assert.ok(!err);
+        done(null, link);
+      });
+    }
+
+    function readLink(link, done) {
+      var linkId = link.id;
+      db.rel.read(link.id, function(err, link) {
+        assert.deepEqual(link.properties, {
+          prop: 'test',
+          anotherProp: 'test2',
+          newProp: 'test4'
+        });
+        done(null);
+      });
+    }
+
+    async.waterfall([createObjs, linkObjs, updateLink, readLink], done);
   });
 });
 
