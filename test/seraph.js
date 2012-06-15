@@ -19,16 +19,20 @@
  *
  * **/
 
+var TEST_INSTANCE_PORT = parseInt('10507' || process.env.TEST_INSTANCE_PORT, 10);
+
 var seraph = require('../');
-var db = seraph.db('http://localhost:7474');
+var db = seraph.db('http://localhost:' + TEST_INSTANCE_PORT);
 var spawn = require('child_process').spawn;
 
 var async = require('async');
 var naan = require('naan');
 var assert = require('assert');
 var path = require('path');
+var fs = require('fs');
 
 var neo4j = path.join(__dirname, '../db/bin/neo4j');
+var neo4jconf = path.join(__dirname, '../db/conf/neo4j-server.properties');
 var datapath = path.join(__dirname, '../db/data');
 
 var counter = (function() {
@@ -37,6 +41,18 @@ var counter = (function() {
     return ++count;
   };
 })();
+
+var updateConf = function(port, done) {
+  var readConf = naan.curry(fs.readFile, neo4jconf, 'utf8');
+  var writeConf = naan.curry(fs.writeFile, neo4jconf);
+  var setPorts = function(confData, callback) {
+    callback(null, confData
+      .replace(/(webserver\.port=)(\d+)/gi, '$1' + port)
+      .replace(/(https\.port=)(\d+)/gi, '$1' + (port + 1))
+    );
+  }
+  async.waterfall([readConf, setPorts, writeConf], done);
+}
 
 var refreshDb = function(done) {
   if (process.env.USE_DIRTY_DATABASE === 'true') {
@@ -51,6 +67,9 @@ var refreshDb = function(done) {
     },
     function(next) {
       spawn('mkdir', ['-p', datapath]).on('exit', function() { next(); });
+    },
+    function(next) {
+      updateConf(TEST_INSTANCE_PORT, next);
     },
     function(next) {
       var n = spawn(neo4j, ['start'])
