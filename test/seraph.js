@@ -65,7 +65,20 @@ var refreshDb = function(done) {
   ], done);
 };
 
+var stopDb = function(done) {
+  if (process.env.NO_STOP === 'true') {
+    return done();
+  }
+
+  var n = spawn(neo4j, ['stop'])
+  n.stdout.on('data', function(d) { 
+    process.stdout.write(d.toString()); 
+  })
+  n.on('exit', function() { console.log(''); done(); });
+}
+
 before(refreshDb);
+after(stopDb);
 
 describe('seraph#call, seraph#operation', function() {
   var originalRequest = seraph.call._request;
