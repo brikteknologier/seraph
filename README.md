@@ -52,9 +52,11 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [rel.delete](#rel.delete) - delete a relationship
 
 ### Index Operations
-* [index.create](#index.create) - create an index
-* [index.add](#index.add) - add a node to an index
-* [index.read](#index.read) - read the nodes in an index
+* [node.index.create & rel.index.create](#index.create) - create an index
+* [node.index.add & rel.index.add](#index.add) - add a nodes/rels to an index
+* [node.index.read & rel.index.read](#index.read) - read nodes/rels from an index
+* [node.index.remove & rel.index.remove](#index.remove) - remove nodes/rels from an index
+* [node.index.delete & rel.index.delete](#index.delete) - delete an index
 
 You can also access all functions directly on `seraph` (without calling `db()`).
 In this case you must supply an options argument. (See [db](#db) for 
@@ -274,7 +276,7 @@ var people = db.find(predicate, function (err, objs) {
 ---------------------------------------
 
 <a name="node.index" />
-### index(<<<TBD>>>)
+### index(node, indexName, key, value, callback)
 **Aliases: __node.index__*
 
 <img src="http://placekitten.com/200/142">
@@ -282,7 +284,7 @@ var people = db.find(predicate, function (err, objs) {
 ---------------------------------------
 
 <a name="node.indexes" />
-### indexes(<<<TBD>>>)
+### indexes(node, callback)
 **Aliases: __node.indexes__*
 
 <img src="http://placekitten.com/200/140">
@@ -318,7 +320,7 @@ var people = db.find(predicate, function (err, objs) {
 ---------------------------------------
 
 <a name="index.create" />
-### index.create(<<<TBD>>>)
+### index.create(name, [config,] callback)
 
 *Intent: create an index*
 
@@ -327,7 +329,7 @@ var people = db.find(predicate, function (err, objs) {
 ---------------------------------------
 
 <a name="index.add" />
-### index.add(<<<TBD>>>)
+### index.add(node|rel, indexName, key, value, callback);
 
 *Intent: add an object to the given index*
 
@@ -336,10 +338,28 @@ var people = db.find(predicate, function (err, objs) {
 ---------------------------------------
 
 <a name="index.read" />
-### index.read(<<<TBD>>>)
+### index.read(node|rel, indexName, key, value, callback);
 
 *Intent: read all (or a subset?) of objects from the given index*
 
 <img src="http://placekitten.com/200/147">
+
+---------------------------------------
+
+<a name="index.remove" />
+### index.remove(node|rel, indexName, key, value, callback);
+
+*Intent: remove an object from an index*
+
+<img src="http://placekitten.com/220/147">
+
+---------------------------------------
+
+<a name="index.delete" />
+### index.delete(name, callback);
+
+*Intent: delete an index*
+
+<img src="http://placekitten.com/240/147">
 
 ---------------------------------------
