@@ -794,4 +794,71 @@ describe('seraph.index', function() {
       });
     });
   });
+
+  it('should read a single object from an index', function(done) {
+    function createAndIndex(done) {
+      db.save({ name: 'Helge' }, function(err, node) {
+        db.node.index('pIndex', node, 'person', 'true', function(err) {
+          done();   
+        });
+      });
+    }
+
+    function readIndex(done) {
+      db.index.read('pIndex', 'person', 'true', function(err, node) {
+        assert.ok(!err);
+        assert.equal(node.name, 'Helge');
+        done();
+      })
+    }
+
+    async.series([createAndIndex, readIndex], done);
+  });
+
+  it('should read all values of a kv pair in an index', function(done) {
+    function createAndIndex(done) {
+      db.save([{ name: 'Helge' }, { name: 'Erlend' }], function(err, nodes) {
+        db.node.index('brikIndex1', nodes, 'company', 'brik', function(err) {
+          done();   
+        });
+      });
+    }
+
+    function readIndex(done) {
+      db.index.read('brikIndex1', 'company', 'brik', function(err, nodes) {
+        assert.ok(!err);
+        var names = nodes.map(function(node) { return node.name });
+        assert.ok(names.indexOf("Helge") !== -1);
+        assert.ok(names.indexOf("Erlend") !== -1);
+        assert.ok(names.length === 2);
+        done();
+      })
+    }
+
+    async.series([createAndIndex, readIndex], done);
+  });
+
+  it('should read a kv pair as a relationship', function(done) {
+    function createAndIndex(done) {
+      db.save([{ name: 'Helge' }, { name: 'Erlend' }], function(err, nodes) {
+        db.relate(nodes[0], 'knows', nodes[1], function(err, rel) {
+          db.rel.index('brelidx', rel, 'company', 'brik', function(err) {
+            done(null, nodes);   
+          });
+        })
+      });
+    }
+
+    function readIndex(nodes, done) {
+      db.index.read('brelidx', 'company', 'brik', function(err, rel) {
+        assert.ok(!err);
+        assert.equal(rel.start, nodes[0].id);
+        assert.equal(rel.end, nodes[1].id);
+        assert.equal(rel.type, 'knows');
+        done();
+      })
+    }
+
+    async.waterfall([createAndIndex, readIndex], done);
+  });
 });
