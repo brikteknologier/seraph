@@ -42,6 +42,8 @@ var counter = (function() {
   };
 })();
 
+var uniqn = function() { return 'identity' + counter(); };
+
 var updateConf = function(port, done) {
   var readConf = naan.curry(fs.readFile, neo4jconf, 'utf8');
   var writeConf = naan.curry(fs.writeFile, neo4jconf);
@@ -709,21 +711,21 @@ describe('seraph#find', function() {
 
 describe('seraph.index', function() {
   it('should be able to create a standard index', function(done) {
-    db.index.create('node', 'testIndex1', function(err) {
+    db.index.create('node', uniqn(), function(err) {
       assert.ok(!err, err);
       done();
     });
   });
 
   it('should create an index with inferred type', function(done) {
-    db.index.create('testIndex3', function(err) {
+    db.index.create(uniqn(), function(err) {
       assert.ok(!err);
       done();
     });
   });
 
   it('should create an index with a config', function(done) {
-    db.index.create('testIndex4', {
+    db.index.create(uniqn(), {
       type: 'fulltext',
       provider: 'lucene'
     }, function(err) {
@@ -733,14 +735,14 @@ describe('seraph.index', function() {
   });
 
   it('should create an index for a relationship', function(done) {
-    db.index.create('relationship', 'testIndex5', function(err) {
+    db.index.create('relationship', uniqn(), function(err) {
       assert.ok(!err);
       done();
     });
   });
 
   it('should create in index with config and inferred type', function(done) {
-    db.index.create('testIndex6', {
+    db.index.create(uniqn(), {
       type: 'fulltext',
       provider: 'lucene'
     }, function(err) {
@@ -750,28 +752,28 @@ describe('seraph.index', function() {
   });
 
   it('should not accept invalid types', function(done) {
-    db.index.create('crazyType', 'testIndex7', function(err) {
+    db.index.create('crazyType', uniqn(), function(err) {
       assert.ok(err);
       done();
     });
   });
 
   it('should accept an array of indexes to create', function(done) {
-    db.index.create('relationship', ['test2', 'test3', 't34'], function(err) {
+    db.index.create('relationship', [uniqn(), uniqn(), uniqn()], function(err) {
       assert.ok(!err);
       done();
     });
   });
 
   it('should be aliased on `seraph.node`', function(done) {
-    db.node.index.create('testIndex9', function(err) {
+    db.node.index.create(uniqn(), function(err) {
       assert.ok(!err);
       done();
     })
   });
 
   it('should be aliased on `seraph.rel`', function(done) {
-    db.rel.index.create('testIndex10', function(err) {
+    db.rel.index.create(uniqn(), function(err) {
       assert.ok(!err);
       done();
     })
@@ -779,7 +781,7 @@ describe('seraph.index', function() {
 
   it('should add a ndoe to an index', function(done) {
     db.save({name: 'Jon'}, function(err, node) {
-      db.node.index.add('newTestIndex123', node, 'test', 'sannelig', function(err) {
+      db.node.index.add(uniqn(), node, 'test', 'sannelig', function(err) {
         assert.ok(!err);
         done();
       });
@@ -788,7 +790,7 @@ describe('seraph.index', function() {
   
   it('should alias seraph.index.add as seraph.node.index', function(done) {
     db.save({name: 'Jon'}, function(err, node) {
-      db.node.index('newTestIndex123', node, 'test', 'sannelig', function(err) {
+      db.node.index(uniqn(), node, 'test', 'sannelig', function(err) {
         assert.ok(!err);
         done();
       });
@@ -796,16 +798,40 @@ describe('seraph.index', function() {
   });
 
   it('should read a single object from an index', function(done) {
+    var iname = uniqn();
+
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
-        db.node.index('pIndex', node, 'person', 'true', function(err) {
+        db.node.index(iname, node, 'person', 'true', function(err) {
           done();   
         });
       });
     }
 
     function readIndex(done) {
-      db.index.read('pIndex', 'person', 'true', function(err, node) {
+      db.index.read(iname, 'person', 'true', function(err, node) {
+        assert.ok(!err);
+        assert.equal(node.name, 'Helge');
+        done();
+      })
+    }
+
+    async.series([createAndIndex, readIndex], done);
+  });
+
+  it('should read a single object from an index with a space', function(done) {
+    var iname = uniqn();
+
+    function createAndIndex(done) {
+      db.save({ name: 'Helge' }, function(err, node) {
+        db.node.index(iname, node, 'person', 'has a space', function(err) {
+          done();   
+        });
+      });
+    }
+
+    function readIndex(done) {
+      db.index.read(iname, 'person', 'has a space', function(err, node) {
         assert.ok(!err);
         assert.equal(node.name, 'Helge');
         done();
@@ -816,21 +842,22 @@ describe('seraph.index', function() {
   });
 
   it('should read all values of a kv pair in an index', function(done) {
+    var iname = uniqn();
+
     function createAndIndex(done) {
       db.save([{ name: 'Helge' }, { name: 'Erlend' }], function(err, nodes) {
-        db.node.index('brikIndex1', nodes, 'company', 'brik', function(err) {
+        db.node.index(iname, nodes, 'company', 'brik', function(err) {
           done();   
         });
       });
     }
 
     function readIndex(done) {
-      db.index.read('brikIndex1', 'company', 'brik', function(err, nodes) {
+      db.index.read(iname, 'company', 'brik', function(err, nodes) {
         assert.ok(!err);
         var names = nodes.map(function(node) { return node.name });
         assert.ok(names.indexOf("Helge") !== -1);
         assert.ok(names.indexOf("Erlend") !== -1);
-        assert.ok(names.length === 2);
         done();
       })
     }
@@ -839,10 +866,12 @@ describe('seraph.index', function() {
   });
 
   it('should read a kv pair as a relationship', function(done) {
+    var iname = uniqn();
+
     function createAndIndex(done) {
       db.save([{ name: 'Helge' }, { name: 'Erlend' }], function(err, nodes) {
         db.relate(nodes[0], 'knows', nodes[1], function(err, rel) {
-          db.rel.index('brelidx', rel, 'company', 'brik', function(err) {
+          db.rel.index(iname, rel, 'company', 'brik', function(err) {
             done(null, nodes);   
           });
         })
@@ -850,7 +879,7 @@ describe('seraph.index', function() {
     }
 
     function readIndex(nodes, done) {
-      db.index.read('brelidx', 'company', 'brik', function(err, rel) {
+      db.rel.index.read(iname, 'company', 'brik', function(err, rel) {
         assert.ok(!err);
         assert.equal(rel.start, nodes[0].id);
         assert.equal(rel.end, nodes[1].id);
