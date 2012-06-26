@@ -710,13 +710,6 @@ describe('seraph#find', function() {
 });
 
 describe('seraph.index', function() {
-  it('should be able to create a standard index', function(done) {
-    db.index.create('node', uniqn(), function(err) {
-      assert.ok(!err, err);
-      done();
-    });
-  });
-
   it('should create an index with inferred type', function(done) {
     db.index.create(uniqn(), function(err) {
       assert.ok(!err);
@@ -735,7 +728,7 @@ describe('seraph.index', function() {
   });
 
   it('should create an index for a relationship', function(done) {
-    db.index.create('relationship', uniqn(), function(err) {
+    db.rel.index.create(uniqn(), function(err) {
       assert.ok(!err);
       done();
     });
@@ -751,15 +744,8 @@ describe('seraph.index', function() {
     });
   });
 
-  it('should not accept invalid types', function(done) {
-    db.index.create('crazyType', uniqn(), function(err) {
-      assert.ok(err);
-      done();
-    });
-  });
-
   it('should accept an array of indexes to create', function(done) {
-    db.index.create('relationship', [uniqn(), uniqn(), uniqn()], function(err) {
+    db.rel.index.create([uniqn(), uniqn(), uniqn()], function(err) {
       assert.ok(!err);
       done();
     });
@@ -889,5 +875,101 @@ describe('seraph.index', function() {
     }
 
     async.waterfall([createAndIndex, readIndex], done);
+  });
+
+  it('should remove a node from an index', function(done) {
+    var iname = uniqn();
+
+    function createAndIndex(done) {
+      db.save({ name: 'Helge' }, function(err, node) {
+        db.node.index(iname, node, 'person', 'true', function(err) {
+          done();   
+        });
+      });
+    }
+
+    function readIndex(done) {
+      db.index.read(iname, 'person', 'true', function(err, node) {
+        assert.equal(node.name, "Helge");
+        db.index.remove(iname, node, 'person', 'true', function(err) {
+          assert.ok(!err)
+          db.index.read(iname, 'person', 'true', function(err, nodes) {
+            assert.ok(!err);
+            assert.ok(!nodes);
+            done();
+          });
+        });
+      })
+    }
+
+    async.series([createAndIndex, readIndex], done);
+  });
+
+  it('should remove all instances of a node from an index for a key', function(done) {
+    var iname = uniqn();
+
+    function createAndIndex(done) {
+      db.save({ name: 'Helge' }, function(err, node) {
+        db.node.index(iname, node, 'person', 'true', function(err) {
+          db.node.index(iname, node, 'person', 'false', function(err) {
+            done();   
+          });
+        });
+      });
+    }
+
+    function readIndex(done) {
+      db.index.read(iname, 'person', 'true', function(err, node) {
+        assert.equal(node.name, "Helge");
+        db.index.remove(iname, node, 'person', function(err) {
+          assert.ok(!err)
+          db.index.read(iname, 'person', 'true', function(err, nodes) {
+            assert.ok(!err);
+            assert.ok(!nodes);
+            db.index.read(iname, 'person', 'false', function(err, nodes) {
+              assert.ok(!err);
+              assert.ok(!nodes);
+              done();
+            });
+          });
+        });
+      })
+    }
+
+    async.series([createAndIndex, readIndex], done);
+  });
+
+  it('should remove all instances of a node from an index', function(done) {
+    var iname = uniqn();
+
+    function createAndIndex(done) {
+      db.save({ name: 'Helge' }, function(err, node) {
+        db.node.index(iname, node, 'person', 'true', function(err) {
+          db.node.index(iname, node, 'otherkey', 'false', function(err) {
+            done();   
+          });
+        });
+      });
+    }
+
+    function readIndex(done) {
+      db.index.read(iname, 'person', 'true', function(err, node) {
+        assert.equal(node.name, "Helge");
+        db.index.remove(iname, node, function(err) {
+          assert.ok(!err)
+          db.index.read(iname, 'person', 'true', function(err, nodes) {
+            assert.ok(!err);
+            assert.ok(!nodes);
+            db.index.read(iname, 'otherkey', 'false', function(err, nodes) {
+              assert.ok(!err);
+              assert.ok(!nodes);
+              done();
+            });
+          });
+        });
+      })
+    }
+
+    async.series([createAndIndex, readIndex], done);
   });
 });
