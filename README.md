@@ -40,8 +40,9 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [find (node.find)](#node.find) - find a node using a predicate
 * [delete (node.delete)](#node.delete) - delete a node
 * [relate (node.relate)](#node.relate) - relate two nodes
-* [relationships (node.relationships)](#node.relationships) - read the relationships of a node
-* [index (node.index)](#node.index) - add an index to a node
+* [relationships (node.relationships)](#node.relationships) - read the 
+  relationships of a node
+* [index (node.index)](#node.index) - add a node to an index
 
 ### Relationship Operations
 * [rel.create](#rel.create) - create a relationship
@@ -50,16 +51,16 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [rel.delete](#rel.delete) - delete a relationship
 
 ### Index Operations
-* [node.index.create & rel.index.create](#index.create) - create an index
-* [node.index.add & rel.index.add](#index.add) - add a nodes/rels to an index
-* [node.index.read & rel.index.read](#index.read) - read nodes/rels from an index
-* [node.index.remove & rel.index.remove](#index.remove) - remove nodes/rels from an index
-* [node.index.delete & rel.index.delete](#index.delete) - delete an index
+* [index.create](#index.create) - create an index
+* [index.add](#index.add) - add a nodes/rels to an index
+* [index.read](#index.read) - read nodes/rels from an index
+* [index.remove](#index.remove) - remove nodes/rels from an index
+* [index.delete](#index.delete) - delete an index
 
 ## Compatibility
 
 Seraph has been tested with Neo4j 1.8. As we progress in development, we will
-begin adding some legacy support for the more recent versions.
+begin adding some legacy support for older versions.
 
 ## Testing
 
@@ -82,14 +83,15 @@ restart and clean the server every time:
 REST API.  
 `query` performs a cypher query and map the columns and results together.
 
-If you're doing queries on very large sets of data, it may be wiser to use
-`query` and deal with neo4j's results directly.
+__Note__: if you're performing large queries it may be advantageous to use
+`queryRaw`, since `query` attempts to infer whole nodes and relationships that
+are returned (in order to transform them into a nicer format).
 
 __Arguments__
 
 * query - Cypher query as a format string.
-* params - Default=`{}`. Replace `{key}` parts in query string.  See cypher
-           documentation for details.
+* params (optional, default=`{}`). Replace `{key}` parts in query string.  See 
+  cypher documentation for details.
 * callback - (err, result).  Result is an array of objects.
 
 __Example__
@@ -128,10 +130,6 @@ db.rawQuery(cypher, {id: 3}, function(err, result) {
 })
 ```
 
-__Note__: if you're performing large queries it may be advantageous to use
-`queryRaw`, since `query` attempts to infer whole nodes and relationships that
-are returned (in order to transform them into a nicer format).
-
 ---------------------------------------
 
 <a name="traversal" />
@@ -149,8 +147,9 @@ Create an operation object that will be passed to [call](#call).
 __Arguments__
 
 * path - the path fragment of the request URL with no leading slash. 
-* method (optional) - the HTTP method to use. When `data` is an 
-  object, `method` defaults to 'POST'. Otherwise, `method` defaults to `GET`.
+* method (optional, default=`'GET'`|`'POST'`) - the HTTP method to use. When 
+  `data` is an  object, `method` defaults to 'POST'. Otherwise, `method` 
+  defaults to `GET`.
 * data (optional) - an object to send to the server with the request.
 
 __Example__
@@ -198,7 +197,7 @@ db.call(operation, function(err, properties) {
 
 __Feature planned for 1.1.0__
 
----------------------------------------
+## Node Operations
 
 <a name="node.save" />
 ### save(object, callback)
@@ -212,9 +211,9 @@ __Arguments__
 
 * node - an object to create or update
 * callback - function(err, node). `node` is the newly saved or updated node. If
-  a create was performed, it will now have an id property. The returned object
-  is not the same reference as the passed object (the passed object will never
-  be altered).
+  a create was performed, `node` will now have an id property. The returned 
+  object is not the same reference as the passed object (the passed object will
+  never be altered).
 
 __Example__
 
@@ -238,7 +237,24 @@ db.save({ name: 'Jon', age: 22, likes: 'Beer' }, function(err, node) {
 ### read(id|object, callback)
 *Aliases: __node.read__*
 
-<img src="http://placekitten.com/200/142">
+Read a node.
+
+__Arguments__
+
+* id|object - either the id of the node to read, or an object containing an id
+property of the node to read.
+* callback - function(err, node). `node` is an object containing the properties
+of the node with the given id.
+
+__Example__
+
+```javascript
+db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
+  db.read(node.id, function(err, node) {
+    console.log(node) // -> { make: 'Citroen', model: 'DS4', id: 1 }
+  })
+})
+```
 
 ---------------------------------------
 
@@ -246,7 +262,23 @@ db.save({ name: 'Jon', age: 22, likes: 'Beer' }, function(err, node) {
 ### delete(id|object, [callback])
 *Aliases: __node.delete__*
 
-<img src="http://placekitten.com/200/140">
+Delete a node.
+
+__Arguments__
+
+* id|object - either the id of the node to delete, or an object containing an id
+property of the node to delete.
+* callback - function(err). if `err` is falsy, the node has been deleted.
+
+__Example__
+
+```
+db.save({ name: 'Jon' }, function(err, node) {
+  db.delete(node, function(err) {
+    if (!err) console.log('Jon has been deleted!');
+  })
+})
+```
 
 ---------------------------------------
 
@@ -260,9 +292,11 @@ cypher query.
 __Arguments__
 
 * predicate - Partially defined object.  Will return elements which match
-              the defined attributes of predicate.
-* any - default=false. If true, elements need only match on one attribute.
-        If false, elements must match on all attributes.
+  the defined attributes of predicate.
+* any (optional, default=`false`) - If true, elements need only match on one 
+  attribute. If false, elements must match on all attributes.
+* callback - function(err, results) - `results` is an array of the resulting
+  nodes.
 
 __Example__
 
@@ -287,99 +321,319 @@ var people = db.find(predicate, function (err, objs) {
 
 ---------------------------------------
 
-<a name="node.relate" />
-### relate(first, relationshipName, second, [props,] callback)
-**Aliases: __node.relate__*
-
-<img src="http://placekitten.com/200/140">
-
----------------------------------------
-
 <a name="node.relationships" />
-### relationships(obj, [direction, [relName,]] callback)
+### relationships(id|object, [direction, [type,]] callback)
 **Aliases: __node.relationships__*
 
-<img src="http://placekitten.com/200/145">
+Read the relationships involving the specified node.
 
----------------------------------------
+__Arguments__
 
-<a name="node.index" />
-### index(node, indexName, key, value, callback)
-**Aliases: __node.index__*
+* id|object - either the id of a node, or an object containing an id property of
+  a node.
+* direction ('all'|'in'|'out') (optional unless `type` is passed, 
+  default=`'all'`) - the direction of relationships to read. 
+* type (optional, default=`''` (match all relationships)) - the relationship
+  type to find
+* callback - function(err, relationships) - `relationships` is an array of the
+  matching relationships
 
-<img src="http://placekitten.com/200/142">
+__Example__
 
----------------------------------------
+```javascript
+db.relationships(452, 'out', 'knows', function(err, relationships) {
+  // relationships = all outgoing `knows` relationships from node 452
+})
+```
+
+## Relationship Operations
 
 <a name="rel.create" />
-### rel.create(firstId|firstObj, name, secondId|secondobj, [props], callback)
+<a name="node.relate" />
+### rel.create(firstId|firstObj, type, secondId|secondobj, [properties], callback)
+*Aliases: __relate__, __node.relate__*
 
-<img src="http://placekitten.com/200/150">
+Create a relationship between two nodes.
+
+__Arguments__
+
+* firstId|firstObject - id of the start node or an object with an id property
+  for the start node
+* type - the name of the relationship
+* secondId|secondObject - id of the end node or an object with an id property
+  for the end node
+* properties (optional, default=`{}`) - properties of the relationship
+* callback - function(err, relationship) - `relationship` is the newly created
+  relationship
+
+__Example__
+
+```javascript
+db.relate(1, 'knows', 2, { for: '2 months' }, function(err, relationship) {
+  assert.deepEqual(relationship, {
+    start: 1,
+    end: 2,
+    type: 'knows',
+    properties: { for: '2 months' },
+    id: 1
+  });
+});
+```
 
 ---------------------------------------
 
 <a name="rel.update" />
 ### rel.update(relationship, callback)
 
-<img src="http://placekitten.com/200/150">
+Update the properties of a relationship. __Note__ that you cannot use this
+method to update the base properties of the relationship (start, end, type) -
+in order to do that you'll need to delete the old relationship and create a new
+one.
+
+__Arguments__
+
+* relationship - the relationship object with some changed properties
+* callback - function(err). if err is falsy, the update succeeded.
+
+__Example__
+
+```javascript
+var props = { for: '2 months', location: 'Bergen' };
+db.rel.create(1, 'knows', 2, props, function(err, relationship) {
+  delete relationship.properties.location;
+  relationship.properties.for = '3 months';
+  db.rel.update(relationship, function(err) {
+    // properties on this relationship in the database are now equal to
+    // { for: '3 months' }
+  });
+});
+```
 
 ---------------------------------------
 
 <a name="rel.read" />
 ### rel.read(object|id, callback)
 
-<img src="http://placekitten.com/200/139">
+Read a relationship.
+
+__Arguments__
+
+* object|id - the id of the relationship to read or an object with an id
+  property of the relationship to read.
+* callback - function(err, relationship). `relationship` is an object
+  representing the read relationship.
+
+__Example__
+
+```javascript
+db.rel.create(1, 'knows', 2, { for: '2 months' }, function(err, newRelationship) {
+  db.rel.read(newRelationship.id, function(err, readRelationship) {
+    assert.deepEqual(newRelationship, readRelationship);
+    assert.deepEqual(readRelationship, {
+      start: 1,
+      end: 2,
+      type: 'knows',
+      id: 1,
+      properties: { for: '2 months' }
+    });
+  });
+});
+```
 
 ---------------------------------------
 
 <a name="rel.delete" />
 ### rel.delete(object|id, [callback])
 
-<img src="http://placekitten.com/200/147">
+Delete a relationship.
 
----------------------------------------
+__Arguments__
+
+* object|id - the id of the relationship to delete or an object with an id
+  property of the relationship to delete.
+* callback - function(err). If `err` is falsy, the relationship has been
+  deleted.
+
+__Example__
+
+```javascript
+db.rel.create(1, 'knows', 2, { for: '2 months' }, function(err, rel) {
+  db.rel.delete(rel.id, function(err) {
+    if (!err) console.log("Relationship was deleted");
+  });
+});
+```
+
+## Index Operations
 
 <a name="index.create" />
-### index.create(name, [config,] callback)
+### node.index.create(name, [config,] callback)
+### rel.index.create(name, [config,] callback)
 
-*Intent: create an index*
+Create a new index. If you're using the default index configuration, this
+method is not necessary - you can just start using the index with
+[index.add](#index.add) as if it already existed.
 
-<img src="http://placekitten.com/200/150">
+__NOTE for index functions:__ there are two different types on index in neo4j - 
+__node__ indexes and __relationship__ indexes. When you're working with __node__
+indexes, you use the functions on `node.index`. Similarly, when you're working
+on __relationship__ indexes you use the functions on `rel.index`. All of the
+functions on both of these are identical, but one acts upon node 
+indexes, and the other upon relationship indexes.
+
+__Arguments__
+
+* name - the name of the index that is being created
+* config (optional, default=`{}`) - the configuration of the index. See the [neo4j docs](http://docs.neo4j.org/chunked/milestone/rest-api-indexes.html#rest-api-create-node-index-with-configuration)
+  for more information.
+* callback - function(err). If `err` is falsy, the index has been created.
+
+__Example__
+
+```javascript
+var indexConfig = { type: 'fulltext', provider: 'lucene' };
+db.node.index.create('a_fulltext_index', indexConfig, function(err) {
+  if (!err) console.log('a fulltext index has been created!');
+});
+```
 
 ---------------------------------------
 
 <a name="index.add" />
-### index.add(node|rel, indexName, key, value, callback);
+<a name="node.index" />
+### node.index.add(indexName, id|object, key, value, callback);
+### rel.index.add(indexName, id|object, key, value, callback);
+*`node.index.add` is aliased as __node.index__ & __index__*
 
-*Intent: add an object to the given index*
+Add a node/relationship to an index.
 
-<img src="http://placekitten.com/200/139">
+__NOTE for index functions:__ there are two different types on index in neo4j - 
+__node__ indexes and __relationship__ indexes. When you're working with __node__
+indexes, you use the functions on `node.index`. Similarly, when you're working
+on __relationship__ indexes you use the functions on `node.rel`. All of the
+functions on both of these are identical, but one acts upon node 
+indexes, and the other upon relationship indexes.
+
+__Arguments__
+
+* indexName - the name of the index to add the node/relationship to.
+* id|object - the id of the node/relationship to add to the index or an object 
+  with an id property of the node/relationship to add to the index.
+* key - the key to index the node/relationship with
+* value - the value to index the node/relationship with
+* callback - function(err). If `err` is falsy, the node/relationship has 
+  been indexed.
+
+__Example__
+
+```javascript
+db.save({ name: 'Jon', }, function(err, node) {
+  db.index('people', node, 'name', node.name, function(err) {
+    if (!err) console.log('Jon has been indexed!');
+  });
+});
+```
 
 ---------------------------------------
 
 <a name="index.read" />
-### index.read(node|rel, indexName, key, value, callback);
+### node.index.read(indexName, key, value, callback);
+### rel.index.read(indexName, key, value, callback);
 
-*Intent: read all (or a subset?) of objects from the given index*
+Read the object(s) from an index that match a key-value pair.
 
-<img src="http://placekitten.com/200/147">
+__NOTE for index functions:__ there are two different types on index in neo4j - 
+__node__ indexes and __relationship__ indexes. When you're working with __node__
+indexes, you use the functions on `node.index`. Similarly, when you're working
+on __relationship__ indexes you use the functions on `node.rel`. All of the
+functions on both of these are identical, but one acts upon node 
+indexes, and the other upon relationship indexes.
+
+__Arguments__
+
+* indexName - the index to read from
+* key - the key to match
+* value - the value to match
+* callback - function(err, results). `results` is a node or relationship object
+  (or an array of them if there was more than one) that matched the given 
+  key-value pair in the given index. If nothing matched, `results === false`.
+
+__Example__
+
+```javascript
+db.rel.index.read('friendships', 'location', 'Norway', function(err, rels) {
+  // `rels` is an array of all relationships indexed in the `friendships`
+  // index, with a value `Norway` for the key `location`.
+});
+```
 
 ---------------------------------------
 
 <a name="index.remove" />
-### index.remove(node|rel, indexName, key, value, callback);
+### node.index.remove(id|object, indexName, [key, [value,]] callback);
+### rel.index.remove(id|object, indexName, [key, [value,]] callback);
 
-*Intent: remove an object from an index*
+Remove a node/relationship from an index. 
 
-<img src="http://placekitten.com/220/147">
+__NOTE for index functions:__ there are two different types on index in neo4j - 
+__node__ indexes and __relationship__ indexes. When you're working with __node__
+indexes, you use the functions on `node.index`. Similarly, when you're working
+on __relationship__ indexes you use the functions on `node.rel`. All of the
+functions on both of these are identical, but one acts upon node 
+indexes, and the other upon relationship indexes.
+
+__Arguments__
+
+* id|object - the id of the node/relationship to remove from the index or an 
+  object with an id property of the node/relationship to remove from the index.
+* indexName - the index to remove the node/relationship from.
+* key (optional) - the key from which to remove the node/relationship. If none
+  is specified, every reference to the node/relationship is deleted from the
+  index.
+* value (optional) - the value from which to remove the node/relationship. If
+  none is specified, every reference to the node/relationship is deleted for the
+  given key.
+* callback - function(err). If `err` is falsy, the specified references have
+  been removed.
+
+__Example__
+
+```javascript
+db.node.index.remove(6821, 'people', function(err) {
+  if (!err) console.log("Every reference of node 6821 has been removed from the people index");
+});
+
+db.rel.index.remove(351, 'friendships', 'in', 'Australia', function(err) {
+  if (!err) console.log("Relationship 351 is no longer indexed as a friendship in Australia");
+})
+```
 
 ---------------------------------------
 
 <a name="index.delete" />
-### index.delete(name, callback);
+### node.index.delete(name, callback);
+### rel.index.delete(name, callback);
 
-*Intent: delete an index*
+Delete an index.
 
-<img src="http://placekitten.com/240/147">
+__NOTE for index functions:__ there are two different types on index in neo4j - 
+__node__ indexes and __relationship__ indexes. When you're working with __node__
+indexes, you use the functions on `node.index`. Similarly, when you're working
+on __relationship__ indexes you use the functions on `node.rel`. All of the
+functions on both of these are identical, but one acts upon node 
+indexes, and the other upon relationship indexes.
+
+__Arguments__
+
+* name - the name of the index to delete
+* callback - function(err). if `err` is falsy, the index has been deleted.
+
+__Example__
+
+```javascript
+db.rel.index.delete('friendships', function(err) {
+  if (!err) console.log('The `friendships` index has been deleted');
+})
+```
 
 ---------------------------------------
