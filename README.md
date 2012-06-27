@@ -251,7 +251,7 @@ of the node with the given id.
 
 __Example__
 
-``javascript
+```javascript
 db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
   db.read(node.id, function(err, node) {
     console.log(node) // -> { make: 'Citroen', model: 'DS4', id: 1 }
