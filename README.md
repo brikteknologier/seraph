@@ -183,9 +183,11 @@ __Arguments__
 __Example__
 
 ```javascript
-var operation = db.operation('node/4285/properties', 'GET', { name: 'Jon' });
-db.call(operation, function(err) {
-  if (!err) console.log('Set `name` to `Jon` on node 4285!')
+var operation = db.operation('node/4285/properties');
+db.call(operation, function(err, properties) {
+  if (err) throw err;
+
+  // `properties` is an object containing the properties from node 4285
 });
 ```
 
@@ -202,7 +204,33 @@ __Feature planned for 1.1.0__
 ### save(object, callback)
 *Aliases: __node.save__*
 
-<img src="http://placekitten.com/200/145">
+Create or update a node. If `object` has an id property, the node with that id
+is updated. Otherwise, a new node is created. Returns the newly created/updated
+node to the callback.
+
+__Arguments__
+
+* node - an object to create or update
+* callback - function(err, node). `node` is the newly saved or updated node. If
+  a create was performed, it will now have an id property. The returned object
+  is not the same reference as the passed object (the passed object will never
+  be altered).
+
+__Example__
+
+```javascript
+// Create a node
+db.save({ name: 'Jon', age: 22, likes: 'Beer' }, function(err, node) {
+  console.log(node); // -> { name: 'Jon', age: 22, likes: 'Beer', id: 1 }
+  
+  // Update it
+  delete node.likes;
+  node.age++;
+  db.save(node, function(err, node) {
+    console.log(node); // -> { name: 'Jon', age: 23, id: 1 }
+  })
+})
+```
 
 ---------------------------------------
 
