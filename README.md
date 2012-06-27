@@ -347,17 +347,62 @@ db.relationships(452, 'out', 'knows', function(err, relationships) {
 
 <a name="rel.create" />
 <a name="node.relate" />
-### rel.create(firstId|firstObj, name, secondId|secondobj, [props], callback)
+### rel.create(firstId|firstObj, type, secondId|secondobj, [properties], callback)
 *Aliases: __relate__, __node.relate__*
 
-<img src="http://placekitten.com/200/150">
+Create a relationship between two nodes.
+
+__Arguments__
+
+* firstId|firstObject - id of the start node or an object with an id property
+  for the start node
+* type - the name of the relationship
+* secondId|secondObject - id of the end node or an object with an id property
+  for the end node
+* properties (optional, default=`{}`) - properties of the relationship
+* callback - function(err, relationship) - returns the created relationship
+
+__Example__
+
+```javascript
+db.relate(1, 'knows', 2, { for: '2 months' }, function(err, relationship) {
+  assert.deepEqual(relationship, {
+    start: 1,
+    end: 2,
+    type: 'knows',
+    properties: { for: '2 months' },
+    id: 1
+  });
+});
+```
 
 ---------------------------------------
 
 <a name="rel.update" />
 ### rel.update(relationship, callback)
 
-<img src="http://placekitten.com/200/150">
+Update the properties of a relationship. __Note__ that you cannot use this
+method to update the base properties of the relationship (start, end, type) -
+in order to do that you'll need to delete the old relationship and create a new
+one.
+
+__Arguments__
+
+* relationship - the relationship object with some changed properties
+* callback - function(err). if err is undefined, the update succeeded.
+
+__Example__
+
+```javascript
+var props = { for: '2 months', location: 'Bergen' };
+db.rel.create(1, 'knows', 2, props, function(err, relationship) {
+  delete relationship.properties.location;
+  relationship.properties.for = '3 months';
+  db.rel.update(relationship, function(err) {
+    // properties have now been updated
+  })
+});
+```
 
 ---------------------------------------
 
