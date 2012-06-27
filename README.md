@@ -283,8 +283,6 @@ db.save({ name: 'Jon' }, function(err, node) {
 })
 ```
 
-<img src="http://placekitten.com/200/140">
-
 ---------------------------------------
 
 <a name="node.find" />
