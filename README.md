@@ -83,7 +83,7 @@ REST API.
 `query` performs a cypher query and map the columns and results together.
 
 If you're doing queries on very large sets of data, it may be wiser to use
-`query` and deal with neo4j's results directly.
+`rawQuery` and deal with neo4j's results directly.
 
 __Arguments__
 
@@ -212,9 +212,9 @@ __Arguments__
 
 * node - an object to create or update
 * callback - function(err, node). `node` is the newly saved or updated node. If
-  a create was performed, it will now have an id property. The returned object
-  is not the same reference as the passed object (the passed object will never
-  be altered).
+  a create was performed, `node` will now have an id property. The returned 
+  object is not the same reference as the passed object (the passed object will
+  never be altered).
 
 __Example__
 
@@ -238,7 +238,24 @@ db.save({ name: 'Jon', age: 22, likes: 'Beer' }, function(err, node) {
 ### read(id|object, callback)
 *Aliases: __node.read__*
 
-<img src="http://placekitten.com/200/142">
+Read a node.
+
+__Arguments__
+
+* id|object - either the id of the node to read, or an object containing an id
+property of the node to read.
+* callback - function(err, node). `node` is an object containing the properties
+of the node with the given id.
+
+__Example__
+
+``javascript
+db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
+  db.read(node.id, function(err, node) {
+    console.log(node) // -> { make: 'Citroen', model: 'DS4', id: 1 }
+  })
+})
+```
 
 ---------------------------------------
 
