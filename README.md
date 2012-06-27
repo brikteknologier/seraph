@@ -345,14 +345,6 @@ db.relationships(452, 'out', 'knows', function(err, relationships) {
 
 ---------------------------------------
 
-<a name="node.index" />
-### index(node, indexName, key, value, callback)
-**Aliases: __node.index__*
-
-<img src="http://placekitten.com/200/142">
-
----------------------------------------
-
 <a name="rel.create" />
 <a name="node.relate" />
 ### rel.create(firstId|firstObj, name, secondId|secondobj, [props], callback)
@@ -384,7 +376,8 @@ db.relationships(452, 'out', 'knows', function(err, relationships) {
 ---------------------------------------
 
 <a name="index.create" />
-### index.create(name, [config,] callback)
+### node.index.create(name, [config,] callback)
+### rel.index.create(name, [config,] callback)
 
 *Intent: create an index*
 
@@ -393,16 +386,19 @@ db.relationships(452, 'out', 'knows', function(err, relationships) {
 ---------------------------------------
 
 <a name="index.add" />
-### index.add(node|rel, indexName, key, value, callback);
-
-*Intent: add an object to the given index*
+<a name="node.index" />
+### node.index.add(id|object, indexName, key, value, callback);
+### rel.index.add(id|object, indexName, key, value, callback);
+*`node.index.add` is aliased as __node.index__ & __index__*
+ 
 
 <img src="http://placekitten.com/200/139">
 
 ---------------------------------------
 
 <a name="index.read" />
-### index.read(node|rel, indexName, key, value, callback);
+### node.index.read(node|rel, indexName, key, value, callback);
+### rel.index.read(node|rel, indexName, key, value, callback);
 
 *Intent: read all (or a subset?) of objects from the given index*
 
@@ -411,7 +407,8 @@ db.relationships(452, 'out', 'knows', function(err, relationships) {
 ---------------------------------------
 
 <a name="index.remove" />
-### index.remove(node|rel, indexName, key, value, callback);
+### node.index.remove(node|rel, indexName, key, value, callback);
+### rel.index.remove(node|rel, indexName, key, value, callback);
 
 *Intent: remove an object from an index*
 
@@ -420,7 +417,8 @@ db.relationships(452, 'out', 'knows', function(err, relationships) {
 ---------------------------------------
 
 <a name="index.delete" />
-### index.delete(name, callback);
+### node.index.delete(name, callback);
+### rel.index.delete(name, callback);
 
 *Intent: delete an index*
 
