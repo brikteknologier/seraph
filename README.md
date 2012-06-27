@@ -88,8 +88,8 @@ If you're doing queries on very large sets of data, it may be wiser to use
 __Arguments__
 
 * query - Cypher query as a format string.
-* params - Default=`{}`. Replace `{key}` parts in query string.  See cypher
-           documentation for details.
+* params (optional, default=`{}`). Replace `{key}` parts in query string.  See 
+  cypher documentation for details.
 * callback - (err, result).  Result is an array of objects.
 
 __Example__
@@ -149,8 +149,9 @@ Create an operation object that will be passed to [call](#call).
 __Arguments__
 
 * path - the path fragment of the request URL with no leading slash. 
-* method (optional) - the HTTP method to use. When `data` is an 
-  object, `method` defaults to 'POST'. Otherwise, `method` defaults to `GET`.
+* method (optional, default=`'GET'`|`'POST'`) - the HTTP method to use. When 
+  `data` is an  object, `method` defaults to 'POST'. Otherwise, `method` 
+  defaults to `GET`.
 * data (optional) - an object to send to the server with the request.
 
 __Example__
@@ -263,6 +264,19 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
 ### delete(id|object, [callback])
 *Aliases: __node.delete__*
 
+Delete a node.
+
+__Arguments__
+
+* id|object - either the id of the node to delete, or an object containing an id
+property of the node to delete.
+* callback - function(err). if `err` is undefined, the node has been deleted.
+
+__Example__
+db.save({ name: 'Jon' }, function() {
+  
+})
+
 <img src="http://placekitten.com/200/140">
 
 ---------------------------------------
@@ -278,7 +292,7 @@ __Arguments__
 
 * predicate - Partially defined object.  Will return elements which match
               the defined attributes of predicate.
-* any - default=false. If true, elements need only match on one attribute.
+* any (optional, default=`false`) - If true, elements need only match on one attribute.
         If false, elements must match on all attributes.
 
 __Example__
@@ -304,19 +318,30 @@ var people = db.find(predicate, function (err, objs) {
 
 ---------------------------------------
 
-<a name="node.relate" />
-### relate(first, relationshipName, second, [props,] callback)
-**Aliases: __node.relate__*
-
-<img src="http://placekitten.com/200/140">
-
----------------------------------------
-
 <a name="node.relationships" />
-### relationships(obj, [direction, [relName,]] callback)
+### relationships(id|object, [direction, [type,]] callback)
 **Aliases: __node.relationships__*
 
-<img src="http://placekitten.com/200/145">
+Read the relationships involving the specified node.
+
+__Arguments__
+
+* id|object - either the id of a node, or an object containing an id property of
+  a node.
+* direction ['all'|'in'|'out'] (optional unless `type` is passed, 
+  default=`'all'`) - the direction of relationships to read. 
+* type (optional, default=`''` (match all relationships)) - the relationship
+  type to find
+* callback - function(err, relationships) - returns an array of the matching
+  relationships
+
+__Example__
+
+```javascript
+db.relationships(452, 'out', 'knows', function(err, relationships) {
+  // relationships = all outgoing `knows` relationships from node 452
+})
+```
 
 ---------------------------------------
 
@@ -329,7 +354,9 @@ var people = db.find(predicate, function (err, objs) {
 ---------------------------------------
 
 <a name="rel.create" />
+<a name="node.relate" />
 ### rel.create(firstId|firstObj, name, secondId|secondobj, [props], callback)
+*Aliases: __relate__, __node.relate__*
 
 <img src="http://placekitten.com/200/150">
 
