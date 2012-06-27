@@ -60,7 +60,7 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 ## Compatibility
 
 Seraph has been tested with Neo4j 1.8. As we progress in development, we will
-begin adding some legacy support for the more recent versions.
+begin adding some legacy support for older versions.
 
 ## Testing
 
