@@ -436,7 +436,24 @@ db.rel.create(1, 'knows', 2, { for: '2 months' }, function(err, newRelationship)
 <a name="rel.delete" />
 ### rel.delete(object|id, [callback])
 
-<img src="http://placekitten.com/200/147">
+Delete a relationship.
+
+__Arguments__
+
+* object|id - the id of the relationship to delete or an object with an id
+  property of the relationship to delete.
+* callback - function(err). If `err` is undefined, the relationship has been
+  deleted.
+
+__Example__
+
+```javascript
+db.rel.create(1, 'knows', 2, { for: '2 months' }, function(err, rel) {
+  db.rel.delete(rel.id, function(err) {
+    if (!err) console.log("Relationship was deleted");
+  });
+});
+```
 
 ---------------------------------------
 
