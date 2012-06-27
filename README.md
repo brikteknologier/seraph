@@ -200,7 +200,7 @@ db.call(operation, function(err, properties) {
 
 __Feature planned for 1.1.0__
 
----------------------------------------
+## Node Operations
 
 <a name="node.save" />
 ### save(object, callback)
@@ -351,7 +351,7 @@ db.relationships(452, 'out', 'knows', function(err, relationships) {
 })
 ```
 
----------------------------------------
+## Relationship Operations
 
 <a name="rel.create" />
 <a name="node.relate" />
@@ -461,7 +461,7 @@ db.rel.create(1, 'knows', 2, { for: '2 months' }, function(err, rel) {
 });
 ```
 
----------------------------------------
+## Index Operations
 
 <a name="index.create" />
 ### node.index.create(name, [config,] callback)
