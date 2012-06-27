@@ -429,6 +429,13 @@ __Example__
 db.rel.create(1, 'knows', 2, { for: '2 months' }, function(err, newRelationship) {
   db.rel.read(newRelationship.id, function(err, readRelationship) {
     assert.deepEqual(newRelationship, readRelationship);
+    assert.deepEqual(readRelationship, {
+      start: 1,
+      end: 2,
+      type: 'knows',
+      id: 1,
+      properties: { for: '2 months' }
+    });
   });
 });
 ```
