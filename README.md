@@ -461,9 +461,23 @@ db.rel.create(1, 'knows', 2, { for: '2 months' }, function(err, rel) {
 ### node.index.create(name, [config,] callback)
 ### rel.index.create(name, [config,] callback)
 
-*Intent: create an index*
+Create a new index. If you're using the default index configuration, this
+method is not necessary - you can just start using the index with
+[index.add](#index.add) as if it already existed.
 
-<img src="http://placekitten.com/200/150">
+__NOTE for index functions:__ there are two different types on index in neo4j - 
+__node__ indexes and __relationship__ indexes. When you're working with __node__
+indexes, you use the functions on `node.index`. Similarly, when you're working
+on __relationship__ indexes you use the functions on `node.rel`. All of the
+functions on both of these are identical, but one acts upon node 
+indexes, and the other upon relationship indexes.
+
+__Arguments__
+
+* name - the name of the index that is being created
+* config - the configuration of the index. See the [neo4j docs](http://docs.neo4j.org/chunked/milestone/rest-api-indexes.html#rest-api-create-node-index-with-configuration)
+  for more information.
+* callback - function(err). If `err` is undefined, the index has been created.
 
 ---------------------------------------
 
