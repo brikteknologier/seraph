@@ -90,7 +90,7 @@ __Arguments__
 * query - Cypher query as a format string.
 * params - Default=`{}`. Replace `{key}` parts in query string.  See cypher
            documentation for details.
-* callback - function (err, result).  Result is an array of objects.
+* callback - (err, result).  Result is an array of objects.
 
 __Example__
 
@@ -137,7 +137,7 @@ are returned (in order to transform them into a nicer format).
 <a name="traversal" />
 ### ~~traversal(traversal, callback)~~
 
-*Feature planned for release 1.1.0*
+__Feature planned for 1.1.0__
 
 ---------------------------------------
 
@@ -167,14 +167,34 @@ db.call(operation, function(err) {
 <a name="call" />
 ### call(operation, callback)
 
-<img src="http://placekitten.com/200/140">
+Perform an HTTP request to the server.
+
+If the body is some JSON, it is parsed and passed to the callback.If the status
+code is not in the 200's, an error is passed to the callback. 
+
+__Arguments__
+
+* operation - an operation created by [operation](#operation) that specifies
+  what to request from the server
+* callback - function(err, result, response). `result` is the JSON parsed body
+  from the server (otherwise empty). `response` is the response object from the
+  request.
+
+__Example__
+
+```javascript
+var operation = db.operation('node/4285/properties', 'GET', { name: 'Jon' });
+db.call(operation, function(err) {
+  if (!err) console.log('Set `name` to `Jon` on node 4285!')
+});
+```
 
 ---------------------------------------
 
 <a name="batch" />
-### batch(block|operationArray, callback)
+### ~~batch(block|operationArray, callback)~~
 
-<img src="http://placekitten.com/200/140">
+__Feature planned for 1.1.0__
 
 ---------------------------------------
 
