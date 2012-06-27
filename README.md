@@ -51,13 +51,11 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [rel.delete](#rel.delete) - delete a relationship
 
 ### Index Operations
-* [node.index.create & rel.index.create](#index.create) - create an index
-* [node.index.add & rel.index.add](#index.add) - add a nodes/rels to an index
-* [node.index.read & rel.index.read](#index.read) - read nodes/rels from an
-  index
-* [node.index.remove & rel.index.remove](#index.remove) - remove nodes/rels
-  from an index
-* [node.index.delete & rel.index.delete](#index.delete) - delete an index
+* [index.create](#index.create) - create an index
+* [index.add](#index.add) - add a nodes/rels to an index
+* [index.read](#index.read) - read nodes/rels from an index
+* [index.remove](#index.remove) - remove nodes/rels from an index
+* [index.delete](#index.delete) - delete an index
 
 ## Compatibility
 
