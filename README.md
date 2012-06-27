@@ -15,8 +15,8 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
   db.delete(node, function(err) {
     if (err) throw err;
     console.log("Test-Man away!");
-  }
-}
+  });
+});
 ```
 
 ## Documentation
@@ -24,16 +24,15 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 <a name="seraph.db_list" />
 ### Generic Operations
 
-* [db](#db) - create a seraph object that uses some supplied options
 * [query](#query) - perform a cypher query and parse the results
 * [rawQuery](#rawQuery) - perform a cypher query and return unparsed results
-* [traversal](#traversal) - perform a traversal
+* ~~[traversal](#traversal) - perform a traversal~~
 
 ### API Communication Operations
 
 * [operation](#operation) - create a representation of a REST API call
 * [call](#call) - take an operation and call it
-* [batch](#batch) - perform multiple operations atomically
+* ~~[batch](#batch) - perform multiple operations atomically~~
 
 ### Node Operations
 * [save (node.save)](#node.save) - create or update a node
@@ -57,23 +56,6 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [node.index.remove & rel.index.remove](#index.remove) - remove nodes/rels from an index
 * [node.index.delete & rel.index.delete](#index.delete) - delete an index
 
-You can also access all functions directly on `seraph` (without calling `db()`).
-In this case you must supply an options argument. (See [db](#db) for 
-configuration documentation).  So this:
-
-```javascript
-var seraph = require("seraph");
-var db = seraph.db("http://localhost:7474/");
-db.save({x: 3});
-```
-
-Could also be written like this:
-
-```javascript
-var seraph = require("seraph");
-seraph.save("http://localhost:7474/", {x: 3});
-```
-
 ## Compatibility
 
 Seraph has been tested with Neo4j 1.8. As we progress in development, we will
@@ -91,27 +73,7 @@ restart and clean the server every time:
 
     npm run-script quick-test
 
-## Module Functions
-
-<a name="db" />
-### db (options)
-
-Returns an object with database access functions.  See
-[seraph.db](#seraph.db_list).
-
-`options` is an object with the following attributes:
-
-* `options.endpoint`: Optional.  Default="http://localhost:7474". URL of neo4j 
-  REST API.
-* `options.id`: Optional.  Default="id".  Saved objects will have this
-  property set to the generated database ID.  When updating or
-  deleting objects, will look for object ID in this property.
-
-Alternatively, `options` can just be the database URL as a string.
-
----------------------------------------
-
-## `db` Functions
+## Generic Operations
 
 <a name="query" /><a name="rawQuery"/>
 ### query(query, [params,] callback), rawQuery(query, [params,] callback)
@@ -119,6 +81,9 @@ Alternatively, `options` can just be the database URL as a string.
 `rawQuery` performs a cypher query and returns the results directly from the
 REST API.  
 `query` performs a cypher query and map the columns and results together.
+
+If you're doing queries on very large sets of data, it may be wiser to use
+`query` and deal with neo4j's results directly.
 
 __Arguments__
 
@@ -170,21 +135,37 @@ are returned (in order to transform them into a nicer format).
 ---------------------------------------
 
 <a name="traversal" />
-### traversal(traversal, callback)
+### ~~traversal(traversal, callback)~~
 
-<img src="http://placekitten.com/200/140">
+*Feature planned for release 1.1.0*
 
 ---------------------------------------
 
 <a name="operation" />
-### operation(path, [method='get'], [data])
+### operation(path, [method='get/post'], [data])
 
-<img src="http://placekitten.com/200/140">
+Create an operation object that will be passed to [call](#call). 
+
+__Arguments__
+
+* path - the path fragment of the request URL with no leading slash. 
+* method (optional) - the HTTP method to use. When `data` is an 
+  object, `method` defaults to 'POST'. Otherwise, `method` defaults to `GET`.
+* data (optional) - an object to send to the server with the request.
+
+__Example__
+
+```javascript
+var operation = db.operation('node/4285/properties', 'PUT', { name: 'Jon' });
+db.call(operation, function(err) {
+  if (!err) console.log('Set `name` to `Jon` on node 4285!')
+});
+```
 
 ---------------------------------------
 
 <a name="call" />
-### call(opts, operation, callback)
+### call(operation, callback)
 
 <img src="http://placekitten.com/200/140">
 
