@@ -42,7 +42,7 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [relate (node.relate)](#node.relate) - relate two nodes
 * [relationships (node.relationships)](#node.relationships) - read the 
   relationships of a node
-* [index (node.index)](#node.index) - add an index to a node
+* [index (node.index)](#node.index) - add a node to an index
 
 ### Relationship Operations
 * [rel.create](#rel.create) - create a relationship
