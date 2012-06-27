@@ -83,8 +83,9 @@ restart and clean the server every time:
 REST API.  
 `query` performs a cypher query and map the columns and results together.
 
-If you're doing queries on very large sets of data, it may be wiser to use
-`rawQuery` and deal with neo4j's results directly.
+__Note__: if you're performing large queries it may be advantageous to use
+`queryRaw`, since `query` attempts to infer whole nodes and relationships that
+are returned (in order to transform them into a nicer format).
 
 __Arguments__
 
@@ -128,10 +129,6 @@ db.rawQuery(cypher, {id: 3}, function(err, result) {
   // for more info
 })
 ```
-
-__Note__: if you're performing large queries it may be advantageous to use
-`queryRaw`, since `query` attempts to infer whole nodes and relationships that
-are returned (in order to transform them into a nicer format).
 
 ---------------------------------------
 
