@@ -331,7 +331,7 @@ __Arguments__
 
 * id|object - either the id of a node, or an object containing an id property of
   a node.
-* direction ['all'|'in'|'out'] (optional unless `type` is passed, 
+* direction ('all'|'in'|'out') (optional unless `type` is passed, 
   default=`'all'`) - the direction of relationships to read. 
 * type (optional, default=`''` (match all relationships)) - the relationship
   type to find
