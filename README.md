@@ -43,7 +43,6 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [relate (node.relate)](#node.relate) - relate two nodes
 * [relationships (node.relationships)](#node.relationships) - read the relationships of a node
 * [index (node.index)](#node.index) - add an index to a node
-* [indexes (node.indexes)](#node.indexes) - read the indexes of a node
 
 ### Relationship Operations
 * [rel.create](#rel.create) - create a relationship
@@ -280,14 +279,6 @@ var people = db.find(predicate, function (err, objs) {
 **Aliases: __node.index__*
 
 <img src="http://placekitten.com/200/142">
-
----------------------------------------
-
-<a name="node.indexes" />
-### indexes(node, callback)
-**Aliases: __node.indexes__*
-
-<img src="http://placekitten.com/200/140">
 
 ---------------------------------------
 
