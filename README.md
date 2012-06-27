@@ -268,7 +268,7 @@ __Arguments__
 
 * id|object - either the id of the node to delete, or an object containing an id
 property of the node to delete.
-* callback - function(err). if `err` is undefined, the node has been deleted.
+* callback - function(err). if `err` is falsy, the node has been deleted.
 
 __Example__
 
@@ -393,7 +393,7 @@ one.
 __Arguments__
 
 * relationship - the relationship object with some changed properties
-* callback - function(err). if err is undefined, the update succeeded.
+* callback - function(err). if err is falsy, the update succeeded.
 
 __Example__
 
@@ -451,7 +451,7 @@ __Arguments__
 
 * object|id - the id of the relationship to delete or an object with an id
   property of the relationship to delete.
-* callback - function(err). If `err` is undefined, the relationship has been
+* callback - function(err). If `err` is falsy, the relationship has been
   deleted.
 
 __Example__
@@ -477,7 +477,7 @@ method is not necessary - you can just start using the index with
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
 indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `node.rel`. All of the
+on __relationship__ indexes you use the functions on `rel.index`. All of the
 functions on both of these are identical, but one acts upon node 
 indexes, and the other upon relationship indexes.
 
@@ -486,7 +486,7 @@ __Arguments__
 * name - the name of the index that is being created
 * config (optional, default=`{}`) - the configuration of the index. See the [neo4j docs](http://docs.neo4j.org/chunked/milestone/rest-api-indexes.html#rest-api-create-node-index-with-configuration)
   for more information.
-* callback - function(err). If `err` is undefined, the index has been created.
+* callback - function(err). If `err` is falsy, the index has been created.
 
 __Example__
 
@@ -521,7 +521,7 @@ __Arguments__
   with an id property of the node/relationship to add to the index.
 * key - the key to index the node/relationship with
 * value - the value to index the node/relationship with
-* callback - function(err). If `err` is undefined, the node/relationship has 
+* callback - function(err). If `err` is falsy, the node/relationship has 
   been indexed.
 
 __Example__
@@ -593,7 +593,7 @@ __Arguments__
 * value (optional) - the value from which to remove the node/relationship. If
   none is specified, every reference to the node/relationship is deleted for the
   given key.
-* callback - function(err). If `err` is undefined, the specified references have
+* callback - function(err). If `err` is falsy, the specified references have
   been removed.
 
 __Example__
@@ -626,7 +626,7 @@ indexes, and the other upon relationship indexes.
 __Arguments__
 
 * name - the name of the index to delete
-* callback - function(err). if `err` is undefined, the index has been deleted.
+* callback - function(err). if `err` is falsy, the index has been deleted.
 
 __Example__
 
