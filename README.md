@@ -294,6 +294,8 @@ __Arguments__
               the defined attributes of predicate.
 * any (optional, default=`false`) - If true, elements need only match on one attribute.
         If false, elements must match on all attributes.
+* callback - function(err, results) - `results` is an array of the resulting
+  nodes.
 
 __Example__
 
@@ -332,8 +334,8 @@ __Arguments__
   default=`'all'`) - the direction of relationships to read. 
 * type (optional, default=`''` (match all relationships)) - the relationship
   type to find
-* callback - function(err, relationships) - returns an array of the matching
-  relationships
+* callback - function(err, relationships) - `relationships` is an array of the
+  matching relationships
 
 __Example__
 
@@ -360,7 +362,8 @@ __Arguments__
 * secondId|secondObject - id of the end node or an object with an id property
   for the end node
 * properties (optional, default=`{}`) - properties of the relationship
-* callback - function(err, relationship) - returns the created relationship
+* callback - function(err, relationship) - `relationship` is the newly created
+  relationship
 
 __Example__
 
@@ -400,7 +403,7 @@ db.rel.create(1, 'knows', 2, props, function(err, relationship) {
   relationship.properties.for = '3 months';
   db.rel.update(relationship, function(err) {
     // properties have now been updated
-  })
+  });
 });
 ```
 
@@ -409,7 +412,24 @@ db.rel.create(1, 'knows', 2, props, function(err, relationship) {
 <a name="rel.read" />
 ### rel.read(object|id, callback)
 
-<img src="http://placekitten.com/200/139">
+Read a relationship.
+
+__Arguments__
+
+* object|id - the id of the relationship to read or an object with an id
+  property of the relationship to read.
+* callback - function(err, relationship). `relationship` is an object
+  representing the read relationship.
+
+__Example__
+
+```javascript
+db.rel.create(1, 'knows', 2, { for: '2 months' }, function(err, newRelationship) {
+  db.rel.read(newRelationship.id, function(err, readRelationship) {
+    assert.deepEqual(newRelationship, readRelationship);
+  });
+});
+```
 
 ---------------------------------------
 
