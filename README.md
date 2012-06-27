@@ -40,7 +40,8 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [find (node.find)](#node.find) - find a node using a predicate
 * [delete (node.delete)](#node.delete) - delete a node
 * [relate (node.relate)](#node.relate) - relate two nodes
-* [relationships (node.relationships)](#node.relationships) - read the relationships of a node
+* [relationships (node.relationships)](#node.relationships) - read the 
+  relationships of a node
 * [index (node.index)](#node.index) - add an index to a node
 
 ### Relationship Operations
@@ -52,8 +53,10 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 ### Index Operations
 * [node.index.create & rel.index.create](#index.create) - create an index
 * [node.index.add & rel.index.add](#index.add) - add a nodes/rels to an index
-* [node.index.read & rel.index.read](#index.read) - read nodes/rels from an index
-* [node.index.remove & rel.index.remove](#index.remove) - remove nodes/rels from an index
+* [node.index.read & rel.index.read](#index.read) - read nodes/rels from an
+  index
+* [node.index.remove & rel.index.remove](#index.remove) - remove nodes/rels
+  from an index
 * [node.index.delete & rel.index.delete](#index.delete) - delete an index
 
 ## Compatibility
@@ -273,9 +276,14 @@ property of the node to delete.
 * callback - function(err). if `err` is undefined, the node has been deleted.
 
 __Example__
-db.save({ name: 'Jon' }, function() {
-  
+
+```
+db.save({ name: 'Jon' }, function(err, node) {
+  db.delete(node, function(err) {
+    if (!err) console.log('Jon has been deleted!');
+  })
 })
+```
 
 <img src="http://placekitten.com/200/140">
 
@@ -291,9 +299,9 @@ cypher query.
 __Arguments__
 
 * predicate - Partially defined object.  Will return elements which match
-              the defined attributes of predicate.
-* any (optional, default=`false`) - If true, elements need only match on one attribute.
-        If false, elements must match on all attributes.
+  the defined attributes of predicate.
+* any (optional, default=`false`) - If true, elements need only match on one 
+  attribute. If false, elements must match on all attributes.
 * callback - function(err, results) - `results` is an array of the resulting
   nodes.
 
@@ -475,40 +483,129 @@ indexes, and the other upon relationship indexes.
 __Arguments__
 
 * name - the name of the index that is being created
-* config - the configuration of the index. See the [neo4j docs](http://docs.neo4j.org/chunked/milestone/rest-api-indexes.html#rest-api-create-node-index-with-configuration)
+* config (optional, default=`{}`) - the configuration of the index. See the [neo4j docs](http://docs.neo4j.org/chunked/milestone/rest-api-indexes.html#rest-api-create-node-index-with-configuration)
   for more information.
 * callback - function(err). If `err` is undefined, the index has been created.
+
+__Example__
+
+```javascript
+var indexConfig = { type: 'fulltext', provider: 'lucene' };
+db.node.index.create('a_fulltext_index', indexConfig, function(err) {
+  if (!err) console.log('a fulltext index has been created!');
+});
+```
 
 ---------------------------------------
 
 <a name="index.add" />
 <a name="node.index" />
-### node.index.add(id|object, indexName, key, value, callback);
-### rel.index.add(id|object, indexName, key, value, callback);
+### node.index.add(indexName, id|object, key, value, callback);
+### rel.index.add(indexName, id|object, key, value, callback);
 *`node.index.add` is aliased as __node.index__ & __index__*
- 
 
-<img src="http://placekitten.com/200/139">
+Add a node/relationship to an index.
+
+__NOTE for index functions:__ there are two different types on index in neo4j - 
+__node__ indexes and __relationship__ indexes. When you're working with __node__
+indexes, you use the functions on `node.index`. Similarly, when you're working
+on __relationship__ indexes you use the functions on `node.rel`. All of the
+functions on both of these are identical, but one acts upon node 
+indexes, and the other upon relationship indexes.
+
+__Arguments__
+
+* indexName - the name of the index to add the node/relationship to.
+* id|object - the id of the node/relationship to add to the index or an object 
+  with an id property of the node/relationship to add to the index.
+* key - the key to index the node/relationship with
+* value - the value to index the node/relationship with
+* callback - function(err). If `err` is undefined, the node/relationship has 
+  been indexed.
+
+__Example__
+
+```javascript
+db.save({ name: 'Jon', }, function(err, node) {
+  db.index('people', node, 'name', node.name, function(err) {
+    if (!err) console.log('Jon has been indexed!');
+  });
+});
+```
 
 ---------------------------------------
 
 <a name="index.read" />
-### node.index.read(node|rel, indexName, key, value, callback);
-### rel.index.read(node|rel, indexName, key, value, callback);
+### node.index.read(indexName, key, value, callback);
+### rel.index.read(indexName, key, value, callback);
 
-*Intent: read all (or a subset?) of objects from the given index*
+Read the object(s) from an index that match a key-value pair.
 
-<img src="http://placekitten.com/200/147">
+__NOTE for index functions:__ there are two different types on index in neo4j - 
+__node__ indexes and __relationship__ indexes. When you're working with __node__
+indexes, you use the functions on `node.index`. Similarly, when you're working
+on __relationship__ indexes you use the functions on `node.rel`. All of the
+functions on both of these are identical, but one acts upon node 
+indexes, and the other upon relationship indexes.
+
+__Arguments__
+
+* indexName - the index to read from
+* key - the key to match
+* value - the value to match
+* callback - function(err, results). `results` is a node or relationship object
+  (or an array of them if there was more than one) that matched the given 
+  key-value pair in the given index. If nothing matched, `results === false`.
+
+__Example__
+
+```javascript
+db.rel.index.read('friendships', 'location', 'Norway', function(err, rels) {
+  // `rels` is an array of all relationships indexed in the `friendships`
+  // index, with a value `Norway` for the key `location`.
+});
+```
 
 ---------------------------------------
 
 <a name="index.remove" />
-### node.index.remove(node|rel, indexName, key, value, callback);
-### rel.index.remove(node|rel, indexName, key, value, callback);
+### node.index.remove(id|object, indexName, [key, [value,]] callback);
+### rel.index.remove(id|object, indexName, [key, [value,]] callback);
 
-*Intent: remove an object from an index*
+Remove a node/relationship from an index. 
 
-<img src="http://placekitten.com/220/147">
+__NOTE for index functions:__ there are two different types on index in neo4j - 
+__node__ indexes and __relationship__ indexes. When you're working with __node__
+indexes, you use the functions on `node.index`. Similarly, when you're working
+on __relationship__ indexes you use the functions on `node.rel`. All of the
+functions on both of these are identical, but one acts upon node 
+indexes, and the other upon relationship indexes.
+
+__Arguments__
+
+* id|object - the id of the node/relationship to remove from the index or an 
+  object with an id property of the node/relationship to remove from the index.
+* indexName - the index to remove the node/relationship from.
+* key (optional) - the key from which to remove the node/relationship. If none
+  is specified, every reference to the node/relationship is deleted from the
+  index.
+* value (optional) - the value from which to remove the node/relationship. If
+  none is specified, every reference to the node/relationship is deleted for the
+  given key.
+* callback - function(err). If `err` is undefined, the specified references have
+  been removed.
+
+__Example__
+
+```javascript
+db.node.index.remove(6821, 'people', function(err) {
+  if (!err) console.log("Every reference of node 6821 has been removed from the people index");
+});
+
+db.rel.index.remove(351, 'friendships', 'in', 'Australia', function(err) {
+  if (!err) console.log("Relationship 351 is no longer indexed as a friendship in Australia");
+})
+```
 
 ---------------------------------------
 
@@ -516,8 +613,26 @@ __Arguments__
 ### node.index.delete(name, callback);
 ### rel.index.delete(name, callback);
 
-*Intent: delete an index*
+Delete an index.
 
-<img src="http://placekitten.com/240/147">
+__NOTE for index functions:__ there are two different types on index in neo4j - 
+__node__ indexes and __relationship__ indexes. When you're working with __node__
+indexes, you use the functions on `node.index`. Similarly, when you're working
+on __relationship__ indexes you use the functions on `node.rel`. All of the
+functions on both of these are identical, but one acts upon node 
+indexes, and the other upon relationship indexes.
+
+__Arguments__
+
+* name - the name of the index to delete
+* callback - function(err). if `err` is undefined, the index has been deleted.
+
+__Example__
+
+```javascript
+db.rel.index.delete('friendships', function(err) {
+  if (!err) console.log('The `friendships` index has been deleted');
+})
+```
 
 ---------------------------------------
