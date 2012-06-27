@@ -403,7 +403,8 @@ db.rel.create(1, 'knows', 2, props, function(err, relationship) {
   delete relationship.properties.location;
   relationship.properties.for = '3 months';
   db.rel.update(relationship, function(err) {
-    // properties have now been updated
+    // properties on this relationship in the database are now equal to
+    // { for: '3 months' }
   });
 });
 ```
