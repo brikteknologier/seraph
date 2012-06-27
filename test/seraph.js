@@ -1,24 +1,5 @@
 /* -*- Mode: Javascript; js-indent-level: 2 -*- */
 
-/**
- * Goal: Seraph 1.0
- * 
- * x db.call(path, [method='get'], [data], callback);
- * x db.save(obj, [callback]);
- * x db.relate(obj|id, linkname, other_obj|id, [props], [callback]);
- * x db.query(query, [params], callback);
- * x db.find(predicate, [indexes], callback);
- * x db.delete(obj, [callback]);
- * x db.read(obj|id, callback);
- * x db.relationships(obj|id, [name], [direction], callback);
- * x db.readLink(linkId, callback);
- * db.addIndex(obj|id, indexName, indexKey, indexValue, [callback])
- * db.readIndex(indexName, indexKey, [indexValue], callback)
- * db.indexes(obj|id, callback);
- * db.traversal(traversal, callback);
- *
- * **/
-
 var TEST_INSTANCE_PORT = parseInt('10507' || process.env.TEST_INSTANCE_PORT, 10);
 
 var seraph = require('../');
@@ -962,6 +943,40 @@ describe('seraph.index', function() {
             assert.ok(!nodes);
             db.index.read(iname, 'otherkey', 'false', function(err, nodes) {
               assert.ok(!err);
+              assert.ok(!nodes);
+              done();
+            });
+          });
+        });
+      })
+    }
+
+    async.series([createAndIndex, readIndex], done);
+  });
+
+  it('should delete an index', function(done) {
+    var iname = uniqn();
+
+    function createAndIndex(done) {
+      db.save({ name: 'Helge' }, function(err, node) {
+        db.node.index(iname, node, 'person', 'true', function(err) {
+          db.node.index(iname, node, 'otherkey', 'false', function(err) {
+            done();   
+          });
+        });
+      });
+    }
+
+    function readIndex(done) {
+      db.index.read(iname, 'person', 'true', function(err, node) {
+        assert.equal(node.name, "Helge");
+        db.index.delete(iname, function(err) {
+          assert.ok(!err)
+          db.index.read(iname, 'person', 'true', function(err, nodes) {
+            assert.ok(err);
+            assert.ok(!nodes);
+            db.index.read(iname, 'otherkey', 'false', function(err, nodes) {
+              assert.ok(err);
               assert.ok(!nodes);
               done();
             });

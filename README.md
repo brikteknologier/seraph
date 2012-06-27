@@ -15,8 +15,8 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
   db.delete(node, function(err) {
     if (err) throw err;
     console.log("Test-Man away!");
-  }
-}
+  });
+});
 ```
 
 ## Documentation
@@ -24,16 +24,15 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 <a name="seraph.db_list" />
 ### Generic Operations
 
-* [db](#db) - create a seraph object that uses some supplied options
 * [query](#query) - perform a cypher query and parse the results
 * [rawQuery](#rawQuery) - perform a cypher query and return unparsed results
-* [traversal](#traversal) - perform a traversal
+* ~~[traversal](#traversal) - perform a traversal~~
 
 ### API Communication Operations
 
 * [operation](#operation) - create a representation of a REST API call
 * [call](#call) - take an operation and call it
-* [batch](#batch) - perform multiple operations atomically
+* ~~[batch](#batch) - perform multiple operations atomically~~
 
 ### Node Operations
 * [save (node.save)](#node.save) - create or update a node
@@ -43,7 +42,6 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [relate (node.relate)](#node.relate) - relate two nodes
 * [relationships (node.relationships)](#node.relationships) - read the relationships of a node
 * [index (node.index)](#node.index) - add an index to a node
-* [indexes (node.indexes)](#node.indexes) - read the indexes of a node
 
 ### Relationship Operations
 * [rel.create](#rel.create) - create a relationship
@@ -57,23 +55,6 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [node.index.read & rel.index.read](#index.read) - read nodes/rels from an index
 * [node.index.remove & rel.index.remove](#index.remove) - remove nodes/rels from an index
 * [node.index.delete & rel.index.delete](#index.delete) - delete an index
-
-You can also access all functions directly on `seraph` (without calling `db()`).
-In this case you must supply an options argument. (See [db](#db) for 
-configuration documentation).  So this:
-
-```javascript
-var seraph = require("seraph");
-var db = seraph.db("http://localhost:7474/");
-db.save({x: 3});
-```
-
-Could also be written like this:
-
-```javascript
-var seraph = require("seraph");
-seraph.save("http://localhost:7474/", {x: 3});
-```
 
 ## Compatibility
 
@@ -92,27 +73,7 @@ restart and clean the server every time:
 
     npm run-script quick-test
 
-## Module Functions
-
-<a name="db" />
-### db (options)
-
-Returns an object with database access functions.  See
-[seraph.db](#seraph.db_list).
-
-`options` is an object with the following attributes:
-
-* `options.endpoint`: Optional.  Default="http://localhost:7474". URL of neo4j 
-  REST API.
-* `options.id`: Optional.  Default="id".  Saved objects will have this
-  property set to the generated database ID.  When updating or
-  deleting objects, will look for object ID in this property.
-
-Alternatively, `options` can just be the database URL as a string.
-
----------------------------------------
-
-## `db` Functions
+## Generic Operations
 
 <a name="query" /><a name="rawQuery"/>
 ### query(query, [params,] callback), rawQuery(query, [params,] callback)
@@ -121,12 +82,15 @@ Alternatively, `options` can just be the database URL as a string.
 REST API.  
 `query` performs a cypher query and map the columns and results together.
 
+If you're doing queries on very large sets of data, it may be wiser to use
+`query` and deal with neo4j's results directly.
+
 __Arguments__
 
 * query - Cypher query as a format string.
 * params - Default=`{}`. Replace `{key}` parts in query string.  See cypher
            documentation for details.
-* callback - function (err, result).  Result is an array of objects.
+* callback - (err, result).  Result is an array of objects.
 
 __Example__
 
@@ -171,30 +135,68 @@ are returned (in order to transform them into a nicer format).
 ---------------------------------------
 
 <a name="traversal" />
-### traversal(traversal, callback)
+### ~~traversal(traversal, callback)~~
 
-<img src="http://placekitten.com/200/140">
+__Feature planned for 1.1.0__
 
 ---------------------------------------
 
 <a name="operation" />
-### operation(path, [method='get'], [data])
+### operation(path, [method='get/post'], [data])
 
-<img src="http://placekitten.com/200/140">
+Create an operation object that will be passed to [call](#call). 
+
+__Arguments__
+
+* path - the path fragment of the request URL with no leading slash. 
+* method (optional) - the HTTP method to use. When `data` is an 
+  object, `method` defaults to 'POST'. Otherwise, `method` defaults to `GET`.
+* data (optional) - an object to send to the server with the request.
+
+__Example__
+
+```javascript
+var operation = db.operation('node/4285/properties', 'PUT', { name: 'Jon' });
+db.call(operation, function(err) {
+  if (!err) console.log('Set `name` to `Jon` on node 4285!')
+});
+```
 
 ---------------------------------------
 
 <a name="call" />
-### call(opts, operation, callback)
+### call(operation, callback)
 
-<img src="http://placekitten.com/200/140">
+Perform an HTTP request to the server.
+
+If the body is some JSON, it is parsed and passed to the callback.If the status
+code is not in the 200's, an error is passed to the callback. 
+
+__Arguments__
+
+* operation - an operation created by [operation](#operation) that specifies
+  what to request from the server
+* callback - function(err, result, response). `result` is the JSON parsed body
+  from the server (otherwise empty). `response` is the response object from the
+  request.
+
+__Example__
+
+```javascript
+var operation = db.operation('node/4285/properties');
+db.call(operation, function(err, properties) {
+  if (err) throw err;
+
+  // `properties` is an object containing the properties from node 4285
+});
+```
 
 ---------------------------------------
 
 <a name="batch" />
-### batch(block|operationArray, callback)
+### ~~batch(block|operationArray, callback)~~
 
-<img src="http://placekitten.com/200/140">
+__Feature planned for 1.1.0__
 
 ---------------------------------------
 
@@ -202,7 +204,33 @@ are returned (in order to transform them into a nicer format).
 ### save(object, callback)
 *Aliases: __node.save__*
 
-<img src="http://placekitten.com/200/145">
+Create or update a node. If `object` has an id property, the node with that id
+is updated. Otherwise, a new node is created. Returns the newly created/updated
+node to the callback.
+
+__Arguments__
+
+* node - an object to create or update
+* callback - function(err, node). `node` is the newly saved or updated node. If
+  a create was performed, it will now have an id property. The returned object
+  is not the same reference as the passed object (the passed object will never
+  be altered).
+
+__Example__
+
+```javascript
+// Create a node
+db.save({ name: 'Jon', age: 22, likes: 'Beer' }, function(err, node) {
+  console.log(node); // -> { name: 'Jon', age: 22, likes: 'Beer', id: 1 }
+  
+  // Update it
+  delete node.likes;
+  node.age++;
+  db.save(node, function(err, node) {
+    console.log(node); // -> { name: 'Jon', age: 23, id: 1 }
+  })
+})
+```
 
 ---------------------------------------
 
@@ -280,14 +308,6 @@ var people = db.find(predicate, function (err, objs) {
 **Aliases: __node.index__*
 
 <img src="http://placekitten.com/200/142">
-
----------------------------------------
-
-<a name="node.indexes" />
-### indexes(node, callback)
-**Aliases: __node.indexes__*
-
-<img src="http://placekitten.com/200/140">
 
 ---------------------------------------
 
