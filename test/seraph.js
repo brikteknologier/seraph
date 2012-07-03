@@ -574,9 +574,9 @@ describe('seraph#query, seraph#queryRaw', function() {
         delete result[0]['collect(n)'][0].id;
         delete result[0]['collect(n)'][1].id;
         assert.deepEqual([{
-          'x': { name: 'Jon' },
-          'collect(n)': [{ name: 'Neil' },
-                         { name: 'Katie' }]
+          'x': { name: 'Jon', age: 23 },
+          'collect(n)': [{ name: 'Neil', age: 60 },
+                         { name: 'Katie', age: 29 }]
         }], result);
         done();
       });
