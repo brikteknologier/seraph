@@ -573,6 +573,12 @@ describe('seraph#query, seraph#queryRaw', function() {
         delete result[0]['x'].id;
         delete result[0]['collect(n)'][0].id;
         delete result[0]['collect(n)'][1].id;
+        // "sort" collect list
+        if (result[0]['collect(n)'][0].name === "Katie") {
+          var t = result[0]['collect(n)'][0];
+          result[0]['collect(n)'][0] = result[0]['collect(n)'][1];
+          result[0]['collect(n)'][1] = t;
+        }
         assert.deepEqual([{
           'x': { name: 'Jon', age: 23 },
           'collect(n)': [{ name: 'Neil', age: 60 },
