@@ -1,9 +1,10 @@
 /* -*- Mode: Javascript; js-indent-level: 2 -*- */
 
 var TEST_INSTANCE_PORT = parseInt('10507' || process.env.TEST_INSTANCE_PORT, 10);
+var testDatabase = 'http://localhost:' + TEST_INSTANCE_PORT;
 
-var seraph = require('../');
-var db = seraph.db('http://localhost:' + TEST_INSTANCE_PORT);
+var seraph = require('../'), _seraph = seraph;
+var db = seraph(testDatabase);
 var spawn = require('child_process').spawn;
 
 var async = require('async');
@@ -83,12 +84,12 @@ before(refreshDb);
 after(stopDb);
 
 describe('seraph#call, seraph#operation', function() {
-  var originalRequest = seraph.call._request;
+  var seraph = _seraph(testDatabase);
   function setupMock(mock) {
     seraph._request = mock;
   };
   afterEach(function() {
-    seraph._request = originalRequest;
+    delete seraph._request;
   });
   
   it('should infer GET request if no data or method supplied', function(done) {
@@ -98,8 +99,8 @@ describe('seraph#call, seraph#operation', function() {
       assert.equal(opts.method, 'GET');
       done();
     });
-    var op = seraph.operation(opts, '');
-    seraph.call(opts, op);
+    var op = seraph.operation('');
+    seraph.call(op);
   });
 
   it('should infer POST request if data supplied', function(done) {
@@ -114,19 +115,19 @@ describe('seraph#call, seraph#operation', function() {
       assert.deepEqual(opts.json, testObject);
       done();
     });
-    var op = seraph.operation(opts, '', testObject);
-    seraph.call(opts, op);
+    var op = seraph.operation('', testObject);
+    seraph.call(op);
   });
 
   it('should add /db/data/ to url', function(done) {
     var opts = { endpoint: '' };
     var obj = {};
     setupMock(function(opts, callback) {
-      assert.equal(opts.uri, '/db/data/');
+      assert.equal(opts.uri, testDatabase + '/db/data/');
       done();
     });
-    var op = seraph.operation(opts, '', obj);
-    seraph.call(opts, op);
+    var op = seraph.operation('', obj);
+    seraph.call(op);
   });
 });
 
