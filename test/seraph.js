@@ -1032,3 +1032,30 @@ describe('seraph.index', function() {
     async.series([createAndIndex, readIndex], done);
   });
 });
+
+describe('seraph#batch', function() {
+  it('should perform a series of operations as expected', function(done) {
+    function createObjs(done) {
+      db.save([{name: 'Jon', age: 23}, 
+               {name: 'Neil', age: 60},
+               {name: 'Katie', age: 29}], function(err, users) {
+        done(null, users);
+      });
+    }
+
+    function readBatch(users, callback) {
+      var ids = [];
+      db.batch(function(db) {
+        ids.push(db.read(users[0]));
+        ids.push(db.read(users[1]));
+        ids.push(db.read(users[2]));
+      }, function(err, results) {
+        assert.deepEqual(results, users);
+        callback();
+      })
+
+    }
+
+    async.waterfall([createObjs, readBatch], done);
+  });
+}); 
