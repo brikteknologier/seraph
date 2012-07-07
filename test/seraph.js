@@ -580,6 +580,44 @@ describe('seraph#query, seraph#queryRaw', function() {
   
     async.waterfall([createObjs, linkObjs, query], done);
   });
+
+  it('should handle arrays in format string', function(done) {
+    function createObjs(done) {
+      db.save([{tool: 'glue'},
+               {tool: 'laser'},
+               {tool: 'toilet paper'}],
+              function(err, tools) {
+                var toolIds = tools.map(function(t) { return t.id; });
+                done(null, toolIds.slice(0, 2), toolIds[2])
+              });
+    }
+    
+    function linkObjs(tools, tp, done) {
+      db.relate(tools, 'ruins', tp, function(err, links) {
+        done(null, tools);
+      });
+    }
+
+    function query(tools, done) {
+      var cypher = "start x = node(" + tools + ") ";
+      cypher    += "match x -[:ruins]-> y ";
+      cypher    += "return x.tool, y.tool ";
+      cypher    += "order by x.tool";
+      db.query(cypher, function(err, result) {
+        assert.ok(!err);
+        assert.deepEqual([{
+          'x.tool': 'glue',
+          'y.tool': 'toilet paper',
+        }, {
+          'x.tool': 'laser',
+          'y.tool': 'toilet paper',
+        }], result);
+        done();
+      });
+    }
+  
+    async.waterfall([createObjs, linkObjs, query], done);
+  });
   
   it('should recurse into collect() arrays on query', function(done) {
     function createObjs(done) {
