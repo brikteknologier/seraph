@@ -695,6 +695,27 @@ describe('seraph#query, seraph#queryRaw', function() {
 
     async.waterfall([createObjs, linkObjs, queryRaw], done);
   });
+
+  it('should handle optional entities', function(done) {
+    function createObjs(done) {
+      db.save({name: 'Jon', age: 23}, function(err, user) {
+        done(null, user);
+      });
+    }
+
+    function query(user, done) {
+      var cypher = "start x = node(" + user.id + ") ";
+      cypher    += "match x -[?]-> n ";
+      cypher    += "return x, n ";
+      db.query(cypher, function(err, result) {
+        assert.ok(!err);
+        assert.deepEqual([ user ], result);
+        done();
+      });
+    }
+  
+    async.waterfall([createObjs, query], done);
+  });
 });
 
 describe('seraph#find', function() {
