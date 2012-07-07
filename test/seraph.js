@@ -709,7 +709,7 @@ describe('seraph#query, seraph#queryRaw', function() {
       cypher    += "return x, n ";
       db.query(cypher, function(err, result) {
         assert.ok(!err);
-        assert.deepEqual([ user ], result);
+        assert.deepEqual([{x: user, n: null}], result);
         done();
       });
     }
