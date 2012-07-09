@@ -22,6 +22,11 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 ## Documentation
 
 <a name="seraph.db_list" />
+### Getting Started
+
+* [Instantiating Seraph](#instantiation)
+* [Options](#options)
+
 ### Generic Operations
 
 * [query](#query) - perform a cypher query and parse the results
@@ -73,6 +78,40 @@ or, if you have started the test instance yourself and don't want the tests to
 restart and clean the server every time:
 
     npm run-script quick-test
+
+## Getting Started
+
+<a name="instantiation"/>
+### Instantiating Seraph
+
+Basic instantiation:
+
+```javascript
+var seraph = require('seraph');
+var myNeo4jDatabase = seraph("http://localhost:7474");
+```
+
+Instantiation with options:
+
+```javascript
+var seraph = require('seraph')
+var myNeo4jDatabase = seraph({
+  endpoint: 'http://192.168.1.5:10572',
+  id: '_id'
+});
+```
+<a name="options"/>
+### Options
+
+* __endpoint__ - *default:* `"http://locahost:7474"` - the location of the 
+  Neo4j server.
+* __id__ - *default:* `"id"` - the key to use as the identifier attribute in 
+  nodes and relationships. For example, if `options.id` is set to 
+  `"__identifier__"`, when a node `{"name": "Jon"}` is returned from the 
+  database, it will look like `{"name": "Jon", "__identifier__": 15}`
+* __streaming__ - *default:* `true` - whether or not to use streaming under the
+  hood. This uses the [JSONStream](https://github.com/dominictarr/JSONStream)
+  parser and streams from the Neo4j server. 
 
 ## Generic Operations
 
