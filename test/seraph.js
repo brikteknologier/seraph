@@ -177,6 +177,10 @@ describe('seraph#save, seraph#read', function() {
 
     async.waterfall([createObjs, readObjs], done);
   });
+
+  it('should handle an empty array of objects to save', function(done) {
+    db.save([], done);
+  });
 })
 
 describe('seraph#update', function() {
