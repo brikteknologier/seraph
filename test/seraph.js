@@ -177,6 +177,10 @@ describe('seraph#save, seraph#read', function() {
 
     async.waterfall([createObjs, readObjs], done);
   });
+
+  it('should handle an empty array of objects to save', function(done) {
+    db.save([], done);
+  });
 })
 
 describe('seraph#update', function() {
@@ -340,6 +344,31 @@ describe('seraph.rel', function() {
     }
 
     async.waterfall([createObjs, linkObjs, readLink], done);
+  });
+
+  it('should link arrays as set multiplication', function(done) {
+    async.auto({
+      dudes: function(cb) {
+        db.save([{name: 'Jon'}, {name: 'Helge'}], cb);
+      },
+      
+      fuels: function(cb) {
+        db.save([{name: 'beer'}, {name: 'coffee'}], cb);
+      },
+      
+      link: ['dudes', 'fuels', function(cb, res) {
+        db.rel.create(res.dudes, 'craves', res.fuels, cb);
+      }],
+
+      readLink: ['link', function(cb, res) {
+        db.rel.read(res.link, cb);
+      }],
+
+      check: ['readLink', function(cb, res) {
+        assert.equal(res.readLink.length, 4);
+        cb();
+      }]
+    }, done);
   });
 
   it('should delete a relationship', function(done) {
