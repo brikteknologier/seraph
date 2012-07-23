@@ -852,6 +852,82 @@ describe('seraph#find', function() {
 
     async.series([createObjs, findObjs], done);
   })
+
+  it('should find some items based on an OR predicate', function(done) {
+    var uniqueKey = 'seraph_find_test' + counter();
+    function createObjs(done) {
+      var objs = [ {name: 'Jon', age: 23}, 
+                   {name: 'Neil', age: 60},
+                   {name: 'Katie', age: 29} ];
+      for (var index in objs) {
+        objs[index][uniqueKey] = true;
+      }
+      objs[3] = {name: uniqueKey+'Belinda', age: 26};
+      objs[3][uniqueKey] = false;
+
+      db.save(objs, function(err, users) {
+        done();
+      });
+    }
+
+    function findObjs(done) {
+      var predicate = {};
+      predicate[uniqueKey] = true;
+      predicate['name'] = uniqueKey+'Belinda';
+
+      db.find(predicate, true, function(err, objs) {
+        assert.ok(!err);
+        assert.equal(objs.length, 4);
+        var names = objs.map(function(o) { return o.name });
+        assert.ok(names.indexOf('Jon') >= 0);
+        assert.ok(names.indexOf('Neil') >= 0);
+        assert.ok(names.indexOf('Katie') >= 0);
+        assert.ok(names.indexOf(uniqueKey+'Belinda') >= 0);
+        done();
+      });
+    }
+
+    async.series([createObjs, findObjs], done);
+  })
+
+  it('should find some items based on a predicate with a custom starting point', function(done) {
+    var uniqueKey = 'seraph_find_test' + counter();
+    function createObjs(done) {
+      var objs = [ {name: 'Jon', age: 23}, 
+                   {name: 'Neil', age: 60},
+                   {name: 'Katie', age: 29} ];
+      for (var index in objs) {
+        objs[index][uniqueKey] = true;
+      }
+      objs[3] = {name: 'Belinda', age: 26};
+      objs[3][uniqueKey] = false;
+
+      db.save(objs, function(err, users) {
+        users = users.slice(1);
+        db.index(uniqueKey, users, 'some_thing', 'perhaps', function() {
+          done();
+        })
+      });
+    }
+
+    function findObjs(done) {
+      var predicate = {};
+      predicate[uniqueKey] = true;
+      var startPoint = 'node:' + uniqueKey + '(some_thing="perhaps")';
+      db.find(predicate, false, startPoint, function(err, objs) {
+        assert.ok(!err);
+        assert.equal(objs.length, 2);
+        var names = objs.map(function(o) { return o.name });
+        assert.ok(names.indexOf('Jon') === -1);
+        assert.ok(names.indexOf('Neil') >= 0);
+        assert.ok(names.indexOf('Katie') >= 0);
+        assert.ok(names.indexOf('Belinda') === -1);
+        done();
+      });
+    }
+
+    async.series([createObjs, findObjs], done);
+  })
 });
 
 describe('seraph.index', function() {

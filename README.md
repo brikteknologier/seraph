@@ -283,7 +283,7 @@ db.save({ name: 'Jon' }, function(err, node) {
 ---------------------------------------
 
 <a name="node.find" />
-### find(predicate, any, callback)
+### find(predicate, [any, [start,]] callback)
 *Aliases: __node.find__*
 
 Perform a query based on a predicate. The predicate is translated to a
@@ -295,6 +295,8 @@ __Arguments__
   the defined attributes of predicate.
 * any (optional, default=`false`) - If true, elements need only match on one 
   attribute. If false, elements must match on all attributes.
+* start (optional, default=`'node(*)'`) - The scope of the search. For alternate
+  values, check the [neo4j docs on the cypher START command](http://docs.neo4j.org/chunked/stable/query-start.html).
 * callback - function(err, results) - `results` is an array of the resulting
   nodes.
 
