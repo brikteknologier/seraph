@@ -84,7 +84,7 @@ before(refreshDb);
 after(stopDb);
 
 describe('seraph#call, seraph#operation', function() {
-  var seraph = _seraph(testDatabase);
+  var seraph = _seraph({endpoint: testDatabase, streaming: false});
   function setupMock(mock) {
     seraph._request = mock;
   };
