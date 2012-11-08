@@ -165,6 +165,40 @@ describe('seraph#save, seraph#read', function() {
     });
   });
 
+  it('should handle alternative id property name', function(done) {
+    function create(done) {
+      db.save({ name: 'Jon', age: 23 }, function(err, user) {
+        assert.ok(!err, err);
+        assert.ok(typeof user.ponies !== 'undefined');
+        assert.equal(user.name, 'Jon');
+        assert.equal(user.age, 23);
+
+        done(null, user.ponies);
+      });
+    }
+
+    function read(userId, done) {
+      db.read(userId, function(err, user) {
+        assert.ok(!err, err);
+        assert.equal(user.name, 'Jon');
+        assert.equal(user.age, 23);
+        done(null, user);
+      });
+    }
+
+    var origId = db.options.id;
+    db.options.id = "ponies";
+    try {
+      async.waterfall([create, read], function(err, res) {
+        db.options.id = origId;
+        done(err, res);
+      });
+    } catch (e) {
+      db.options.id = origId;
+      throw e;
+    }
+  });
+
   it('should be able to create an object and read it back', function(done) {
     function create(done) {
       db.save({ name: 'Jon', age: 23 }, function(err, user) {
