@@ -1146,6 +1146,29 @@ describe('seraph.index', function() {
     async.series([createAndIndex, readIndex], done);
   });
 
+
+  it('should read a single object from an index named with a space', function(done) {
+    var iname = uniqn() + " with a space";
+
+    function createAndIndex(done) {
+      db.save({ name: 'Helge' }, function(err, node) {
+        db.node.index(iname, node, 'person', 'has a space', function(err) {
+          done();   
+        });
+      });
+    }
+
+    function readIndex(done) {
+      db.index.read(iname, 'person', 'has a space', function(err, node) {
+        assert.ok(!err);
+        assert.equal(node.name, 'Helge');
+        done();
+      })
+    }
+
+    async.series([createAndIndex, readIndex], done);
+  });
+
   it('should read all values of a kv pair in an index', function(done) {
     var iname = uniqn();
 
