@@ -3,6 +3,12 @@
 A terse & familiar binding to the [Neo4j](http://neo4j.org/) REST API that is 
 idiomatic to [node.js](http://nodejs.org/).
 
+## Install
+
+```
+npm install seraph
+```
+
 ## Quick Example
 
 ```javascript
