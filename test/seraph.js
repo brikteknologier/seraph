@@ -1302,9 +1302,20 @@ describe('seraph#batch', function() {
         assert.deepEqual(results, users);
         callback();
       })
-
     }
 
     async.waterfall([createObjs, readBatch], done);
+  });
+
+  it('should perform a series of saves in a batch', function(done) {
+    db.batch(function(db) {
+      db.save({ newPerson: 'bob' });
+      db.save([ {newPerson: 'orange'}, {newPerson: 'cat'} ]);
+    }, function(err, result) {
+      assert.equal(result[0].newPerson, 'bob');
+      assert.equal(result[1][0].newPerson, 'orange');
+      assert.equal(result[1][1].newPerson, 'cat');
+      done();
+    });
   });
 }); 
