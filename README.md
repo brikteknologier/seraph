@@ -639,3 +639,6 @@ db.rel.index.delete('friendships', function(err) {
 ```
 
 ---------------------------------------
+
+*Seraph.js was started lovingly by BRIK Teknologier AS in Bergen, Norway*  
+<img src="http://brik.no/brikflake.svg" width="91" height="87"/>
