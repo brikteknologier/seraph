@@ -83,6 +83,23 @@ var stopDb = function(done) {
 before(refreshDb);
 after(stopDb);
 
+describe('errors', function() {
+  it('should give Error objects with message', function(done) {
+    db.read(console, function(err, data) {
+      assert.ok(err instanceof Error);
+      assert.ok(err.message);
+      done();
+    });
+  });
+
+  it('should decorate errors originating from neo4j', function(done) {
+    db.query("herp derp;", function(err, data) {
+      assert.ok(err.neo4jException);
+      done();
+    });
+  });
+});
+
 describe('seraph#call, seraph#operation', function() {
   var seraph = _seraph(testDatabase);
   function setupMock(mock) {
