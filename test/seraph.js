@@ -149,6 +149,22 @@ describe('seraph#call, seraph#operation', function() {
 });
 
 describe('seraph#save, seraph#read', function() {
+  it('should accept id of 0 on read', function(done) {
+    db.read(0, function(err, data) {
+      if (err)
+        assert.equal(err.statusCode, 204); // neo4j gives 204 no content
+      done();
+    });
+  });
+
+  it('should accept id of 0 on save', function(done) {
+    db.save({ id: 0, herp: "DERP" }, function(err, data) {
+      if (err)
+        assert.ok(err.statusCode); // not seraph error
+      done();
+    });
+  });
+
   it('should be able to create an object and read it back', function(done) {
     function create(done) {
       db.save({ name: 'Jon', age: 23 }, function(err, user) {
@@ -325,6 +341,22 @@ describe('seraph#delete', function() {
 });
 
 describe('seraph.rel', function() {
+  it('should accept id of 0 on rel.read', function(done) {
+    db.rel.read(0, function(err, data) {
+      if (err)
+        assert.ok(err.statusCode); // not seraph error
+      done();
+    });
+  });
+
+  it('should accept id of 0 on rel.update', function(done) {
+    db.rel.update({ id: 0, properties: { x: "y" } }, function(err, data) {
+      if (err)
+        assert.ok(err.statusCode); // not seraph error
+      done();
+    });
+  });
+
   it('should link two objects together', function(done) {
     function createObjs(done) {
       db.save([{name: 'Jon'}, {name: 'Helge'}], function(err, users) {
