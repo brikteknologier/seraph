@@ -265,7 +265,7 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
 ---------------------------------------
 
 <a name="node.delete" />
-### delete(id|object, [callback])
+### delete(id|object, [force], [callback])
 *Aliases: __node.delete__*
 
 Delete a node.
@@ -274,6 +274,7 @@ __Arguments__
 
 * id|object - either the id of the node to delete, or an object containing an id
 property of the node to delete.
+* force - if truthy, will delete all the node's relations prior to deleting the node.
 * callback - function(err). if `err` is falsy, the node has been deleted.
 
 __Example__
