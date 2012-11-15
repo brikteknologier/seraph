@@ -255,7 +255,6 @@ describe('seraph#save, seraph#read', function() {
         db.save(thingamajig, function(err, thingamajiggy) {
           db.query('START n = node({id}) RETURN n.id? as thingamajiggle',
                    thingamajiggy, function(err, thingamajoggle) {
-            console.log(err);
             assert.ok(thingamajoggle[0] === null);
             done();
           });
@@ -354,6 +353,49 @@ describe('seraph#delete', function() {
     }
 
     async.waterfall([create, del], done);
+  });
+
+  it('should not delete node w/relations if not forced', function(done) {
+    async.auto({
+      n: function(cb) {
+        db.save({}, cb);
+      },
+      m: function(cb) {
+        db.save({}, cb);
+      },
+      r: ["n", "m", function(cb, res) {
+        db.rel.create(res.n, "abscurs", res.m, cb);
+      }],
+      d: ["n", "r", function(cb, res) {
+        db.delete(res.n, function(err) {
+          var re = /org.neo4j.server.rest.web.OperationFailureException:/;
+          cb(!re.test(err.neo4jException));
+        });
+      }]
+    }, function(err, res) {
+      assert.ok(!err, err);
+      done();
+    });
+  });
+
+  it('should delete node+relations if forced', function(done) {
+    async.auto({
+      n: function(cb) {
+        db.save({}, cb);
+      },
+      m: function(cb) {
+        db.save({}, cb);
+      },
+      r: ["n", "m", function(cb, res) {
+        db.rel.create(res.n, "abscurs", res.m, cb);
+      }],
+      d: ["n", "r", function(cb, res) {
+        db.delete(res.n, true, cb);
+      }]
+    }, function(err, res) {
+      assert.ok(!err, err);
+      done();
+    });
   });
 
   it('should take an array of objects to delete', function(done) {
