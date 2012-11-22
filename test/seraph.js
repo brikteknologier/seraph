@@ -101,16 +101,18 @@ describe('errors', function() {
 });
 
 describe('seraph#call, seraph#operation', function() {
-  var seraph = _seraph(testDatabase);
-  function setupMock(mock) {
+  var seraph;
+  function setupMock(opts, mock) {
+    if (typeof opts == 'function') {
+      seraph = _seraph(testDatabase);
+      mock = opts;
+    } else {
+      seraph = _seraph(opts);
+    }
     seraph._request = mock;
   };
-  afterEach(function() {
-    delete seraph._request;
-  });
   
   it('should infer GET request if no data or method supplied', function(done) {
-    var opts = { endpoint: '' };
     setupMock(function(opts, callback) {
       assert.ok(typeof callback === 'function');
       assert.equal(opts.method, 'GET');
@@ -121,7 +123,6 @@ describe('seraph#call, seraph#operation', function() {
   });
 
   it('should infer POST request if data supplied', function(done) {
-    var opts = { endpoint: '' };
     var testObject = {
       foo: 'foo',
       bar: 10
@@ -136,11 +137,40 @@ describe('seraph#call, seraph#operation', function() {
     seraph.call(op);
   });
 
-  it('should add /db/data/ to url', function(done) {
-    var opts = { endpoint: '' };
+  it('should infer http://localhost:7474 as server', function(done) {
+    var obj = {};
+    setupMock({ }, function(opts, callback) {
+      assert.ok(opts.uri.match('http://localhost:7474'));
+      done();
+    });
+    var op = seraph.operation('', obj);
+    seraph.call(op);
+  });
+
+  it('should infer /db/data/ as endpoint', function(done) {
     var obj = {};
     setupMock(function(opts, callback) {
-      assert.equal(opts.uri, testDatabase + '/db/data/');
+      assert.ok(opts.uri.match('/db/data/'));
+      done();
+    });
+    var op = seraph.operation('', obj);
+    seraph.call(op);
+  });
+
+  it('should accept specific endpoint', function(done) {
+    var obj = {};
+    setupMock({ endpoint: '/herp/derp' }, function(opts, callback) {
+      assert.ok(opts.uri.match('/herp/derp/'));
+      done();
+    });
+    var op = seraph.operation('', obj);
+    seraph.call(op);
+  });
+
+  it('should accept specific server', function(done) {
+    var obj = {};
+    setupMock({ server: 'http://legit.ru:1337' }, function(opts, callback) {
+      assert.ok(opts.uri.match('http://legit.ru:1337'));
       done();
     });
     var op = seraph.operation('', obj);
