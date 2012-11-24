@@ -557,7 +557,7 @@ Add a node/relationship to an index.
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
 indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `node.rel`. All of the
+on __relationship__ indexes you use the functions on `rel.index`. All of the
 functions on both of these are identical, but one acts upon node 
 indexes, and the other upon relationship indexes.
 
@@ -592,7 +592,7 @@ Read the object(s) from an index that match a key-value pair.
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
 indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `node.rel`. All of the
+on __relationship__ indexes you use the functions on `rel.index`. All of the
 functions on both of these are identical, but one acts upon node 
 indexes, and the other upon relationship indexes.
 
@@ -625,7 +625,7 @@ Remove a node/relationship from an index.
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
 indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `node.rel`. All of the
+on __relationship__ indexes you use the functions on `rel.index`. All of the
 functions on both of these are identical, but one acts upon node 
 indexes, and the other upon relationship indexes.
 
@@ -666,7 +666,7 @@ Delete an index.
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
 indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `node.rel`. All of the
+on __relationship__ indexes you use the functions on `rel.index`. All of the
 functions on both of these are identical, but one acts upon node 
 indexes, and the other upon relationship indexes.
 
