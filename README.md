@@ -93,8 +93,8 @@ assumes the Neo4J REST API is running locally at the default location
 
 __Arguments__
 
-* server (default=`"http://localhost:7474"`) - Protocol and authority part of Neo4J REST URI.
-* options (default=`{ server: "http://localhost:7474", endpoint: "/db/data" }` - `server` is protocol and authority part of Neo4J REST URI, and `endpoint` should be the path segment of the REST URI.
+* options (default=`{ server: "http://localhost:7474", endpoint: "/db/data" }` - `server` is protocol and authority part of Neo4J REST API URI, and `endpoint` should be the path segment of the URI.
+* server (string) - Short form to specify server parameter only. `"http://localhorse:4747"` is equivalent to `{ server: "http://localhorse:4747" }`.
 
 ## Generic Operations
 
