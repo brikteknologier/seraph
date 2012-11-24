@@ -28,6 +28,9 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 ## Documentation
 
 <a name="seraph.db_list" />
+### Initialization
+* [seraph](#seraph) - initialize the seraph client
+
 ### Generic Operations
 
 * [query](#query) - perform a cypher query and parse the results
@@ -79,6 +82,41 @@ or, if you have started the test instance yourself and don't want the tests to
 restart and clean the server every time:
 
     npm run-script quick-test
+
+## Initialization
+<a name="seraph" />
+### seraph([server|options])
+
+Creates and returns the Seraph instance.  If no parameters are given,
+assumes the Neo4J REST API is running locally at the default location
+`http://localhost:7474/db/data`.
+
+__Arguments__
+
+* options (default=`{ server: "http://localhost:7474", endpoint: "/db/data" }` - `server` is protocol and authority part of Neo4J REST API URI, and `endpoint` should be the path segment of the URI.
+* server (string) - Short form to specify server parameter only. `"http://localhorse:4747"` is equivalent to `{ server: "http://localhorse:4747" }`.
+
+__Example__
+
+```javascript
+// To http://localhost:7474/db/data
+var dbLocal = require("seraph")();
+
+// To http://example.com:53280/neo
+var dbRemote = require("seraph")({ server: "http://example.com:53280",
+                                   endpoint: "/neo" });
+
+// Copy node#13 from remote server
+dbRemote.read({ id: 13 }, function(err, node) {
+  if (err) throw err;
+  delete node.id; // copy instead of overwriting local node#13
+  dbLocal.save(node, function(err, nodeL) {
+    if (err) throw err;
+    console.log("Copied remote node#13 to " +
+                "local node#" + nodeL.id.toString() + ".");
+  });
+});
+```
 
 ## Generic Operations
 
