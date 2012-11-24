@@ -96,6 +96,28 @@ __Arguments__
 * options (default=`{ server: "http://localhost:7474", endpoint: "/db/data" }` - `server` is protocol and authority part of Neo4J REST API URI, and `endpoint` should be the path segment of the URI.
 * server (string) - Short form to specify server parameter only. `"http://localhorse:4747"` is equivalent to `{ server: "http://localhorse:4747" }`.
 
+__Example__
+
+```javascript
+// To http://localhost:7474/db/data
+var dbLocal = require("seraph")();
+
+// To http://example.com:53280/neo
+var dbRemote = require("seraph")({ server: "http://example.com:53280",
+                                   endpoint: "/neo" });
+
+// Copy node#13 from remote server
+dbRemote.read({ id: 13 }, function(err, node) {
+  if (err) throw err;
+  delete node.id; // copy instead of overwriting local node#13
+  dbLocal.save(node, function(err, nodeL) {
+    if (err) throw err;
+    console.log("Copied remote node#13 to " +
+                "local node#" + nodeL.id.toString() + ".");
+  });
+});
+```
+
 ## Generic Operations
 
 <a name="query" /><a name="rawQuery"/>
