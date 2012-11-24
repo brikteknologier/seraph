@@ -28,6 +28,9 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 ## Documentation
 
 <a name="seraph.db_list" />
+### Initialization
+* [seraph](#seraph) - initialize the seraph client
+
 ### Generic Operations
 
 * [query](#query) - perform a cypher query and parse the results
@@ -79,6 +82,19 @@ or, if you have started the test instance yourself and don't want the tests to
 restart and clean the server every time:
 
     npm run-script quick-test
+
+## Initialization
+<a name="seraph" />
+### seraph([server|options])
+
+Creates and returns the Seraph instance.  If no parameters are given,
+assumes the Neo4J REST API is running locally at the default location
+`http://localhost:7474/db/data`.
+
+__Arguments__
+
+* server (default=`"http://localhost:7474"`) - Protocol and authority part of Neo4J REST URI.
+* options (default=`{ server: "http://localhost:7474", endpoint: "/db/data" }` - `server` is protocol and authority part of Neo4J REST URI, and `endpoint` should be the path segment of the REST URI.
 
 ## Generic Operations
 
