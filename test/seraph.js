@@ -1,6 +1,6 @@
 /* -*- Mode: Javascript; js-indent-level: 2 -*- */
 
-var TEST_INSTANCE_PORT = parseInt('10507' || process.env.TEST_INSTANCE_PORT, 10);
+var TEST_INSTANCE_PORT = parseInt(process.env.TEST_INSTANCE_PORT || '10507', 10);
 var testDatabase = 'http://localhost:' + TEST_INSTANCE_PORT;
 
 var seraph = require('../'), _seraph = seraph;
