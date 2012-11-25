@@ -1,6 +1,6 @@
 /* -*- Mode: Javascript; js-indent-level: 2 -*- */
 
-var TEST_INSTANCE_PORT = parseInt('10507' || process.env.TEST_INSTANCE_PORT, 10);
+var TEST_INSTANCE_PORT = parseInt(process.env.TEST_INSTANCE_PORT || '10507', 10);
 var testDatabase = 'http://localhost:' + TEST_INSTANCE_PORT;
 
 var seraph = require('../'), _seraph = seraph;
@@ -82,6 +82,17 @@ var stopDb = function(done) {
 
 before(refreshDb);
 after(stopDb);
+
+describe('configuration', function() {
+  it('should handle referencing the server by alias', function(done) {
+    var alias = 'http://127.0.0.1:' + TEST_INSTANCE_PORT;
+    var db = _seraph(alias);
+    db.save({ jelly: "belly" }, function(err, data) {
+      assert.ok(!err);
+      done();
+    });
+  });
+});
 
 describe('errors', function() {
   it('should give Error objects with message', function(done) {
