@@ -84,6 +84,16 @@ before(refreshDb);
 after(stopDb);
 
 describe('configuration', function() {
+  it('should gracefully handle options.server set to a pizza', function(done) {
+    try {
+      db = _seraph("a pizza");
+      asser.fail("did not handle pizza");
+    } catch (e) {
+      assert.ok(/%o%o%%/.test(e.message));
+      done();
+    }
+  });
+
   /* This checks that the server accepts seraph constructed node id
    * urls where the authority segment or the URL refers to the server
    * by a different name than it knows itself as. */
