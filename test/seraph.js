@@ -1,7 +1,6 @@
 /* -*- Mode: Javascript; js-indent-level: 2 -*- */
 
 var testDatabase = require('./util/database');
-
 var seraph = require('../'), _seraph = seraph;
 var db = seraph(testDatabase.url);
 
@@ -51,23 +50,6 @@ describe('configuration', function() {
     testWithServerName('127.0.0.1', function(err) {
       if (err) return done(err);
       testWithServerName('localhost', done);
-    });
-  });
-});
-
-describe('errors', function() {
-  it('should give Error objects with message', function(done) {
-    db.read(console, function(err, data) {
-      assert.ok(err instanceof Error);
-      assert.ok(err.message);
-      done();
-    });
-  });
-
-  it('should decorate errors originating from neo4j', function(done) {
-    db.query("herp derp;", function(err, data) {
-      assert.ok(err.neo4jException);
-      done();
     });
   });
 });
