@@ -1,6 +1,7 @@
 /* -*- Mode: Javascript; js-indent-level: 2 -*- */
 
 var testDatabase = require('./util/database');
+var uniqn = require('./util/ponies').uniqn;
 var seraph = require('../'), _seraph = seraph;
 var db = seraph(testDatabase.url);
 
@@ -8,51 +9,8 @@ var async = require('async');
 var naan = require('naan');
 var assert = require('assert');
 
-var counter = (function() {
-  var count = Date.now();
-  return function() {
-    return ++count;
-  };
-})();
-
-var uniqn = function() { return 'identity' + counter(); };
-
 before(testDatabase.refreshDb);
 after(testDatabase.stopDb);
-
-describe('configuration', function() {
-  /* This checks that the server accepts seraph constructed node id
-   * urls where the authority segment or the URL refers to the server
-   * by a different name than it knows itself as. */
-  it('should understand ids when ref the server by alias', function(done) {
-    function testWithServerName(serverName, done) {
-      var alias = 'http://' + serverName + ':' + testDatabase.port;
-      var db = _seraph(alias);
-      var idxName = uniqn();
-      var origNode = { jelly: "belly" };
-      function mkNode(done) {
-        db.save(origNode, done);
-      }
-      function mkIdx(node, done) {
-        db.index(idxName, node.id, 'application', node.jelly, done);
-      }
-      function readIdx(done) {
-        db.node.index.read(idxName, 'application',
-                           origNode.jelly, done);
-      }
-      function check(nodeFromIndex, done) {
-        assert.equal(nodeFromIndex.jelly, origNode.jelly);
-        done();
-      }
-      async.waterfall([mkNode, mkIdx, readIdx, check], done);
-    }
-
-    testWithServerName('127.0.0.1', function(err) {
-      if (err) return done(err);
-      testWithServerName('localhost', done);
-    });
-  });
-});
 
 describe('seraph#call, seraph#operation', function() {
   var seraph;
@@ -943,7 +901,7 @@ describe('seraph#query, seraph#queryRaw', function() {
 
 describe('seraph#find', function() {
   it('should find some items based on a predicate', function(done) {
-    var uniqueKey = 'seraph_find_test' + counter();
+    var uniqueKey = 'seraph_find_test' + uniqn();
     function createObjs(done) {
       var objs = [ {name: 'Jon', age: 23}, 
                    {name: 'Neil', age: 60},
@@ -978,7 +936,7 @@ describe('seraph#find', function() {
   })
 
   it('should find some items based on an OR predicate', function(done) {
-    var uniqueKey = 'seraph_find_test' + counter();
+    var uniqueKey = 'seraph_find_test' + uniqn();
     function createObjs(done) {
       var objs = [ {name: 'Jon', age: 23}, 
                    {name: 'Neil', age: 60},
@@ -1015,7 +973,7 @@ describe('seraph#find', function() {
   })
 
   it('should find some items based on a predicate with a custom starting point', function(done) {
-    var uniqueKey = 'seraph_find_test' + counter();
+    var uniqueKey = 'seraph_find_test' + uniqn();
     function createObjs(done) {
       var objs = [ {name: 'Jon', age: 23}, 
                    {name: 'Neil', age: 60},
@@ -1090,7 +1048,8 @@ describe('seraph.index', function() {
   });
 
   it('should accept an array of indexes to create', function(done) {
-    db.rel.index.create([uniqn(), uniqn(), uniqn()], function(err) {
+    db.rel.index.create([uniqn(), uniqn(), uniqn()],
+                        function(err) {
       assert.ok(!err);
       done();
     });
