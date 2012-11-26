@@ -1,21 +1,13 @@
 /* -*- Mode: Javascript; js-indent-level: 2 -*- */
 
-var TEST_INSTANCE_PORT = parseInt(process.env.TEST_INSTANCE_PORT || '10507', 10);
-var testDatabase = 'http://localhost:' + TEST_INSTANCE_PORT;
+var testDatabase = require('./util/database');
 
 var seraph = require('../'), _seraph = seraph;
-var db = seraph(testDatabase);
-var spawn = require('child_process').spawn;
+var db = seraph(testDatabase.url);
 
 var async = require('async');
 var naan = require('naan');
 var assert = require('assert');
-var path = require('path');
-var fs = require('fs');
-
-var neo4j = path.join(__dirname, '../db/bin/neo4j');
-var neo4jconf = path.join(__dirname, '../db/conf/neo4j-server.properties');
-var datapath = path.join(__dirname, '../db/data');
 
 var counter = (function() {
   var count = Date.now();
@@ -26,62 +18,8 @@ var counter = (function() {
 
 var uniqn = function() { return 'identity' + counter(); };
 
-var updateConf = function(port, done) {
-  var readConf = naan.curry(fs.readFile, neo4jconf, 'utf8');
-  var writeConf = naan.curry(fs.writeFile, neo4jconf);
-  var setPorts = function(confData, callback) {
-    callback(null, confData
-      .replace(/(webserver\.port=)(\d+)/gi, '$1' + port)
-      .replace(/(https\.port=)(\d+)/gi, '$1' + (port + 1))
-    );
-  }
-  async.waterfall([readConf, setPorts, writeConf], done);
-}
-
-var refreshDb = function(done) {
-  if (process.env.USE_DIRTY_DATABASE === 'true') {
-    return done();
-  }
-  async.series([
-    function(next) {
-      spawn(neo4j, ['stop']).on('exit', function() { next(); })
-    },
-    function(next) {
-      spawn('rm', ['-rf', datapath]).on('exit', function() { next(); });
-    },
-    function(next) {
-      spawn('mkdir', ['-p', datapath]).on('exit', function() { next(); });
-    },
-    function(next) {
-      updateConf(TEST_INSTANCE_PORT, next);
-    },
-    function(next) {
-      var n = spawn(neo4j, ['start'])
-      n.stdout.on('data', function(d) { 
-        process.stdout.write(d.toString()); 
-      })
-      n.on('exit', function() { console.log(''); next(); });
-    }, 
-    function(next) {
-      setTimeout(function() { next(); }, 1000);
-    }
-  ], done);
-};
-
-var stopDb = function(done) {
-  if (process.env.NO_STOP === 'true') {
-    return done();
-  }
-
-  var n = spawn(neo4j, ['stop'])
-  n.stdout.on('data', function(d) { 
-    process.stdout.write(d.toString()); 
-  })
-  n.on('exit', function() { console.log(''); done(); });
-}
-
-before(refreshDb);
-after(stopDb);
+before(testDatabase.refreshDb);
+after(testDatabase.stopDb);
 
 describe('configuration', function() {
   /* This checks that the server accepts seraph constructed node id
@@ -89,7 +27,7 @@ describe('configuration', function() {
    * by a different name than it knows itself as. */
   it('should understand ids when ref the server by alias', function(done) {
     function testWithServerName(serverName, done) {
-      var alias = 'http://' + serverName + ':' + TEST_INSTANCE_PORT;
+      var alias = 'http://' + serverName + ':' + testDatabase.port;
       var db = _seraph(alias);
       var idxName = uniqn();
       var origNode = { jelly: "belly" };
@@ -138,7 +76,7 @@ describe('seraph#call, seraph#operation', function() {
   var seraph;
   function setupMock(opts, mock) {
     if (typeof opts == 'function') {
-      seraph = _seraph(testDatabase);
+      seraph = _seraph(testDatabase.url);
       mock = opts;
     } else {
       seraph = _seraph(opts);
