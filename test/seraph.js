@@ -84,10 +84,10 @@ before(refreshDb);
 after(stopDb);
 
 describe('configuration', function() {
+  /* This checks that the server accepts seraph constructed node id
+   * urls where the authority segment or the URL refers to the server
+   * by a different name than it knows itself as. */
   it('should understand ids when ref the server by alias', function(done) {
-    /* This checks that the server accepts seraph constructed node id
-     * urls where the authority segment or the URL refers to the
-     * server by a different name than it knows itself as. */
     function testWithServerName(serverName, done) {
       var alias = 'http://' + serverName + ':' + TEST_INSTANCE_PORT;
       var db = _seraph(alias);
