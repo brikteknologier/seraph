@@ -84,13 +84,26 @@ before(refreshDb);
 after(stopDb);
 
 describe('configuration', function() {
-  it('should handle referencing the server by alias', function(done) {
+  it('should understand ids when ref the server by alias', function(done) {
     var alias = 'http://127.0.0.1:' + TEST_INSTANCE_PORT;
     var db = _seraph(alias);
-    db.save({ jelly: "belly" }, function(err, data) {
-      assert.ok(!err);
+    var idxName = uniqn();
+    var origNode = { jelly: "belly" };
+    function mkNode(done) {
+      db.save(origNode, done);
+    }
+    function mkIdx(node, done) {
+      db.index(idxName, node.id, 'application', node.jelly, done);
+    }
+    function readIdx(done) {
+      db.node.index.read(idxName, 'application',
+                         origNode.jelly, done);
+    }
+    function check(nodeFromIndex, done) {
+      assert.equal(nodeFromIndex.jelly, origNode.jelly);
       done();
-    });
+    }
+    async.waterfall([mkNode, mkIdx, readIdx, check], done);
   });
 });
 
