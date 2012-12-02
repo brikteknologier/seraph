@@ -5,7 +5,7 @@
   ],
   "name": "seraph",
   "description": "A thin and familiar layer between node and neo4j's REST api.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "repository": {
     "url": "https://github.com/brikteknologier/seraph"
   },
