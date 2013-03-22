@@ -685,5 +685,7 @@ db.rel.index.delete('friendships', function(err) {
 
 ---------------------------------------
 
-*Seraph.js was started lovingly by BRIK Teknologier AS in Bergen, Norway*  
-<img src="https://raw.github.com/brikteknologier/brikflake/master/brikflake.svg" width="91" height="87"/>
+Development of Seraph is lovingly sponsored by 
+[BRIK Tekonologier AS](http://www.github.com/brikteknologier) in Bergen, Norway.
+
+<img src="http://i.imgur.com/9JjcBcx.jpg" width="800"/>
