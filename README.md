@@ -3,6 +3,12 @@
 A terse & familiar binding to the [Neo4j](http://neo4j.org/) REST API that is 
 idiomatic to [node.js](http://nodejs.org/).
 
+## Install
+
+```
+npm install seraph
+```
+
 ## Quick Example
 
 ```javascript
@@ -22,6 +28,9 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 ## Documentation
 
 <a name="seraph.db_list" />
+### Initialization
+* [seraph](#seraph) - initialize the seraph client
+
 ### Generic Operations
 
 * [query](#query) - perform a cypher query and parse the results
@@ -73,6 +82,41 @@ or, if you have started the test instance yourself and don't want the tests to
 restart and clean the server every time:
 
     npm run-script quick-test
+
+## Initialization
+<a name="seraph" />
+### seraph([server|options])
+
+Creates and returns the Seraph instance.  If no parameters are given,
+assumes the Neo4J REST API is running locally at the default location
+`http://localhost:7474/db/data`.
+
+__Arguments__
+
+* options (default=`{ server: "http://localhost:7474", endpoint: "/db/data" }` - `server` is protocol and authority part of Neo4J REST API URI, and `endpoint` should be the path segment of the URI.
+* server (string) - Short form to specify server parameter only. `"http://localhorse:4747"` is equivalent to `{ server: "http://localhorse:4747" }`.
+
+__Example__
+
+```javascript
+// To http://localhost:7474/db/data
+var dbLocal = require("seraph")();
+
+// To http://example.com:53280/neo
+var dbRemote = require("seraph")({ server: "http://example.com:53280",
+                                   endpoint: "/neo" });
+
+// Copy node#13 from remote server
+dbRemote.read({ id: 13 }, function(err, node) {
+  if (err) throw err;
+  delete node.id; // copy instead of overwriting local node#13
+  dbLocal.save(node, function(err, nodeL) {
+    if (err) throw err;
+    console.log("Copied remote node#13 to " +
+                "local node#" + nodeL.id.toString() + ".");
+  });
+});
+```
 
 ## Generic Operations
 
@@ -259,7 +303,7 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
 ---------------------------------------
 
 <a name="node.delete" />
-### delete(id|object, [callback])
+### delete(id|object, [force], [callback])
 *Aliases: __node.delete__*
 
 Delete a node.
@@ -268,6 +312,7 @@ __Arguments__
 
 * id|object - either the id of the node to delete, or an object containing an id
 property of the node to delete.
+* force - if truthy, will delete all the node's relations prior to deleting the node.
 * callback - function(err). if `err` is falsy, the node has been deleted.
 
 __Example__
@@ -512,7 +557,7 @@ Add a node/relationship to an index.
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
 indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `node.rel`. All of the
+on __relationship__ indexes you use the functions on `rel.index`. All of the
 functions on both of these are identical, but one acts upon node 
 indexes, and the other upon relationship indexes.
 
@@ -547,7 +592,7 @@ Read the object(s) from an index that match a key-value pair.
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
 indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `node.rel`. All of the
+on __relationship__ indexes you use the functions on `rel.index`. All of the
 functions on both of these are identical, but one acts upon node 
 indexes, and the other upon relationship indexes.
 
@@ -580,7 +625,7 @@ Remove a node/relationship from an index.
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
 indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `node.rel`. All of the
+on __relationship__ indexes you use the functions on `rel.index`. All of the
 functions on both of these are identical, but one acts upon node 
 indexes, and the other upon relationship indexes.
 
@@ -621,7 +666,7 @@ Delete an index.
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
 indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `node.rel`. All of the
+on __relationship__ indexes you use the functions on `rel.index`. All of the
 functions on both of these are identical, but one acts upon node 
 indexes, and the other upon relationship indexes.
 
@@ -639,3 +684,8 @@ db.rel.index.delete('friendships', function(err) {
 ```
 
 ---------------------------------------
+
+Development of Seraph is lovingly sponsored by 
+[BRIK Tekonologier AS](http://www.github.com/brikteknologier) in Bergen, Norway.
+
+<img src="http://i.imgur.com/9JjcBcx.jpg" width="800"/>
