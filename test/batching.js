@@ -40,6 +40,8 @@ describe('seraph#batch', function() {
       assert.equal(result[0].newPerson, 'bob');
       assert.equal(result[1][0].newPerson, 'orange');
       assert.equal(result[1][1].newPerson, 'cat');
+      assert(result[0].id);
+      assert(result[1][0].id);
       done();
     });
   });
@@ -88,6 +90,22 @@ describe('seraph#batch', function() {
           done();
         });
       });
+    });
+  });
+
+  it('should not go completely insane when nesting batches', function(done) {
+    db.batch(function(db) {
+      db.save({person:"person-1"});
+      db.batch(function(db) {
+        db.save({person:"person-2"});
+      })
+      db.save({person:"person-3"});
+    }, function(err, result) {
+      assert(result[0].id);
+      assert(result[0].person == 'person-1');
+      assert(result[1][0].id);
+      assert(result[1][0].person == 'person-2');   
+      done();
     });
   });
 }); 
