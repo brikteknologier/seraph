@@ -42,4 +42,35 @@ describe('seraph#batch', function() {
       done();
     });
   });
+
+  it('should perform an update in a batch', function(done) {
+    db.save({name:'Jon', age: 23}, function(err, user) {
+      db.batch(function(db) {
+        user.name = 'Jellybean';
+        db.save(user);
+      }, function(err, result) {
+        db.read(user, function(err, user) {
+          assert(user.name == 'Jellybean');
+          done();
+        });
+      });
+    });
+  });
+
+  it('should relate two nodes in a batch', function(done) {
+    db.save([{person:'First'},{person:'Second'}], function(err, users) {
+      db.batch(function(db) {
+        db.relate(users[0], 'knows', users[1], {testprop:'test'});
+      }, function(err, result) {
+        db.relationships(users[0], function(err, rels) {
+          assert(rels.length == 1);
+          assert(rels[0].start == users[0].id);
+          assert(rels[0].end == users[1].id);
+          assert(rels[0].properties.testprop == 'test');
+          assert(rels[0].type == 'knows');
+          done();
+        });
+      });
+    });
+  });
 }); 
