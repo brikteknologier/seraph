@@ -81,9 +81,10 @@ describe('seraph#batch', function() {
       db.batch(function(db) {
         db.index(iname, user, 'something', 'magical');
       }, function(err, results) {
-        db.index.read(iname, 'something', 'magical', function(err, nodes) {
-          assert(nodes.length == 1);
-          assert(nodes[0].person == 'indexable');
+        assert(!err);
+        db.index.read(iname, 'something', 'magical', function(err, node) {
+          assert(!err);
+          assert(node.person == 'indexable');
           done();
         });
       });
