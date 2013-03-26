@@ -2,6 +2,7 @@
 
 var testDatabase = require('./util/database');
 var db = require('../')(testDatabase.url);
+var uniqn = require('./util/ponies').uniqn;
 
 var assert = require('assert');
 var async = require('async');
@@ -68,6 +69,21 @@ describe('seraph#batch', function() {
           assert(rels[0].end == users[1].id);
           assert(rels[0].properties.testprop == 'test');
           assert(rels[0].type == 'knows');
+          done();
+        });
+      });
+    });
+  });
+
+  it('should index a node in a batch', function(done) {
+    var iname = uniqn();
+    db.save({person:'indexable'}, function(err, user) {
+      db.batch(function(db) {
+        db.index(iname, user, 'something', 'magical');
+      }, function(err, results) {
+        db.index.read(iname, 'something', 'magical', function(err, nodes) {
+          assert(nodes.length == 1);
+          assert(nodes[0].person == 'indexable');
           done();
         });
       });
