@@ -108,4 +108,64 @@ describe('seraph#batch', function() {
       done();
     });
   });
+
+  it('should work in procedural mode', function(done) {
+    var txn = db.batch();
+
+    var bob = txn.save({name:'Bob'});
+    var tim = txn.save([{name:'Tim'}, {name:'Jan'}]);
+
+    txn.commit(function(err, results) {
+      assert(!err);
+      assert(results[bob].name == 'Bob');
+      assert(results[bob].id);
+      assert(results[tim][0].name = 'Tim');
+      assert(results[tim][0].id);
+      assert(results[tim][1].name = 'Jan');
+      assert(results[tim][1].id);
+      done();
+    });
+  });
+
+  it('should allow callbacks in procedural mode', function(done) {
+    var txn = db.batch();
+
+    var call1 = false;
+    var call2 = false;
+    
+    txn.save({name: 'Tim'}, function(err, person) {
+      assert(!err);
+      assert(person.name == 'Tim');
+      assert(person.id);
+      call1 = true;
+    });
+
+    txn.save({name: 'Bob'}, function(err, person) {
+      assert(!err);
+      assert(person.name == 'Bob');
+      assert(person.id);
+      call2 = true;
+    });
+
+    txn.commit(function(err, results) {
+      assert(!err);
+      process.nextTick(function() {
+        assert(call1);
+        assert(call2);
+        done();
+      });
+    });
+  });
+
+  it('should not require a commit callback in procedural mode', function(done) {
+    var txn = db.batch();
+
+    txn.save({name: 'Tim'}, function(err, person) {
+      assert(person.name == 'Tim');
+      assert(person.id);
+      done();
+    });
+
+    txn.commit();
+  });
 }); 
