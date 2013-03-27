@@ -127,6 +127,17 @@ describe('seraph#batch', function() {
     });
   });
 
+  it('should return sensible values corresponding to the result', function() {
+    var txn = db.batch();
+
+    var bob = txn.save({name:'Bob'});
+    var tim = txn.save([{name:'Tim'}, {name:'Jan'}]);
+
+    assert(bob >= 0);
+    assert(tim >= 0);
+    assert(!Array.isArray(tim));
+  });
+
   it('should allow callbacks in procedural mode', function(done) {
     var txn = db.batch();
 
