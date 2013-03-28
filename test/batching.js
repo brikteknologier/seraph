@@ -179,4 +179,78 @@ describe('seraph#batch', function() {
 
     txn.commit();
   });
+
+  describe('Self Referencing', function() {
+    it('should support self referencing', function(done) {
+      var txn = db.batch();
+
+      var bob = txn.save({name: "Bob"});
+      var james = txn.save({name: "James"});
+      
+      var rel = txn.relate(bob, 'knows', james, { since: "2011" });
+
+      txn.commit(function(err, results) {
+        assert(!err);
+        assert(results[bob].name == 'Bob');
+        assert(results[james].name == 'James');
+        assert(results[bob].id);
+        assert(results[james].id);
+        assert(results[rel].start == results[bob].id);
+        assert(results[rel].end == results[james].id);
+        assert(results[rel].properties.since == '2011');
+        db.relationships(results[bob], function(err, rels) {
+          assert(!err);
+          assert(rels.length == 1);
+          assert(rels[0].end == results[james].id);
+          done();
+        });
+      });
+    });
+
+    it('should support group saves', function(done) {
+      var txn = db.batch();
+
+      var beers = txn.save([{name:'Lucky Jack'}, {name:'Galaxy IPA'}]);
+      var brewery = txn.save({name:'Lervig Aktiebryggeri'});
+      var rel = txn.relate(brewery, 'brews', beers);
+
+      txn.commit(function(err, results) {
+        assert(!err);
+        assert(results[beers][0].name == 'Lucky Jack');
+        assert(results[beers][0].id);
+        assert(results[beers][1].name == 'Galaxy IPA');
+        assert(results[beers][1].id);
+        assert(results[brewery].name == 'Lervig Aktiebryggeri');
+        assert(results[brewery].id);
+        db.relationships(results[brewery], function(err, rels) {
+          assert(!err);
+          assert(rels.length == 2);
+          assert(rels[0].start == results[brewery].id);
+          assert(rels[1].start == results[brewery].id);
+          assert(rels[0].end == results[beer][0].id ||
+                 rels[0].end == results[beer][1].id);
+          assert(rels[1].end == results[beer][0].id ||
+                 rels[1].end == results[beer][1].id);
+          done();
+        });
+      });
+    });
+
+    it('should support indexing', function(done) {
+      var txn = db.batch();
+      var idx = uniqn();
+
+      var person = txn.save({name:'Jon'});
+      txn.index(idx, person, 'thing', 'stuff');
+
+      txn.commit(function(err, results) {
+        assert(!err);
+        db.index.read(idx, 'thing', 'stuff', function(err, person1) {
+          assert(!err);
+          assert.deepEqual(person1, results[person]);
+        });
+      });
+
+    });
+  });
 }); 
