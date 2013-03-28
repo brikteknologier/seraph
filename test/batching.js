@@ -265,6 +265,7 @@ describe('seraph#batch', function() {
         db.index.read(idx, 'thing', 'stuff', function(err, person1) {
           assert(!err);
           assert.deepEqual(person1, results[person]);
+          done();
         });
       });
 

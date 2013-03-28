@@ -225,13 +225,10 @@ describe('seraph#delete', function() {
         db.rel.create(res.n, "abscurs", res.m, cb);
       }],
       d: ["n", "r", function(cb, res) {
-        db.delete(res.n, function(err) {
-          var re = /org.neo4j.server.rest.web.OperationFailureException:/;
-          cb(!re.test(err.neo4jException));
-        });
+        db.delete(res.n, cb);
       }]
     }, function(err, res) {
-      assert.ok(!err, err);
+      assert.ok(err);
       done();
     });
   });
