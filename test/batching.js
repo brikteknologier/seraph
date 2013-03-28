@@ -244,10 +244,10 @@ describe('seraph#batch', function() {
           assert(rels.length == 2);
           assert(rels[0].start == results[brewery].id);
           assert(rels[1].start == results[brewery].id);
-          assert(rels[0].end == results[beer][0].id ||
-                 rels[0].end == results[beer][1].id);
-          assert(rels[1].end == results[beer][0].id ||
-                 rels[1].end == results[beer][1].id);
+          assert(rels[0].end == results[beers][0].id ||
+                 rels[0].end == results[beers][1].id);
+          assert(rels[1].end == results[beers][0].id ||
+                 rels[1].end == results[beers][1].id);
           done();
         });
       });
