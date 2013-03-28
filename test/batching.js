@@ -119,9 +119,9 @@ describe('seraph#batch', function() {
       assert(!err);
       assert(results[bob].name == 'Bob');
       assert(results[bob].id);
-      assert(results[tim][0].name = 'Tim');
+      assert(results[tim][0].name == 'Tim');
       assert(results[tim][0].id);
-      assert(results[tim][1].name = 'Jan');
+      assert(results[tim][1].name == 'Jan');
       assert(results[tim][1].id);
       done();
     });
@@ -136,6 +136,23 @@ describe('seraph#batch', function() {
     assert(bob >= 0);
     assert(tim >= 0);
     assert(!Array.isArray(tim));
+  });
+
+  it('should handle group saves and return sane refs', function(done) {
+    var txn = db.batch();
+
+    var bob = txn.save({name:'Bob'});
+    var tim = txn.save([{name:'Tim'}, {name:'Jan'}]);
+    var thing = txn.save({stuff:'Things'});
+
+    txn.commit(function(err, results) {
+      assert(!err);
+      assert(results[bob].name == 'Bob');
+      assert(results[tim][0].name == 'Tim');
+      assert(results[tim][1].name == 'Jan');
+      assert(results[thing].stuff == 'Things');
+      done();
+    });
   });
 
   it('should allow callbacks in procedural mode', function(done) {
