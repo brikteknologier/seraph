@@ -253,6 +253,23 @@ describe('seraph#batch', function() {
       });
     });
 
+    it('should support referencing separate parts of a group', function(done) {
+      var txn = db.batch();
+
+      var people = txn.save([{name:'Taru'}, {name: 'Ella'}]);
+      txn.relate(people[0], 'knows', people[1]);
+
+      txn.commit(function(err, results) {
+        assert(!err);
+        db.relationships(results[people][0], function(err, rels) {
+          assert(!err);
+          assert(rels.length > 0);
+          assert(rels[0].end == results[people][1].id);
+          done();
+        });
+      });
+    });
+
     it('should support indexing', function(done) {
       var txn = db.batch();
       var idx = uniqn();
@@ -270,5 +287,29 @@ describe('seraph#batch', function() {
       });
 
     });
+
+    it('should support updating a rel', function(done) {
+      var txn = db.batch();
+      var people = txn.save([{name:'Taru'},{name:'Ella'}]);
+      var rel = txn.relate(people[0], 'knows', people[1], {thing:'stuff'});
+
+      txn.commit(function(err, result) {
+        assert(!err);
+        assert(result[rel].properties.thing == 'stuff');
+        result[rel].properties.thing = 'other_stuff';
+        txn = db.batch();
+        var rup = txn.rel.update(result[rel]);
+        txn.commit(function(err, res) {
+          assert(!err);
+          db.rel.read(result[rel].id, function(err, rel) {
+            assert(!err);
+            assert(rel.properties.thing == 'other_stuff');
+            done();
+          });
+        });
+      });
+    });
+
+
   });
 }); 
