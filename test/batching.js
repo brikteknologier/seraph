@@ -8,6 +8,12 @@ var assert = require('assert');
 var async = require('async');
 
 describe('seraph#batch', function() {
+  it('should properly indicate if the current context is a batch', function() {
+    assert(!db.isBatch);
+    var b = db.batch();
+    assert(b.isBatch);
+  });
+
   it('should perform a series of operations as expected', function(done) {
     function createObjs(done) {
       db.save([{name: 'Jon', age: 23}, 
