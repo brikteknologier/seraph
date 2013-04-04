@@ -93,22 +93,6 @@ describe('seraph#batch', function() {
     });
   });
 
-  it('should not go completely insane when nesting batches', function(done) {
-    db.batch(function(db) {
-      db.save({person:"person-1"});
-      db.batch(function(db) {
-        db.save({person:"person-2"});
-      })
-      db.save({person:"person-3"});
-    }, function(err, result) {
-      assert(result[0].id);
-      assert(result[0].person == 'person-1');
-      assert(result[1][0].id);
-      assert(result[1][0].person == 'person-2');   
-      done();
-    });
-  });
-
   it('should work in procedural mode', function(done) {
     var txn = db.batch();
 
