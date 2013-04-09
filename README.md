@@ -617,8 +617,8 @@ db.rel.index.read('friendships', 'location', 'Norway', function(err, rels) {
 ---------------------------------------
 
 <a name="index.remove" />
-### node.index.remove(id|object, indexName, [key, [value,]] callback);
-### rel.index.remove(id|object, indexName, [key, [value,]] callback);
+### node.index.remove(indexName, id|object, [key, [value,]] callback);
+### rel.index.remove(indexName, id|object, [key, [value,]] callback);
 
 Remove a node/relationship from an index. 
 
@@ -631,9 +631,9 @@ indexes, and the other upon relationship indexes.
 
 __Arguments__
 
+* indexName - the index to remove the node/relationship from.
 * id|object - the id of the node/relationship to remove from the index or an 
   object with an id property of the node/relationship to remove from the index.
-* indexName - the index to remove the node/relationship from.
 * key (optional) - the key from which to remove the node/relationship. If none
   is specified, every reference to the node/relationship is deleted from the
   index.
@@ -646,11 +646,11 @@ __Arguments__
 __Example__
 
 ```javascript
-db.node.index.remove(6821, 'people', function(err) {
+db.node.index.remove('people', 6821, function(err) {
   if (!err) console.log("Every reference of node 6821 has been removed from the people index");
 });
 
-db.rel.index.remove(351, 'friendships', 'in', 'Australia', function(err) {
+db.rel.index.remove('friendships', 351, 'in', 'Australia', function(err) {
   if (!err) console.log("Relationship 351 is no longer indexed as a friendship in Australia");
 })
 ```
