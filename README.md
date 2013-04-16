@@ -135,7 +135,9 @@ __Arguments__
 
 * query - Cypher query as a format string.
 * params (optional, default=`{}`). Replace `{key}` parts in query string.  See 
-  cypher documentation for details.
+  cypher documentation for details. **note** that if you want to send a list of
+  ids as a parameter, you should send them as an array, rather than a string
+  representing them (`[2,3]` rather than `"2,3"`).
 * callback - (err, result).  Result is an array of objects.
 
 __Example__
