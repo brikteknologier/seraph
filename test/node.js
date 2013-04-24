@@ -236,10 +236,10 @@ describe('seraph#delete', function() {
   it('should delete node+relations if forced', function(done) {
     async.auto({
       n: function(cb) {
-        db.save({}, cb);
+        db.save({potato:'mega'}, cb);
       },
       m: function(cb) {
-        db.save({}, cb);
+        db.save({llol:'stuf'}, cb);
       },
       r: ["n", "m", function(cb, res) {
         db.rel.create(res.n, "abscurs", res.m, cb);
@@ -250,6 +250,26 @@ describe('seraph#delete', function() {
     }, function(err, res) {
       assert.ok(!err, err);
       done();
+    });
+  });
+  
+  it('should delete node+relations if forced', function(done) {
+    async.auto({
+      n: function(cb) {
+        db.save({potato:'mega'}, cb);
+      },
+      d: ["n", function(cb, res) {
+        db.delete(res.n, true, function(err) {
+          cb(err, res.n);
+        });
+      }]
+    }, function(err, res) {
+      assert.ok(!err, err);
+      db.read(res.d, function(err, node) {
+        assert(err.statusCode == 404);
+        assert(!node);
+        done();
+      });
     });
   });
 
