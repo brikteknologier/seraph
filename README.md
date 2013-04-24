@@ -285,6 +285,12 @@ db.save({ name: 'Jon', age: 22, likes: 'Beer' }, function(err, node) {
 
 Read a node.
 
+**Note**: If the node doesn't exist, Neo4j will return an exception. You can 
+check if this is indicating that your node doesn't exist because
+`err.statusCode` will equal `404`. This is inconsistent with behaviour of
+[node.index.read](#index.read), but it is justified because the Neo4j REST api
+behaviour is inconsistent in this way as well. 
+
 __Arguments__
 
 * id|object - either the id of the node to read, or an object containing an id
