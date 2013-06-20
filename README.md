@@ -299,8 +299,8 @@ __Arguments__
 
 * node - an object to create or update
 * index - the index in which `key` and `value` are relevant
-* key - the key under which to index this relationship and enforce uniqueness
-* value - the value under which to index this relationship and enforce uniqueness
+* key - the key under which to index this node and enforce uniqueness
+* value - the value under which to index this node and enforce uniqueness
 * returnExistingOnConflict (optional, default=`false`) - what to do when there is
   a conflict (when the index you specified already refers to a node). If set to 
   `true`, the node that the index currently refers to is returned.  Otherwise, 
