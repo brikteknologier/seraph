@@ -407,7 +407,7 @@ describe('seraph.index', function() {
       var props = { original: true };
 
       setupNodes(function(node, node2) {
-        db.rel.index.getOrSaveUnique(node, 'sings', node2, index, props, 'name', 
+        db.rel.index.getOrSaveUnique(node, 'sings', node2, props, index, 'name', 
           'johanna', function(err, rel) {
           assert(!err);
           assert(rel.id);
@@ -416,6 +416,7 @@ describe('seraph.index', function() {
           assert(rel.end);
           assert.equal(rel.end, node2.id);
           assert.equal(rel.type, 'sings');
+          assert.deepEqual(rel.properties, props);
           done();
         });
       });
