@@ -45,6 +45,8 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 
 ### Node Operations
 * [save (node.save)](#node.save) - create or update a node
+* [saveUnique (node.saveUnique)](#node.saveUnique) - save a node using an index 
+  to enforce uniqueness
 * [read (node.read)](#node.read) - read a node
 * [find (node.find)](#node.find) - find a node using a predicate
 * [delete (node.delete)](#node.delete) - delete a node
@@ -55,6 +57,8 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 
 ### Relationship Operations
 * [rel.create](#rel.create) - create a relationship
+* [rel.createUnique](#rel.createUnique) - create a relationship using an index
+  to enforce uniqueness
 * [rel.update](#rel.update) - update the properties of a relationship
 * [rel.read](#rel.read) - read a relationship
 * [rel.delete](#rel.delete) - delete a relationship
@@ -65,6 +69,10 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [index.read](#index.read) - read nodes/rels from an index
 * [index.remove](#index.remove) - remove nodes/rels from an index
 * [index.delete](#index.delete) - delete an index
+* [index.getOrSaveUnique](#index.getOrSaveUnique) - get or save a node using an 
+  index for uniqueness
+* [index.saveUniqueOrFail](#index.saveUniqueOrFail) - save a node using an index
+  to enforce uniqueness
 
 ## Compatibility
 
@@ -279,6 +287,48 @@ db.save({ name: 'Jon', age: 22, likes: 'Beer' }, function(err, node) {
 
 ---------------------------------------
 
+<a name="node.saveUnique" />
+### rel.saveUnique(node, index, key, value, [returnExistingOnConflict = false,] callback)
+
+Save a node, using an index to enforce uniqueness.
+
+See also [node.index.saveUniqueOrFail](#index.saveUniqueOrFail) &
+[node.index.getOrSaveUnique](#index.getOrSaveUnique).
+
+__Arguments__
+
+* node - an object to create or update
+* index - the index in which `key` and `value` are relevant
+* key - the key under which to index this relationship and enforce uniqueness
+* value - the value under which to index this relationship and enforce uniqueness
+* returnExistingOnConflict (optional, default=`false`) - what to do when there is
+  a conflict (when the index you specified already refers to a node). If set to 
+  `true`, the node that the index currently refers to is returned.  Otherwise, 
+  an error is return indicating that there was a conflict (you can check this by 
+  testing `err.statusCode == 409`.
+* callback - function(err, node) - `node` is the newly created node or the node 
+  that was in the specified index, depending on `returnExistingOnConflict`.
+
+__Example__
+
+```javascript
+db.saveUnique({name: 'jon'}, 'people', 'name', 'jon', function(err, node) {
+  //node = { name: 'jon', id: 1 }
+  db.saveUnique({age: 24}, 'people', 'name', 'jon', function(err, node) {
+    //err.statusCode == 409, because there was already a node indexed under
+    //people(name="jon").
+  });
+  
+  db.saveUnique({location:'Bergen'}, 'people', 'name', 'jon', true, function(err, node) {
+    // node = {name: 'jon', id: 1}
+    // because there was node already indexed under people(name="jon") and we 
+    // specified that we wanted that node returned on the event of a conflict.
+  });
+});
+```
+
+---------------------------------------
+
 <a name="node.read" />
 ### read(id|object, callback)
 *Aliases: __node.read__*
@@ -437,6 +487,56 @@ db.relate(1, 'knows', 2, { for: '2 months' }, function(err, relationship) {
 
 ---------------------------------------
 
+<a name="rel.createUnique" />
+### rel.createUnique(firstId|firstObj, type, secondId|secondObj, [properties,] index, key, value, [returnExistingOnConflict = false,] callback)
+
+Create a relationship between two nodes, using an index to enforce uniqueness.
+
+See also [rel.index.saveUniqueOrFail](#index.saveUniqueOrFail) &
+[rel.index.getOrSaveUnique](#index.getOrSaveUnique).
+
+__Arguments__
+
+* firstId|firstObject - id of the start node or an object with an id property
+  for the start node
+* type - the name of the relationship
+* secondId|secondObject - id of the end node or an object with an id property
+  for the end node
+* properties (optional, default=`{}`) - properties of the relationship
+* index - the index in which `key` and `value` are relevant
+* key - the key under which to index this relationship and enforce uniqueness
+* value - the value under which to index this relationship and enforce uniqueness
+* returnExistingOnConflict (optional, default=`false`) - what to do when there is
+  a conflict (when the index you specified already refers to a relationship). If
+  set to `true`, the relationship that the index currently refers to is returned.
+  Otherwise, an error is return indicating that there was a conflict (you can 
+  check this by testing `err.statusCode == 409`.
+* callback - function(err, relationship) - `relationship` is the newly created
+  relationship or the relationship that was in the specified index, depending
+  on `returnExistingOnConflict`
+
+__Example__
+
+```javascript
+db.rel.createUnique(1, 'knows', 2, 'friendships', 'type', 'super', function(err, rel) {
+  // rel = {start: 1, end: 2, type: 'knows', properties: {}, id = 1}
+  db.rel.createUnique(1, 'knows', 2, 'friendships', 'type', 'super', function(err, node) {
+    //err.statusCode == 409, because there was already a relationship indexed under
+    //friendships(type="super").
+  });
+  
+  db.rel.createUnique(1, 'knows', 2, 'friendships', 'type', 'super', true, function(err, node) {
+    // rel = {start: 1, end: 2, type: 'knows', properties: {}, id = 1}
+    // no new index was created, the first one was returned - because there was
+    // already a relationship indexed under friendships(type="super") and we
+    // specified that on the event of a conflict we wanted the indexed rel to 
+    // be returned
+  });
+});
+```
+
+---------------------------------------
+
 <a name="rel.update" />
 ### rel.update(relationship, callback)
 
@@ -532,9 +632,9 @@ method is not necessary - you can just start using the index with
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
 indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `rel.index`. All of the
-functions on both of these are identical, but one acts upon node 
-indexes, and the other upon relationship indexes.
+on __relationship__ indexes you use the functions on `rel.index`. Most of the
+functions on both of these are identical (excluding the uniqueness functions),
+but one acts upon node indexes, and the other upon relationship indexes.
 
 __Arguments__
 
@@ -565,9 +665,9 @@ Add a node/relationship to an index.
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
 indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `rel.index`. All of the
-functions on both of these are identical, but one acts upon node 
-indexes, and the other upon relationship indexes.
+on __relationship__ indexes you use the functions on `rel.index`. Most of the
+functions on both of these are identical (excluding the uniqueness functions),
+but one acts upon node indexes, and the other upon relationship indexes.
 
 __Arguments__
 
@@ -600,9 +700,9 @@ Read the object(s) from an index that match a key-value pair.
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
 indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `rel.index`. All of the
-functions on both of these are identical, but one acts upon node 
-indexes, and the other upon relationship indexes.
+on __relationship__ indexes you use the functions on `rel.index`. Most of the
+functions on both of these are identical (excluding the uniqueness functions),
+but one acts upon node indexes, and the other upon relationship indexes.
 
 __Arguments__
 
@@ -633,9 +733,9 @@ Remove a node/relationship from an index.
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
 indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `rel.index`. All of the
-functions on both of these are identical, but one acts upon node 
-indexes, and the other upon relationship indexes.
+on __relationship__ indexes you use the functions on `rel.index`. Most of the
+functions on both of these are identical (excluding the uniqueness functions),
+but one acts upon node indexes, and the other upon relationship indexes.
 
 __Arguments__
 
@@ -674,9 +774,9 @@ Delete an index.
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
 indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `rel.index`. All of the
-functions on both of these are identical, but one acts upon node 
-indexes, and the other upon relationship indexes.
+on __relationship__ indexes you use the functions on `rel.index`. Most of the
+functions on both of these are identical (excluding the uniqueness functions),
+but one acts upon node indexes, and the other upon relationship indexes.
 
 __Arguments__
 
@@ -689,6 +789,118 @@ __Example__
 db.rel.index.delete('friendships', function(err) {
   if (!err) console.log('The `friendships` index has been deleted');
 })
+```
+
+---------------------------------------
+
+<a name="index.getOrSaveUnique" />
+### node.index.getOrSaveUnique(node, index, key, value, callback);
+### rel.index.getOrSaveUnique(startNode, relName, endNode, [properties,] index, key, value, callback);
+
+Save a node or relationship, using an index to enforce uniqueness. If there is
+already a node or relationship saved under the specified `key` and `value` in 
+the specified `index`, that node or relationship will be returned.
+
+Note that you cannot use this function to update nodes.
+
+__NOTE for index functions:__ there are two different types on index in neo4j - 
+__node__ indexes and __relationship__ indexes. When you're working with __node__
+indexes, you use the functions on `node.index`. Similarly, when you're working
+on __relationship__ indexes you use the functions on `rel.index`. Most of the
+functions on both of these are identical (excluding the uniqueness functions),
+but one acts upon node indexes, and the other upon relationship indexes.
+
+__Arguments (node)__
+
+* `node` - the node to save
+* `index` - the name of the index in which `key` and `value` are relevant
+* `key` - the key to check or store under
+* `value` - the value to check or store under
+* `callback` - function(err, node) - returns your saved node, or the node that
+  was referenced by the specified `key` and `value` if one already existed.
+
+__Arguments (relationship)__ 
+* `startNode` - the start point of the relationship (object containing id or id)
+* `relName` - the name of the relationship to create
+* `endNode` - the end point of the relationship (object containing id or id)
+* `properties` (optional) - an object containing properties to store on the
+  created relationship.
+* `index` - the name of the index in which `key` and `value` are relevant
+* `key` - the key to check or store under
+* `value` - the value to check or store under
+* `callback` - function(err, rel) - returns your created relationship, or the 
+  relationship that was referenced by the specified `key` and `value` if one 
+  already existed.
+
+__Example__
+
+```javascript
+var tag = { name: 'finnish' };
+db.node.index.getOrSaveUnique(tag, 'tags', 'name', tag.name, function(err, tag) {
+  // tag == { id: 1, name: 'finnish' }
+
+  // save another new object with the same properties
+  db.node.index.getOrSaveUnique({name: 'finnish'}, 'tags', 'name', 'finnish', function(err, newTag) {
+    // newTag == { id: 1, name: 'finnish' }
+    // no save was performed because there was already an object at that index
+  });
+});
+```
+
+---------------------------------------
+
+<a name="index.saveUniqueOrFail" />
+### node.index.saveUniqueOrFail(node, index, key, value, callback);
+### rel.index.saveUniqueOrFail(startNode, relName, endNode, [properties,] index, key, value, callback);
+
+Save a node or relationship, using an index to enforce uniqueness. If there is
+already a node or relationship saved under the specified `key` and `value` in 
+the specified `index`, an error is returned indicating that there as a conflict.
+You can check if the result was a conflict by checking if 
+`err.statusCode == 409`.
+
+__NOTE for index functions:__ there are two different types on index in neo4j - 
+__node__ indexes and __relationship__ indexes. When you're working with __node__
+indexes, you use the functions on `node.index`. Similarly, when you're working
+on __relationship__ indexes you use the functions on `rel.index`. Most of the
+functions on both of these are identical (excluding the uniqueness functions),
+but one acts upon node indexes, and the other upon relationship indexes.
+
+__Arguments (node)__
+
+* `node` - the node to save
+* `index` - the name of the index in which `key` and `value` are relevant
+* `key` - the key to check or store under
+* `value` - the value to check or store under
+* `callback` - function(err, node) - returns your created node, or an err with 
+  `statusCode == 409` if a node already existed at that index
+
+__Arguments (relationship)__ 
+* `startNode` - the start point of the relationship (object containing id or id)
+* `relName` - the name of the relationship to create
+* `endNode` - the end point of the relationship (object containing id or id)
+* `properties` (optional) - an object containing properties to store on the
+  created relationship.
+* `index` - the name of the index in which `key` and `value` are relevant
+* `key` - the key to check or store under
+* `value` - the value to check or store under
+* `callback` - function(err, rel) - returns your created relationship, or an 
+  err with `statusCode == 409` if a relationship already existed at that index
+
+__Example__
+
+```javascript
+var tag = { name: 'finnish' };
+db.node.index.saveUniqueOrFail(tag, 'tags', 'name', tag.name, function(err, tag) {
+  // tag == { id: 1, name: 'finnish' }
+
+  // save another new object with the same properties
+  db.node.index.saveUniqueOrFail({name: 'finnish'}, 'tags', 'name', 'finnish', function(err, newTag) {
+    // newTag == undefined
+    // err.statusCode == 409 (conflict)
+    // an error was thrown because there was already a node at that index.
+  });
+});
 ```
 
 ---------------------------------------
