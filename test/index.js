@@ -627,10 +627,10 @@ describe('seraph.index', function() {
 
       setupNodes(function(node, node2) {
         db.rel.saveUnique(node, 'sings', node2, index, 'name', 
-          'johanna', false, function(err, rel) {
+          'johanna', true, function(err, rel) {
           assert(!err);
-          db.rel.index.getOrSaveUnique(node, 'sung', node2, index, 'name',
-            'johanna', false, function(err, newRel) {
+          db.rel.saveUnique(node, 'sung', node2, index, 'name',
+            'johanna', true, function(err, newRel) {
             assert(!err);
             assert.deepEqual(newRel, rel);
             done();
@@ -644,10 +644,10 @@ describe('seraph.index', function() {
       var index = uniqn();
       var node = { name: 'Johanna' };
 
-      db.saveUnique(node, index, 'name', 'johanna', false,
+      db.saveUnique(node, index, 'name', 'johanna', true,
       function(err, originalNode) {
         assert(!err);
-        db.saveUnique(node, index, 'name', 'johanna', false,
+        db.saveUnique(node, index, 'name', 'johanna', true,
         function(err, newNode) {
           assert(!err);
           assert.equal(newNode.id, originalNode.id);
