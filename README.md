@@ -35,13 +35,11 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 
 * [query](#query) - perform a cypher query and parse the results
 * [rawQuery](#rawQuery) - perform a cypher query and return unparsed results
-* ~~[traversal](#traversal) - perform a traversal~~
 
 ### API Communication Operations
 
 * [operation](#operation) - create a representation of a REST API call
 * [call](#call) - take an operation and call it
-* ~~[batch](#batch) - perform multiple operations atomically~~
 
 ### Node Operations
 * [save (node.save)](#node.save) - create or update a node
@@ -178,13 +176,6 @@ db.rawQuery(cypher, {id: 3}, function(err, result) {
 
 ---------------------------------------
 
-<a name="traversal" />
-### ~~traversal(traversal, callback)~~
-
-__Feature planned for 1.1.0__
-
----------------------------------------
-
 <a name="operation" />
 ### operation(path, [method='get/post'], [data])
 
@@ -235,13 +226,6 @@ db.call(operation, function(err, properties) {
   // `properties` is an object containing the properties from node 4285
 });
 ```
-
----------------------------------------
-
-<a name="batch" />
-### ~~batch(block|operationArray, callback)~~
-
-__Feature planned for 1.1.0__
 
 ## Node Operations
 
