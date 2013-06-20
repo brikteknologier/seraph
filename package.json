@@ -15,7 +15,7 @@
     "quick-test": "USE_DIRTY_DATABASE=true NO_STOP=true ./node_modules/mocha/bin/mocha -R spec -t 3000 -s 2000"
   },
   "engines": {
-    "node": "~0.6.11 || ~0.8.0"
+    "node": "~0.10.0"
   },
   "license": "MIT",
   "dependencies": {
@@ -26,6 +26,6 @@
   },
   "devDependencies": {
     "mocha": "~1.2.0",
-    "disposable-seraph": "~0.1.9"
+    "disposable-seraph": "~0.2.3-neo4j-2.0.0-M03"
   }
 }
