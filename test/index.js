@@ -422,7 +422,8 @@ describe('seraph.index', function() {
       });
     });
 
-    it('should create a unique rel', function(done) {
+    it('should get original rel in get-or-save mode when saving', 
+    function(done) {
       var index = uniqn();
 
       function setupNodes(cb) {
@@ -442,6 +443,127 @@ describe('seraph.index', function() {
             'johanna', function(err, newRel) {
             assert(!err);
             assert.deepEqual(newRel, rel);
+            done();
+          });
+        });
+      });
+    });
+    
+    it('should create a unique node in save-or-fail mode', function(done) {
+      var index = uniqn();
+      var node = { name: 'Johanna' };
+
+      db.index.saveUniqueOrFail(node, index, 'name', 'johanna', 
+      function(err, node) {
+        assert(!err);
+        assert.equal(node.name, 'Johanna');
+        assert(node.id);
+        done();
+      });
+    });
+
+    it('should create a unique rel in save-or-fail mode', function(done) {
+      var index = uniqn();
+
+      function setupNodes(cb) {
+        var node = { name: 'Johanna' };
+        var node2 = { name: 'Sun sarkyä anna mä en' };
+        db.save([node, node2], function(err,nodes) {
+          assert(!err);
+          cb(nodes[0], nodes[1]);
+        });
+      }
+
+      setupNodes(function(node, node2) {
+        db.rel.index.saveUniqueOrFail(node, 'sings', node2, index, 'name', 
+          'johanna', function(err, rel) {
+          assert(!err);
+          assert(rel.id);
+          assert(rel.start);
+          assert.equal(rel.start, node.id);
+          assert(rel.end);
+          assert.equal(rel.end, node2.id);
+          assert.equal(rel.type, 'sings');
+          done();
+        });
+      });
+    });
+
+    it('should create a unique rel with properties in save-or-fail mode', 
+    function(done) {
+      var index = uniqn();
+
+      function setupNodes(cb) {
+        var node = { name: 'Johanna' };
+        var node2 = { name: 'Sun sarkyä anna mä en' };
+        db.save([node, node2], function(err,nodes) {
+          assert(!err);
+          cb(nodes[0], nodes[1]);
+        });
+      }
+
+      var props = { original: true };
+
+      setupNodes(function(node, node2) {
+        db.rel.index.saveUniqueOrFail(node, 'sings', node2, props, index, 'name', 
+          'johanna', function(err, rel) {
+          assert(!err);
+          assert(rel.id);
+          assert(rel.start);
+          assert.equal(rel.start, node.id);
+          assert(rel.end);
+          assert.equal(rel.end, node2.id);
+          assert.equal(rel.type, 'sings');
+          assert.deepEqual(rel.properties, props);
+          done();
+        });
+      });
+    });
+
+    it('should fail in save-or-fail mode when re-writing a unique rel', 
+    function(done) {
+      var index = uniqn();
+
+      function setupNodes(cb) {
+        var node = { name: 'Johanna' };
+        var node2 = { name: 'Sun sarkyä anna mä en' };
+        db.save([node, node2], function(err,nodes) {
+          assert(!err);
+          cb(nodes[0], nodes[1]);
+        });
+      }
+
+      setupNodes(function(node, node2) {
+        db.rel.index.saveUniqueOrFail(node, 'sings', node2, index, 'name', 
+          'johanna', function(err, rel) {
+          assert(!err);
+          db.rel.index.saveUniqueOrFail(node, 'sung', node2, index, 'name',
+            'johanna', function(err, newRel) {
+            assert(err);
+            assert(err.statusCode == 419);
+            assert(!newRel);
+            done();
+          });
+        });
+      });
+    });
+
+    it('should fail in save-or-fail mode when re-writing a unique node', 
+    function(done) {
+      var index = uniqn();
+      var node = { name: 'Johanna' };
+
+      db.index.saveUniqueOrFail(node, index, 'name', 'johanna', 
+      function(err, originalNode) {
+        assert(!err);
+        db.index.saveUniqueOrFail(node, index, 'name', 'johanna',
+        function(err, newNode) {
+          assert(!err);
+          assert.equal(newNode.id, originalNode.id);
+          db.index.read(index, 'name', 'johanna', function(err, node) {
+            assert(err);
+            assert(err.statusCode == 419);
+            assert(!node);
             done();
           });
         });
