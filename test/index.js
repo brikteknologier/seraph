@@ -581,10 +581,10 @@ describe('seraph.index', function() {
       }
 
       setupNodes(function(node, node2) {
-        db.rel.saveUnique(node, 'sings', node2, index, 'name', 
+        db.rel.createUnique(node, 'sings', node2, index, 'name', 
           'johanna', function(err, rel) {
           assert(!err);
-          db.rel.saveUnique(node, 'sung', node2, index, 'name',
+          db.rel.createUnique(node, 'sung', node2, index, 'name',
             'johanna', function(err, newRel) {
             assert(err);
             assert(err.statusCode == 409);
@@ -626,10 +626,10 @@ describe('seraph.index', function() {
       }
 
       setupNodes(function(node, node2) {
-        db.rel.saveUnique(node, 'sings', node2, index, 'name', 
+        db.rel.createUnique(node, 'sings', node2, index, 'name', 
           'johanna', true, function(err, rel) {
           assert(!err);
-          db.rel.saveUnique(node, 'sung', node2, index, 'name',
+          db.rel.createUnique(node, 'sung', node2, index, 'name',
             'johanna', true, function(err, newRel) {
             assert(!err);
             assert.deepEqual(newRel, rel);
