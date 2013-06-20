@@ -540,7 +540,7 @@ describe('seraph.index', function() {
           db.rel.index.saveUniqueOrFail(node, 'sung', node2, index, 'name',
             'johanna', function(err, newRel) {
             assert(err);
-            assert(err.statusCode == 419);
+            assert(err.statusCode == 409);
             assert(!newRel);
             done();
           });
@@ -558,14 +558,10 @@ describe('seraph.index', function() {
         assert(!err);
         db.index.saveUniqueOrFail(node, index, 'name', 'johanna',
         function(err, newNode) {
-          assert(!err);
-          assert.equal(newNode.id, originalNode.id);
-          db.index.read(index, 'name', 'johanna', function(err, node) {
-            assert(err);
-            assert(err.statusCode == 419);
-            assert(!node);
-            done();
-          });
+          assert(err);
+          assert(err.statusCode == 409);
+          assert(!newNode);
+          done()
         });
       });
     });
