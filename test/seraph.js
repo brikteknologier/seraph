@@ -39,6 +39,25 @@ describe('configuration', function() {
       testWithServerName('localhost', done);
     });
   });
+
+  it('should work with a trailing slash on the server url', function(done) {
+    var db = seraph('http://127.0.0.1:' + testDatabase.port + '/');
+    db.save({name:'mr potato'}, function(err,node) {
+      assert(!err);
+      done();
+    });
+  });
+
+  it('should work with a trailing slash on the server endpoint', function(done) {
+    var db = seraph({
+      server: 'http://127.0.0.1:' + testDatabase.port + '/',
+      endpoint: '/db/data/'
+    });
+    db.save({name:'mr potato'}, function(err,node) {
+      assert(!err);
+      done();
+    });
+  });
 });
 
 describe('seraph#call, seraph#operation', function() {
