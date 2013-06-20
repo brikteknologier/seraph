@@ -66,20 +66,16 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 
 ## Compatibility
 
-Seraph has been tested with Neo4j 1.8. As we progress in development, we will
-begin adding some legacy support for older versions.
+Seraph has been tested with Neo4j 2.0.0-M03. If you would like to test 
+compatibility with another version of neo4j, change the version values stored in 
+`test/util/database.js`.
 
 ## Testing
 
-To test Seraph, download Neo4j and extract it in the seraph directory. Rename
-the neo4j folder to `db`. Then:
-
-    npm test
-
-or, if you have started the test instance yourself and don't want the tests to
-restart and clean the server every time:
-
-    npm run-script quick-test
+You can test Seraph simply by running `npm test`. It will spin up its own neo4j 
+instance for testing. **Note** that the first time you run your tests (or change 
+neo4j version), a new version of neo4j will need to be downloaded. That can,
+of course, take a little time.
 
 ## Initialization
 <a name="seraph" />
