@@ -364,4 +364,13 @@ describe('seraph#find', function() {
 
     async.series([createObjs, findObjs], done);
   });
+
+  it('should properly align count columns', function(done) {
+    db.query("start n=node(*) return count(n) as totalNodes", function(e, res) {
+      assert(!e);
+      assert(!Array.isArray(res));
+      assert(res.totalNodes);
+      done()
+    });
+  });
 });
