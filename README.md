@@ -40,6 +40,7 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 
 * [operation](#operation) - create a representation of a REST API call
 * [call](#call) - take an operation and call it
+* [batch](#batch) - perform a series of atomic operations with one api call.
 
 ### Node Operations
 * [save (node.save)](#node.save) - create or update a node
@@ -230,6 +231,99 @@ db.call(operation, function(err, properties) {
   // `properties` is an object containing the properties from node 4285
 });
 ```
+
+---------------------------------------
+
+<a name="batch" />
+### batch()
+### batch(operations)
+
+Batching provides a method of performing a series of operations atomically. You
+could also call it a transaction. It has the added benefit of being performed
+all in a single call to the neo4j api, which theoretically should result in 
+improved performance when performing more than one operation at the same time.
+
+When you create a batch, you're given a new `seraph` object to use. All calls to
+this object will be added to the batch. Note that once a batch is committed, you
+should no longer use this object.
+
+#### What happens to my callbacks?
+
+You can still pass callbacks to operations on a batch transaction. They will
+perform as you expect, but they will not be called until after the batch has
+been committed. 
+
+#### Can I reference newly created nodes?
+
+Yes! Calling, for example, `node.save` will synchronously return a special object
+which you can use to refer to that newly created node within the batch.
+
+For example, this is perfectly valid in the context of a batch transaction:
+
+```javascript
+var txn = db.batch();
+
+var singer = txn.save({name: 'Johanna Kurkela'});
+var album = txn.save({title: 'Kauriinsilmät', year: 2008});
+var performance = txn.relate(singer, 'performs_on', album, {role: 'Primary Artist'});
+txn.rel.index('performances', performance, 'year', '2008');
+
+txn.commit(function(err, results) {});
+```
+
+#### I didn't use any callbacks. How can I find my results when the batch is done?
+
+Each function you call on the batch object will return a special object that you
+can use to refer to that call's results once that batch is finished (in 
+addition to the intra-batch referencing feature mentioned above). The best
+way to demonstrate this is by example:
+
+```javascript
+var txn = db.batch();
+
+var album = txn.save({title: 'Hetki Hiljaa'});
+var songs = txn.save([
+  { title: 'Olen Sinussa', length: 248 },
+  { title: 'Juurrun Tähän Ikävään', length: 271 }
+]);
+// note we can also use `songs` to reference the node that will be created
+txn.relate(album, 'has_song', songs[0], { trackNumber: 1 });
+txn.relate(album, 'has_song', songs[1], { trackNumber: 3 });
+
+txn.commit(function(err, results) {
+  var album = results[album]; // album -> { title: 'Hetki Hiljaa', id: 1 }
+  var tracks = results[songs];
+  /* tracks -> [{ title: 'Olen Sinussa', length: 248, id: 2 },
+                { title: 'Juurrun Tähän Ikävään', length: 271, id: 3}] */
+});
+```
+
+#### Can I do all this in my own closure, please?
+
+Sure! You can do all of this with just a single call of `batch`, it just makes
+tracking all your results a little bit trickier. But if you're just doing 
+2 or 3 operations then the results object will be quite easy to predict. Here's
+an example of using batch like this:
+
+```javascript
+db.batch(function(txn) {
+  txn.save({ title: 'Kaikki Askeleet' });
+  txn.save({ title: 'Sinä Nukut Siinä' });
+  txn.save({ title: 'Pohjanmaa' });
+}, function(err, results) {
+  /* results -> [{ id: 1, title: 'Kaikki Askeleet' },
+                 { id: 2, title: 'Sinä Nukut Siinä' },
+                 { id: 3, title: 'Pohjanmaa' }] */
+});
+
+#### What happens if one of the operations fails?
+
+Then no changes are made. Neo4j's batch transactions are atomic, so if one
+operation fails, then no changes to the database are made. Neo4j's own
+documentation has the following to say: 
+> This service is transactional. If any of the operations performed fails 
+> (returns a non-2xx HTTP status code), the transaction will be rolled back and
+> all changes will be undone.
 
 ## Node Operations
 
