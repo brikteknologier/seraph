@@ -254,7 +254,7 @@ should no longer use this object.
 * [I didn't use any callbacks. How can I find my results when the batch is done?](#i-didnt-use-any-callbacks-how-can-i-find-my-results-when-the-batch-is-done)
 * [What happens if one of the operations fails?](#what-happens-if-one-of-the-operations-fails)
 * [Can I nest batches?](#can-i-nest-batches)
-* [How can I tell if this `db` object is a part of a batch?](#how-can-i-tell-if-this-db-object-is-a-part-of-a-batch)
+* [How can I tell if this `db` object is a batch operation?](#how-can-i-tell-if-this-db-object-is-a-batch-operation)
 
 #### How do I use it?
 
@@ -374,7 +374,7 @@ No, as of now we don't support nesting batches as it tends to confuse the
 intra-batch referencing functionality. To enforce this, you'll find that the
 seraph-like object returned by `db.batch()` has no `.batch` function itself.
 
-#### How can I tell if this `db` object is a part of a batch?
+#### How can I tell if this `db` object is a batch operation?
 
 Like so:
 
