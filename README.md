@@ -40,6 +40,7 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 
 * [operation](#operation) - create a representation of a REST API call
 * [call](#call) - take an operation and call it
+* [batch](#batch) - perform a series of atomic operations with one api call.
 
 ### Node Operations
 * [save (node.save)](#node.save) - create or update a node
@@ -230,6 +231,159 @@ db.call(operation, function(err, properties) {
   // `properties` is an object containing the properties from node 4285
 });
 ```
+
+---------------------------------------
+
+<a name="batch" />
+### Batching/transactions - `batch([operations, callback])`
+
+Batching provides a method of performing a series of operations atomically. You
+could also call it a transaction. It has the added benefit of being performed
+all in a single call to the neo4j api, which theoretically should result in 
+improved performance when performing more than one operation at the same time.
+
+When you create a batch, you're given a new `seraph` object to use. All calls to
+this object will be added to the batch. Note that once a batch is committed, you
+should no longer use this object.
+
+* [How do I use it?](#how-do-i-use-it)
+* [What happens to my callbacks?](#what-happens-to-my-callbacks)
+* [Can I reference newly created nodes?](#can-i-reference-newly-created-nodes)
+* [I didn't use any callbacks. How can I find my results when the batch is done?](#i-didnt-use-any-callbacks-how-can-i-find-my-results-when-the-batch-is-done)
+* [What happens if one of the operations fails?](#what-happens-if-one-of-the-operations-fails)
+* [Can I nest batches?](#can-i-nest-batches)
+* [How can I tell if this `db` object is a batch operation?](#how-can-i-tell-if-this-db-object-is-a-batch-operation)
+
+#### How do I use it?
+
+There's two ways. You can do the whole thing asynchronously, and commit the 
+transaction whenever you want, or you can do it synchronously, and have the 
+transaction committed for you as soon as your function is finished running.
+Here's a couple of examples of performing the same operations with batch 
+synchronously and asynchronously:
+
+##### Asynchronously
+
+```javascript
+var txn = db.batch();
+
+txn.save({ title: 'Kaikki Askeleet' });
+txn.save({ title: 'Sinä Nukut Siinä' });
+txn.save({ title: 'Pohjanmaa' });
+
+txn.commit(function(err, results) {
+  /* results -> [{ id: 1, title: 'Kaikki Askeleet' },
+                 { id: 2, title: 'Sinä Nukut Siinä' },
+                 { id: 3, title: 'Pohjanmaa' }] */
+});
+```
+
+##### Synchronously
+
+**Note** - it's only the creation of operations that is synchronous. The actual
+API call is asynchronous still, of course.
+
+```javascript
+db.batch(function(txn) {
+  txn.save({ title: 'Kaikki Askeleet' });
+  txn.save({ title: 'Sinä Nukut Siinä' });
+  txn.save({ title: 'Pohjanmaa' });
+}, function(err, results) {
+  /* results -> [{ id: 1, title: 'Kaikki Askeleet' },
+                 { id: 2, title: 'Sinä Nukut Siinä' },
+                 { id: 3, title: 'Pohjanmaa' }] */
+});
+```
+
+#### What happens to my callbacks?
+
+You can still pass callbacks to operations on a batch transaction. They will
+perform as you expect, but they will not be called until after the batch has
+been committed. Here's an example of using callbacks as normal:
+
+```javascript
+var txn = db.batch();
+
+txn.save({ title: 'Marmoritaivas' }, function(err, node) {
+  // this code is not reached until `txn.commit` is called
+  // node -> { id: 1, title: 'Marmoritaivas' }
+});
+
+txn.commit();
+```
+
+#### Can I reference newly created nodes?
+
+Yes! Calling, for example, `node.save` will synchronously return a special object
+which you can use to refer to that newly created node within the batch.
+
+For example, this is perfectly valid in the context of a batch transaction:
+
+```javascript
+var txn = db.batch();
+
+var singer = txn.save({name: 'Johanna Kurkela'});
+var album = txn.save({title: 'Kauriinsilmät', year: 2008});
+var performance = txn.relate(singer, 'performs_on', album, {role: 'Primary Artist'});
+txn.rel.index('performances', performance, 'year', '2008');
+
+txn.commit(function(err, results) {});
+```
+
+#### I didn't use any callbacks. How can I find my results when the batch is done?
+
+Each function you call on the batch object will return a special object that you
+can use to refer to that call's results once that batch is finished (in 
+addition to the intra-batch referencing feature mentioned above). The best
+way to demonstrate this is by example:
+
+```javascript
+var txn = db.batch();
+
+var album = txn.save({title: 'Hetki Hiljaa'});
+var songs = txn.save([
+  { title: 'Olen Sinussa', length: 248 },
+  { title: 'Juurrun Tähän Ikävään', length: 271 }
+]);
+// note we can also use `songs` to reference the node that will be created
+txn.relate(album, 'has_song', songs[0], { trackNumber: 1 });
+txn.relate(album, 'has_song', songs[1], { trackNumber: 3 });
+
+txn.commit(function(err, results) {
+  var album = results[album]; // album -> { title: 'Hetki Hiljaa', id: 1 }
+  var tracks = results[songs];
+  /* tracks -> [{ title: 'Olen Sinussa', length: 248, id: 2 },
+                { title: 'Juurrun Tähän Ikävään', length: 271, id: 3}] */
+});
+```
+
+#### What happens if one of the operations fails?
+
+Then no changes are made. Neo4j's batch transactions are atomic, so if one
+operation fails, then no changes to the database are made. Neo4j's own
+documentation has the following to say: 
+> This service is transactional. If any of the operations performed fails 
+> (returns a non-2xx HTTP status code), the transaction will be rolled back and
+> all changes will be undone.
+
+#### Can I nest batches?
+
+No, as of now we don't support nesting batches as it tends to confuse the
+intra-batch referencing functionality. To enforce this, you'll find that the
+seraph-like object returned by `db.batch()` has no `.batch` function itself.
+
+#### How can I tell if this `db` object is a batch operation?
+
+Like so:
+
+```javascript
+// db.isBatch -> undefined
+var txn = db.batch();
+// txn.isBatch -> true
+if (txn.isBatch) // Woo! I'm in a batch.
+```
+
+-------------
 
 ## Node Operations
 
