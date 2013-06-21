@@ -246,8 +246,6 @@ When you create a batch, you're given a new `seraph` object to use. All calls to
 this object will be added to the batch. Note that once a batch is committed, you
 should no longer use this object.
 
-*Contents of batching docs*
-
 * [How do I use it?](#how-do-i-use-it)
 * [What happens to my callbacks?](#what-happens-to-my-callbacks)
 * [Can I reference newly created nodes?](#can-i-reference-newly-created-nodes)
