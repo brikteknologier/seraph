@@ -235,8 +235,7 @@ db.call(operation, function(err, properties) {
 ---------------------------------------
 
 <a name="batch" />
-### batch()
-### batch(operations)
+### Batching/transactions - `batch([operations, callback])`
 
 Batching provides a method of performing a series of operations atomically. You
 could also call it a transaction. It has the added benefit of being performed
@@ -247,11 +246,60 @@ When you create a batch, you're given a new `seraph` object to use. All calls to
 this object will be added to the batch. Note that once a batch is committed, you
 should no longer use this object.
 
+#### How do I use it?
+
+There's two ways. You can do the whole thing asynchronously, and commit the 
+transaction whenever you want, or you can do it synchronously, and have the 
+transaction committed for you as soon as your function is finished running.
+Here's a couple of examples of performing the same operations with batch 
+synchronously and asynchronously:
+
+##### Asynchronously
+
+```javascript
+var txn = db.batch();
+
+txn.save({ title: 'Kaikki Askeleet' });
+txn.save({ title: 'Sinä Nukut Siinä' });
+txn.save({ title: 'Pohjanmaa' });
+
+txn.commit(function(err, results) {
+  /* results -> [{ id: 1, title: 'Kaikki Askeleet' },
+                 { id: 2, title: 'Sinä Nukut Siinä' },
+                 { id: 3, title: 'Pohjanmaa' }] */
+});
+```
+
+##### Synchronously
+
+```javascript
+db.batch(function(txn) {
+  txn.save({ title: 'Kaikki Askeleet' });
+  txn.save({ title: 'Sinä Nukut Siinä' });
+  txn.save({ title: 'Pohjanmaa' });
+}, function(err, results) {
+  /* results -> [{ id: 1, title: 'Kaikki Askeleet' },
+                 { id: 2, title: 'Sinä Nukut Siinä' },
+                 { id: 3, title: 'Pohjanmaa' }] */
+});
+```
+
 #### What happens to my callbacks?
 
 You can still pass callbacks to operations on a batch transaction. They will
 perform as you expect, but they will not be called until after the batch has
-been committed. 
+been committed. Here's an example of using callbacks as normal:
+
+```javascript
+var txn = db.batch();
+
+txn.save({ title: 'Marmoritaivas' }, function(err, node) {
+  // this code is not reached until `txn.commit` is called
+  // node -> { id: 1, title: 'Marmoritaivas' }
+});
+
+txn.commit();
+```
 
 #### Can I reference newly created nodes?
 
@@ -305,16 +353,6 @@ tracking all your results a little bit trickier. But if you're just doing
 2 or 3 operations then the results object will be quite easy to predict. Here's
 an example of using batch like this:
 
-```javascript
-db.batch(function(txn) {
-  txn.save({ title: 'Kaikki Askeleet' });
-  txn.save({ title: 'Sinä Nukut Siinä' });
-  txn.save({ title: 'Pohjanmaa' });
-}, function(err, results) {
-  /* results -> [{ id: 1, title: 'Kaikki Askeleet' },
-                 { id: 2, title: 'Sinä Nukut Siinä' },
-                 { id: 3, title: 'Pohjanmaa' }] */
-});
 
 #### What happens if one of the operations fails?
 
@@ -324,6 +362,25 @@ documentation has the following to say:
 > This service is transactional. If any of the operations performed fails 
 > (returns a non-2xx HTTP status code), the transaction will be rolled back and
 > all changes will be undone.
+
+#### Can I nest batches?
+
+No, as of now we don't support nesting batches as it tends to confuse the
+intra-batch referencing functionality. To enforce this, you'll find that the
+seraph-like object returned by `db.batch()` has no `.batch` function itself.
+
+#### How can I tell if this `db` object is a part of a batch?
+
+Like so:
+
+```javascript
+// db.isBatch -> undefined
+var txn = db.batch();
+// txn.isBatch -> true
+if (txn.isBatch) // Woo! I'm in a batch.
+```
+
+-------------
 
 ## Node Operations
 
