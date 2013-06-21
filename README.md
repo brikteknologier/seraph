@@ -288,7 +288,7 @@ db.save({ name: 'Jon', age: 22, likes: 'Beer' }, function(err, node) {
 ---------------------------------------
 
 <a name="node.saveUnique" />
-### rel.saveUnique(node, index, key, value, [returnExistingOnConflict = false,] callback)
+### node.saveUnique(node, index, key, value, [returnExistingOnConflict = false,] callback)
 
 Save a node, using an index to enforce uniqueness.
 
