@@ -11,7 +11,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha -R spec -b -t 10000 -s 2000",
+    "test": "./node_modules/mocha/bin/mocha -R spec -t 10000 -s 2000",
     "quick-test": "USE_DIRTY_DATABASE=true NO_STOP=true ./node_modules/mocha/bin/mocha -R spec -t 3000 -s 2000"
   },
   "engines": {
