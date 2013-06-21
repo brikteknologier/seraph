@@ -246,6 +246,16 @@ When you create a batch, you're given a new `seraph` object to use. All calls to
 this object will be added to the batch. Note that once a batch is committed, you
 should no longer use this object.
 
+*Contents of batching docs*
+
+* [How do I use it?](#how-do-i-use-it)
+* [What happens to my callbacks?](#what-happens-to-my-callbacks)
+* [Can I reference newly created nodes?](#can-i-reference-newly-created-nodes)
+* [I didn't use any callbacks. How can I find my results when the batch is done?](#i-didnt-use-any-callbacks-how-can-i-find-my-results-when-the-batch-is-done)
+* [What happens if one of the operations fails?](#what-happens-if-one-of-the-operations-fails)
+* [Can I nest batches?](#can-i-nest-batches)
+* [How can I tell if this `db` object is a part of a batch?](#how-can-i-tell-if-this-db-object-is-a-part-of-a-batch)
+
 #### How do I use it?
 
 There's two ways. You can do the whole thing asynchronously, and commit the 
@@ -271,6 +281,9 @@ txn.commit(function(err, results) {
 ```
 
 ##### Synchronously
+
+**Note** - it's only the creation of operations that is synchronous. The actual
+API call is asynchronous still, of course.
 
 ```javascript
 db.batch(function(txn) {
@@ -345,14 +358,6 @@ txn.commit(function(err, results) {
                 { title: 'Juurrun Tähän Ikävään', length: 271, id: 3}] */
 });
 ```
-
-#### Can I do all this in my own closure, please?
-
-Sure! You can do all of this with just a single call of `batch`, it just makes
-tracking all your results a little bit trickier. But if you're just doing 
-2 or 3 operations then the results object will be quite easy to predict. Here's
-an example of using batch like this:
-
 
 #### What happens if one of the operations fails?
 
