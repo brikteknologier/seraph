@@ -443,7 +443,10 @@ describe('seraph.index', function() {
             'johanna', function(err, newRel) {
             assert(!err);
             assert.deepEqual(newRel, rel);
-            done();
+            db.rel.index.read(index, 'name', 'johanna', function(err, irel) {
+              assert.equal(rel.id, irel.id);
+              done();
+            });
           });
         });
       });
@@ -458,7 +461,11 @@ describe('seraph.index', function() {
         assert(!err);
         assert.equal(node.name, 'Johanna');
         assert(node.id);
-        done();
+        db.index.read(index, 'name', 'johanna', function(err, inode) {
+          assert(!err);
+          assert.equal(inode.id, node.id);
+          done();
+        });
       });
     });
 
@@ -484,7 +491,11 @@ describe('seraph.index', function() {
           assert(rel.end);
           assert.equal(rel.end, node2.id);
           assert.equal(rel.type, 'sings');
-          done();
+          db.rel.index.read(index, 'name', 'johanna', function(err, irel) {
+            assert(!err);
+            assert.deepEqual(irel, rel);
+            done();
+          });
         });
       });
     });
@@ -515,7 +526,11 @@ describe('seraph.index', function() {
           assert.equal(rel.end, node2.id);
           assert.equal(rel.type, 'sings');
           assert.deepEqual(rel.properties, props);
-          done();
+          db.rel.index.read(index, 'name', 'johanna', function(err, irel) {
+            assert(!err);
+            assert.deepEqual(rel, irel);
+            done();
+          });
         });
       });
     });
@@ -542,7 +557,11 @@ describe('seraph.index', function() {
             assert(err);
             assert(err.statusCode == 409);
             assert(!newRel);
-            done();
+            db.rel.index.read(index, 'name', 'johanna', function(err, irel) {
+              assert(!err);
+              assert.deepEqual(irel, rel);
+              done();
+            });
           });
         });
       });
@@ -589,7 +608,11 @@ describe('seraph.index', function() {
             assert(err);
             assert(err.statusCode == 409);
             assert(!newRel);
-            done();
+            db.rel.index.read(index, 'name', 'johanna', function(err, irel) {
+              assert(!err);
+              assert.deepEqual(rel, irel);
+              done();
+            });
           });
         });
       });
@@ -607,7 +630,11 @@ describe('seraph.index', function() {
           assert(err);
           assert(err.statusCode == 409);
           assert(!newNode);
-          done()
+          db.index.read(index, 'name', 'johanna', function(err, inode) {
+            assert(!err);
+            assert.deepEqual(inode, originalNode);
+            done();
+          });
         });
       });
     });
