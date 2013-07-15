@@ -275,7 +275,24 @@ describe('seraph#batch', function() {
           done();
         });
       });
+    });
 
+    it('should support indexing and index.readAsList', function(done) {
+      var txn = db.batch();
+      var idx = uniqn();
+
+      var person = txn.save({name:'Jon'});
+      txn.index(idx, person, 'thing', 'stuff');
+
+      txn.commit(function(err, txnResults) {
+        assert(!err);
+        db.index.readAsList(idx, 'thing', 'stuff', function(err, readResults) {
+          assert(!err);
+          assert.equal(readResults.length, 1);
+          assert.deepEqual(readResults[0], txnResults[person]);
+          done();
+        });
+      });
     });
 
     it('should support updating a rel', function(done) {
