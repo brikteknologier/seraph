@@ -96,8 +96,8 @@ assumes the Neo4J REST API is running locally at the default location
 
 __Arguments__
 
-* options (default=`{ server: "http://localhost:7474", endpoint: "/db/data" }` - `server` is protocol and authority part of Neo4J REST API URI, and `endpoint` should be the path segment of the URI.
-* server (string) - Short form to specify server parameter only. `"http://localhorse:4747"` is equivalent to `{ server: "http://localhorse:4747" }`.
+* `options` (default=`{ server: "http://localhost:7474", endpoint: "/db/data" }` - `server` is protocol and authority part of Neo4J REST API URI, and `endpoint` should be the path segment of the URI.
+* `server` (string) - Short form to specify server parameter only. `"http://localhorse:4747"` is equivalent to `{ server: "http://localhorse:4747" }`.
 
 __Example__
 
@@ -136,12 +136,12 @@ are returned (in order to transform them into a nicer format).
 
 __Arguments__
 
-* query - Cypher query as a format string.
-* params (optional, default=`{}`). Replace `{key}` parts in query string.  See 
+* `query` - Cypher query as a format string.
+* `params` (optional, default=`{}`). Replace `{key}` parts in query string.  See 
   cypher documentation for details. **note** that if you want to send a list of
   ids as a parameter, you should send them as an array, rather than a string
   representing them (`[2,3]` rather than `"2,3"`).
-* callback - (err, result).  Result is an array of objects.
+* `callback` - (err, result).  Result is an array of objects.
 
 __Example__
 
@@ -188,11 +188,11 @@ Create an operation object that will be passed to [call](#call).
 
 __Arguments__
 
-* path - the path fragment of the request URL with no leading slash. 
-* method (optional, default=`'GET'`|`'POST'`) - the HTTP method to use. When 
+* `path` - the path fragment of the request URL with no leading slash. 
+* `method` (optional, default=`'GET'`|`'POST'`) - the HTTP method to use. When 
   `data` is an  object, `method` defaults to 'POST'. Otherwise, `method` 
   defaults to `GET`.
-* data (optional) - an object to send to the server with the request.
+* `data` (optional) - an object to send to the server with the request.
 
 __Example__
 
@@ -215,9 +215,9 @@ code is not in the 200's, an error is passed to the callback.
 
 __Arguments__
 
-* operation - an operation created by [operation](#operation) that specifies
+* `operation` - an operation created by [operation](#operation) that specifies
   what to request from the server
-* callback - function(err, result, response). `result` is the JSON parsed body
+* `callback` - function(err, result, response). `result` is the JSON parsed body
   from the server (otherwise empty). `response` is the response object from the
   request.
 
@@ -397,8 +397,8 @@ node to the callback.
 
 __Arguments__
 
-* node - an object to create or update
-* callback - function(err, node). `node` is the newly saved or updated node. If
+* `node` - an object to create or update
+* `callback` - function(err, node). `node` is the newly saved or updated node. If
   a create was performed, `node` will now have an id property. The returned 
   object is not the same reference as the passed object (the passed object will
   never be altered).
@@ -431,16 +431,16 @@ See also [node.index.saveUniqueOrFail](#index.saveUniqueOrFail) &
 
 __Arguments__
 
-* node - an object to create or update
-* index - the index in which `key` and `value` are relevant
-* key - the key under which to index this node and enforce uniqueness
-* value - the value under which to index this node and enforce uniqueness
-* returnExistingOnConflict (optional, default=`false`) - what to do when there is
+* `node` - an object to create or update
+* `index` - the index in which `key` and `value` are relevant
+* `key` - the key under which to index this node and enforce uniqueness
+* `value` - the value under which to index this node and enforce uniqueness
+* `returnExistingOnConflict` (optional, default=`false`) - what to do when there is
   a conflict (when the index you specified already refers to a node). If set to 
   `true`, the node that the index currently refers to is returned.  Otherwise, 
   an error is return indicating that there was a conflict (you can check this by 
   testing `err.statusCode == 409`.
-* callback - function(err, node) - `node` is the newly created node or the node 
+* `callback` - function(err, node) - `node` is the newly created node or the node 
   that was in the specified index, depending on `returnExistingOnConflict`.
 
 __Example__
@@ -477,9 +477,9 @@ behaviour is inconsistent in this way as well.
 
 __Arguments__
 
-* id|object - either the id of the node to read, or an object containing an id
+* `id | object` - either the id of the node to read, or an object containing an id
 property of the node to read.
-* callback - function(err, node). `node` is an object containing the properties
+* `callback` - function(err, node). `node` is an object containing the properties
 of the node with the given id.
 
 __Example__
@@ -502,10 +502,10 @@ Delete a node.
 
 __Arguments__
 
-* id|object - either the id of the node to delete, or an object containing an id
+* `id | object` - either the id of the node to delete, or an object containing an id
 property of the node to delete.
-* force - if truthy, will delete all the node's relations prior to deleting the node.
-* callback - function(err). if `err` is falsy, the node has been deleted.
+* `force` - if truthy, will delete all the node's relations prior to deleting the node.
+* `callback` - function(err). if `err` is falsy, the node has been deleted.
 
 __Example__
 
@@ -528,13 +528,13 @@ cypher query.
 
 __Arguments__
 
-* predicate - Partially defined object.  Will return elements which match
+* `predicate` - Partially defined object.  Will return elements which match
   the defined attributes of predicate.
-* any (optional, default=`false`) - If true, elements need only match on one 
+* `any` (optional, default=`false`) - If true, elements need only match on one 
   attribute. If false, elements must match on all attributes.
-* start (optional, default=`'node(*)'`) - The scope of the search. For alternate
+* `start` (optional, default=`'node(*)'`) - The scope of the search. For alternate
   values, check the [neo4j docs on the cypher START command](http://docs.neo4j.org/chunked/stable/query-start.html).
-* callback - function(err, results) - `results` is an array of the resulting
+* `callback` - function(err, results) - `results` is an array of the resulting
   nodes.
 
 __Example__
@@ -568,13 +568,13 @@ Read the relationships involving the specified node.
 
 __Arguments__
 
-* id|object - either the id of a node, or an object containing an id property of
+* `id | object` - either the id of a node, or an object containing an id property of
   a node.
-* direction ('all'|'in'|'out') (optional unless `type` is passed, 
+* `direction` ('all'|'in'|'out') (optional unless `type` is passed, 
   default=`'all'`) - the direction of relationships to read. 
-* type (optional, default=`''` (match all relationships)) - the relationship
+* `type` (optional, default=`''` (match all relationships)) - the relationship
   type to find
-* callback - function(err, relationships) - `relationships` is an array of the
+* `callback` - function(err, relationships) - `relationships` is an array of the
   matching relationships
 
 __Example__
@@ -596,13 +596,13 @@ Create a relationship between two nodes.
 
 __Arguments__
 
-* firstId|firstObject - id of the start node or an object with an id property
+* `firstId | firstObject` - id of the start node or an object with an id property
   for the start node
-* type - the name of the relationship
-* secondId|secondObject - id of the end node or an object with an id property
+* `type` - the name of the relationship
+* `secondId | secondObject` - id of the end node or an object with an id property
   for the end node
-* properties (optional, default=`{}`) - properties of the relationship
-* callback - function(err, relationship) - `relationship` is the newly created
+* `properties` (optional, default=`{}`) - properties of the relationship
+* `callback` - function(err, relationship) - `relationship` is the newly created
   relationship
 
 __Example__
@@ -631,21 +631,21 @@ See also [rel.index.saveUniqueOrFail](#index.saveUniqueOrFail) &
 
 __Arguments__
 
-* firstId|firstObject - id of the start node or an object with an id property
+* `firstId | firstObject` - id of the start node or an object with an id property
   for the start node
-* type - the name of the relationship
-* secondId|secondObject - id of the end node or an object with an id property
+* `type` - the name of the relationship
+* `secondId | secondObject` - id of the end node or an object with an id property
   for the end node
-* properties (optional, default=`{}`) - properties of the relationship
-* index - the index in which `key` and `value` are relevant
-* key - the key under which to index this relationship and enforce uniqueness
-* value - the value under which to index this relationship and enforce uniqueness
-* returnExistingOnConflict (optional, default=`false`) - what to do when there is
+* `properties` (optional, default=`{}`) - properties of the relationship
+* `index` - the index in which `key` and `value` are relevant
+* `key` - the key under which to index this relationship and enforce uniqueness
+* `value` - the value under which to index this relationship and enforce uniqueness
+* `returnExistingOnConflict` (optional, default=`false`) - what to do when there is
   a conflict (when the index you specified already refers to a relationship). If
   set to `true`, the relationship that the index currently refers to is returned.
   Otherwise, an error is return indicating that there was a conflict (you can 
   check this by testing `err.statusCode == 409`.
-* callback - function(err, relationship) - `relationship` is the newly created
+* `callback` - function(err, relationship) - `relationship` is the newly created
   relationship or the relationship that was in the specified index, depending
   on `returnExistingOnConflict`
 
@@ -681,8 +681,8 @@ one.
 
 __Arguments__
 
-* relationship - the relationship object with some changed properties
-* callback - function(err). if err is falsy, the update succeeded.
+* `relationship` - the relationship object with some changed properties
+* `callback` - function(err). if err is falsy, the update succeeded.
 
 __Example__
 
@@ -707,9 +707,9 @@ Read a relationship.
 
 __Arguments__
 
-* object|id - the id of the relationship to read or an object with an id
+* `object | id` - the id of the relationship to read or an object with an id
   property of the relationship to read.
-* callback - function(err, relationship). `relationship` is an object
+* `callback` - function(err, relationship). `relationship` is an object
   representing the read relationship.
 
 __Example__
@@ -738,9 +738,9 @@ Delete a relationship.
 
 __Arguments__
 
-* object|id - the id of the relationship to delete or an object with an id
+* `object | id` - the id of the relationship to delete or an object with an id
   property of the relationship to delete.
-* callback - function(err). If `err` is falsy, the relationship has been
+* `callback` - function(err). If `err` is falsy, the relationship has been
   deleted.
 
 __Example__
@@ -772,10 +772,10 @@ but one acts upon node indexes, and the other upon relationship indexes.
 
 __Arguments__
 
-* name - the name of the index that is being created
-* config (optional, default=`{}`) - the configuration of the index. See the [neo4j docs](http://docs.neo4j.org/chunked/milestone/rest-api-indexes.html#rest-api-create-node-index-with-configuration)
+* `name` - the name of the index that is being created
+* `config` (optional, default=`{}`) - the configuration of the index. See the [neo4j docs](http://docs.neo4j.org/chunked/milestone/rest-api-indexes.html#rest-api-create-node-index-with-configuration)
   for more information.
-* callback - function(err). If `err` is falsy, the index has been created.
+* `callback` - function(err). If `err` is falsy, the index has been created.
 
 __Example__
 
@@ -805,12 +805,12 @@ but one acts upon node indexes, and the other upon relationship indexes.
 
 __Arguments__
 
-* indexName - the name of the index to add the node/relationship to.
-* id|object - the id of the node/relationship to add to the index or an object 
+* `indexName` - the name of the index to add the node/relationship to.
+* `id | object` - the id of the node/relationship to add to the index or an object 
   with an id property of the node/relationship to add to the index.
-* key - the key to index the node/relationship with
-* value - the value to index the node/relationship with
-* callback - function(err). If `err` is falsy, the node/relationship has 
+* `key` - the key to index the node/relationship with
+* `value` - the value to index the node/relationship with
+* `callback` - function(err). If `err` is falsy, the node/relationship has 
   been indexed.
 
 __Example__
@@ -840,10 +840,10 @@ but one acts upon node indexes, and the other upon relationship indexes.
 
 __Arguments__
 
-* indexName - the index to read from
-* key - the key to match
-* value - the value to match
-* callback - function(err, results). `results` is a node or relationship object
+* `indexName` - the index to read from
+* `key` - the key to match
+* `value` - the value to match
+* `callback` - function(err, results). `results` is a node or relationship object
   (or an array of them if there was more than one) that matched the given 
   key-value pair in the given index. If nothing matched, `results === false`.
 
@@ -873,16 +873,16 @@ but one acts upon node indexes, and the other upon relationship indexes.
 
 __Arguments__
 
-* indexName - the index to remove the node/relationship from.
-* id|object - the id of the node/relationship to remove from the index or an 
+* `indexName` - the index to remove the node/relationship from.
+* `id | object` - the id of the node/relationship to remove from the index or an 
   object with an id property of the node/relationship to remove from the index.
-* key (optional) - the key from which to remove the node/relationship. If none
+* `key` (optional) - the key from which to remove the node/relationship. If none
   is specified, every reference to the node/relationship is deleted from the
   index.
-* value (optional) - the value from which to remove the node/relationship. If
+* `value` (optional) - the value from which to remove the node/relationship. If
   none is specified, every reference to the node/relationship is deleted for the
   given key.
-* callback - function(err). If `err` is falsy, the specified references have
+* `callback` - function(err). If `err` is falsy, the specified references have
   been removed.
 
 __Example__
@@ -914,8 +914,8 @@ but one acts upon node indexes, and the other upon relationship indexes.
 
 __Arguments__
 
-* name - the name of the index to delete
-* callback - function(err). if `err` is falsy, the index has been deleted.
+* `name` - the name of the index to delete
+* `callback` - function(err). if `err` is falsy, the index has been deleted.
 
 __Example__
 
