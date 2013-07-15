@@ -88,7 +88,7 @@ describe('seraph.index', function() {
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
         db.node.index(iname, node, 'person', 'true', function(err) {
-          done();   
+          done();
         });
       });
     }
@@ -110,7 +110,7 @@ describe('seraph.index', function() {
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
         db.node.index(iname, node, 'person', 'has a space', function(err) {
-          done();   
+          done();
         });
       });
     }
@@ -133,7 +133,7 @@ describe('seraph.index', function() {
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
         db.node.index(iname, node, 'person', 'has a space', function(err) {
-          done();   
+          done();
         });
       });
     }
@@ -155,7 +155,7 @@ describe('seraph.index', function() {
     function createAndIndex(done) {
       db.save([{ name: 'Helge' }, { name: 'Erlend' }], function(err, nodes) {
         db.node.index(iname, nodes, 'company', 'brik', function(err) {
-          done();   
+          done();
         });
       });
     }
@@ -205,7 +205,7 @@ describe('seraph.index', function() {
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
         db.node.index(iname, node, 'person', 'true', function(err) {
-          done();   
+          done();
         });
       });
     }
@@ -234,7 +234,7 @@ describe('seraph.index', function() {
       db.save({ name: 'Helge' }, function(err, node) {
         db.node.index(iname, node, 'person', 'true', function(err) {
           db.node.index(iname, node, 'person', 'false', function(err) {
-            done();   
+            done();
           });
         });
       });
@@ -268,7 +268,7 @@ describe('seraph.index', function() {
       db.save({ name: 'Helge' }, function(err, node) {
         db.node.index(iname, node, 'person', 'true', function(err) {
           db.node.index(iname, node, 'otherkey', 'false', function(err) {
-            done();   
+            done();
           });
         });
       });
@@ -302,7 +302,7 @@ describe('seraph.index', function() {
       db.save({ name: 'Helge' }, function(err, node) {
         db.node.index(iname, node, 'person', 'true', function(err) {
           db.node.index(iname, node, 'otherkey', 'false', function(err) {
-            done();   
+            done();
           });
         });
       });
