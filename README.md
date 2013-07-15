@@ -829,7 +829,8 @@ db.save({ name: 'Jon', }, function(err, node) {
 ### node.index.read(indexName, key, value, callback);
 ### rel.index.read(indexName, key, value, callback);
 
-Read the object(s) from an index that match a key-value pair.
+Read the object(s) from an index that match a key-value pair. See also
+[index.readAsList](#index.readAsList).
 
 __NOTE for index functions:__ there are two different types on index in neo4j - 
 __node__ indexes and __relationship__ indexes. When you're working with __node__
@@ -846,11 +847,48 @@ __Arguments__
 * `callback` - function(err, results). `results` is a node or relationship object
   (or an array of them if there was more than one) that matched the given 
   key-value pair in the given index. If nothing matched, `results === false`.
+  [index.readAsList](#index.readAsList) is similar, but always gives `results` as
+  an array, with zero, one or more elements.
 
 __Example__
 
 ```javascript
 db.rel.index.read('friendships', 'location', 'Norway', function(err, rels) {
+  // `rels` is an array of all relationships indexed in the `friendships`
+  // index, with a value `Norway` for the key `location`.
+});
+```
+
+---------------------------------------
+
+<a name="index.readAsList" />
+### node.index.readAsList(indexName, key, value, callback);
+### rel.index.readAsList(indexName, key, value, callback);
+
+Read the object(s) from an index that match a key-value pair. See also
+[index.read](#index.read).
+
+__NOTE for index functions:__ there are two different types on index in neo4j - 
+__node__ indexes and __relationship__ indexes. When you're working with __node__
+indexes, you use the functions on `node.index`. Similarly, when you're working
+on __relationship__ indexes you use the functions on `rel.index`. Most of the
+functions on both of these are identical (excluding the uniqueness functions),
+but one acts upon node indexes, and the other upon relationship indexes.
+
+__Arguments__
+
+* `indexName` - the index to read from
+* `key` - the key to match
+* `value` - the value to match
+* `callback` - function(err, results). `results` is an array of node or
+  relationship objects that matched the given key-value pair in the given index.
+  [index.read](#index.read) is similar, but gives `results` as `false`, an object
+  or an array of objects depending on the number of hits.
+
+__Example__
+
+```javascript
+db.rel.index.readAsList('friendships', 'location', 'Norway', function(err, rels) {
   // `rels` is an array of all relationships indexed in the `friendships`
   // index, with a value `Norway` for the key `location`.
 });
