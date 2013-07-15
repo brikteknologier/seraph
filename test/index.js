@@ -82,6 +82,28 @@ describe('seraph.index', function() {
     });
   });
 
+  it('should read zero objects from an index as `false`', function(done) {
+    var iname = uniqn();
+
+    function createAndIndex(done) {
+      db.save({ name: 'Helge' }, function(err, node) {
+        db.node.index(iname, node, 'person', 'true', function(err) {
+          done();
+        });
+      });
+    }
+
+    function readIndex(done) {
+      db.index.read(iname, 'person', 'false', function(err, results) {
+        assert.ok(!err);
+        assert.equal(results, false);
+        done();
+      })
+    }
+
+    async.series([createAndIndex, readIndex], done);
+  });
+
   it('should read a single object from an index', function(done) {
     var iname = uniqn();
 
@@ -197,6 +219,75 @@ describe('seraph.index', function() {
     }
 
     async.waterfall([createAndIndex, readIndex], done);
+  });
+
+  it('should readAsList zero objects from an index as `[]`', function(done) {
+    var iname = uniqn();
+
+    function createAndIndex(done) {
+      db.save({ name: 'Helge' }, function(err, node) {
+        db.node.index(iname, node, 'person', 'true', function(err) {
+          done();
+        });
+      });
+    }
+
+    function readIndex(done) {
+      db.index.readAsList(iname, 'person', 'false', function(err, results) {
+        assert.ok(!err);
+        assert.deepEqual(results, []);
+        done();
+      })
+    }
+
+    async.series([createAndIndex, readIndex], done);
+  });
+
+  it('should readAsList a single object from an index as a list', function(done) {
+    var iname = uniqn();
+
+    function createAndIndex(done) {
+      db.save({ name: 'Helge' }, function(err, node) {
+        db.node.index(iname, node, 'person', 'true', function(err) {
+          done();
+        });
+      });
+    }
+
+    function readIndex(done) {
+      db.index.readAsList(iname, 'person', 'true', function(err, results) {
+        assert.ok(!err);
+        assert.equal(results.length, 1);
+        assert.equal(results[0].name, 'Helge');
+        done();
+      })
+    }
+
+    async.series([createAndIndex, readIndex], done);
+  });
+
+  it('should readAsList all values of a kv pair in an index', function(done) {
+    var iname = uniqn();
+
+    function createAndIndex(done) {
+      db.save([{ name: 'Helge' }, { name: 'Erlend' }], function(err, nodes) {
+        db.node.index(iname, nodes, 'company', 'brik', function(err) {
+          done();
+        });
+      });
+    }
+
+    function readIndex(done) {
+      db.index.readAsList(iname, 'company', 'brik', function(err, nodes) {
+        assert.ok(!err);
+        var names = nodes.map(function(node) { return node.name });
+        assert.ok(names.indexOf("Helge") !== -1);
+        assert.ok(names.indexOf("Erlend") !== -1);
+        done();
+      })
+    }
+
+    async.series([createAndIndex, readIndex], done);
   });
 
   it('should remove a node from an index', function(done) {
