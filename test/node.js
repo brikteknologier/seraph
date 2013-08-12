@@ -241,10 +241,13 @@ describe('seraph#delete', function() {
       m: function(cb) {
         db.save({llol:'stuf'}, cb);
       },
-      r: ["n", "m", function(cb, res) {
+      r1: ["n", "m", function(cb, res) {
         db.rel.create(res.n, "abscurs", res.m, cb);
       }],
-      d: ["n", "r", function(cb, res) {
+      r2: ["n", "m", function(cb, res) {
+        db.rel.create(res.m, "something", res.n, cb);
+      }],
+      d: ["n", "r1", "r2", function(cb, res) {
         db.delete(res.n, true, cb);
       }]
     }, function(err, res) {
