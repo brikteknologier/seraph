@@ -244,7 +244,7 @@ describe('seraph#delete', function() {
       r1: ["n", "m", function(cb, res) {
         db.rel.create(res.n, "abscurs", res.m, cb);
       }],
-      r2: ["n", "m", function(cb, res) {
+      r2: ["n", "m", "r1", function(cb, res) {
         db.rel.create(res.m, "something", res.n, cb);
       }],
       d: ["n", "r1", "r2", function(cb, res) {
