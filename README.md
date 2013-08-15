@@ -388,7 +388,7 @@ if (txn.isBatch) // Woo! I'm in a batch.
 ## Node Operations
 
 <a name="node.save" />
-### save(object, callback)
+### save(object, [key, value,] callback)
 *Aliases: __node.save__*
 
 Create or update a node. If `object` has an id property, the node with that id
@@ -398,6 +398,9 @@ node to the callback.
 __Arguments__
 
 * node - an object to create or update
+* key, value (optional) - a property key and a value to update it with. This
+  allows you to only update a single property of the node, without touching any
+  others. If `key` is specified, `value` must also be. 
 * callback - function(err, node). `node` is the newly saved or updated node. If
   a create was performed, `node` will now have an id property. The returned 
   object is not the same reference as the passed object (the passed object will
@@ -672,7 +675,7 @@ db.rel.createUnique(1, 'knows', 2, 'friendships', 'type', 'super', function(err,
 ---------------------------------------
 
 <a name="rel.update" />
-### rel.update(relationship, callback)
+### rel.update(relationship, [key, value,] callback)
 
 Update the properties of a relationship. __Note__ that you cannot use this
 method to update the base properties of the relationship (start, end, type) -
@@ -682,6 +685,8 @@ one.
 __Arguments__
 
 * relationship - the relationship object with some changed properties
+* key, value (optional) - if a key and value is specified, only the property with
+  that key will be updated. the rest of the object will not be touched.
 * callback - function(err). if err is falsy, the update succeeded.
 
 __Example__
