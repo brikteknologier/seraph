@@ -111,9 +111,13 @@ describe('seraph#save, seraph#read', function() {
       node.name = 'hidden name man';
       db.save(node, 'age', 47, function(err, node) {
         assert(!err);
-        assert.equal(node.name, 'bob')
         assert.equal(node.age, 47);
-        done();
+        db.read(node, function(err, node) {
+          assert(!err);
+          assert.equal(node.age, 47);
+          assert.equal(node.name, 'bob');
+          done();
+        });
       });
     });
   });
