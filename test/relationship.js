@@ -187,6 +187,52 @@ describe('seraph.rel', function() {
 
     async.waterfall([createObjs, linkObjs, updateLink, readLink], done);
   });
+
+  it('should update a single property of a rel', function(done) {
+    function createObjs(done) {
+      db.save([{name: 'Jon'}, {name: 'Helge'}], function(err, users) {
+        done(null, users[0], users[1]);
+      });
+    }
+
+    function linkObjs(user1, user2, done) {
+      db.rel.create(user1, 'coworker', user2, {
+        prop: 'test',
+        anotherProp: 'test2',
+        thirdProp: 'test3'
+      }, function(err, link) {
+        assert.deepEqual(link.properties, {
+          prop: 'test',
+          anotherProp: 'test2',
+          thirdProp: 'test3'
+        });
+        done(null, link);
+      });
+    }
+
+    function updateLink(link, done) {
+      link.properties.thirdProp = 'fake new value';
+      db.rel.update(link, 'anotherProp', 'amazing new value', function(err) {
+        assert.ok(!err);
+        done(null, link);
+      });
+    }
+
+    function readLink(link, done) {
+      var linkId = link.id;
+      db.rel.read(link.id, function(err, link) {
+        assert.deepEqual(link.properties, {
+          prop: 'test',
+          anotherProp: 'amazing new value',
+          thirdProp: 'test3'
+        });
+        done(null);
+      });
+    }
+
+    async.waterfall([createObjs, linkObjs, updateLink, readLink], done);
+  });
+
 });
 
 describe('seraph#links', function() {
