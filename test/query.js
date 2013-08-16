@@ -26,18 +26,18 @@ describe('seraph#query, seraph#queryRaw', function() {
     function query(user, done) {
       var cypher = "start x = node(" + user.id + ") ";
       cypher    += "match x -[r]-> n ";
-      cypher    += "return type(r), n.name?, n.age? ";
+      cypher    += "return type(r), n.name, n.age ";
       cypher    += "order by n.name";
       db.query(cypher, function(err, result) {
         assert.ok(!err);
         assert.deepEqual([{
           'type(r)': 'knows',
-          'n.name?': 'Katie',
-          'n.age?': 29
+          'n.name': 'Katie',
+          'n.age': 29
         }, {
           'type(r)': 'knows',
-          'n.name?': 'Neil',
-          'n.age?': 60
+          'n.name': 'Neil',
+          'n.age': 60
         }], result);
         done();
       });
@@ -216,13 +216,13 @@ describe('seraph#query, seraph#queryRaw', function() {
     function queryRaw(user, done) {
       var cypher = "start x = node(" + user.id + ") ";
       cypher    += "match x -[r]-> n ";
-      cypher    += "return type(r), n.name?, n.age? ";
+      cypher    += "return type(r), n.name, n.age ";
       cypher    += "order by n.name";
       db.queryRaw(cypher, function(err, result) {
         assert.ok(!err);
         assert.deepEqual({
           data: [['knows', 'Katie', 29], ['knows', 'Neil', 60]],
-          columns: ['type(r)', 'n.name?', 'n.age?']
+          columns: ['type(r)', 'n.name', 'n.age']
         }, result);
         done();
       });

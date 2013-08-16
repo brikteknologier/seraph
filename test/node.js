@@ -130,7 +130,7 @@ describe('seraph#save, seraph#read', function() {
     db.save({pie: 'potato'}, function(err, thing) {
       db.read(thing, function(err, thingamajig) {
         db.save(thingamajig, function(err, thingamajiggy) {
-          db.query('START n = node({id}) RETURN n.id? as thingamajiggle',
+          db.query('START n = node({id}) RETURN n.id as thingamajiggle',
                    thingamajiggy, function(err, thingamajoggle) {
             assert.ok(thingamajoggle[0] === null);
             done();
