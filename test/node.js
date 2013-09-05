@@ -130,7 +130,6 @@ describe('seraph#save, seraph#read', function() {
       node.name = 'hidden name man';
       db.save(node.id, 'age', 47, function(err, node) {
         assert(!err);
-        assert.equal(node.age, 47);
         db.read(node, function(err, node) {
           assert(!err);
           assert.equal(node.age, 47);
@@ -171,10 +170,10 @@ describe('seraph#save, seraph#read', function() {
       node.name = 'hidden name man';
       db.save(node, 'age', 47, function(err, node) {
         assert(!err);
-        db.delete(node.id, 'age', function(err, node) {
+        db.delete(node.id, 'age', function(err) {
           assert(!err);
-          assert(node.age == null);
           db.read(node, function(err, node) {
+            console.log(err)
             assert(!err);
             assert(node.age == null);
             assert(node.name == 'bob');
