@@ -467,7 +467,7 @@ db.saveUnique({name: 'jon'}, 'people', 'name', 'jon', function(err, node) {
 ---------------------------------------
 
 <a name="node.read" />
-### read(id|object, callback)
+### read(id|object, [property,] callback)
 *Aliases: __node.read__*
 
 Read a node.
@@ -482,6 +482,8 @@ __Arguments__
 
 * `id | object` - either the id of the node to read, or an object containing an id
 property of the node to read.
+* `property` (optional) - the name of the property to read. if this is specified,
+  only the value of this property on the object is returned.
 * `callback` - function(err, node). `node` is an object containing the properties
 of the node with the given id.
 
@@ -498,7 +500,7 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
 ---------------------------------------
 
 <a name="node.delete" />
-### delete(id|object, [force], [callback])
+### delete(id|object, [force | property], [callback])
 *Aliases: __node.delete__*
 
 Delete a node.
@@ -507,7 +509,11 @@ __Arguments__
 
 * `id | object` - either the id of the node to delete, or an object containing an id
 property of the node to delete.
-* `force` - if truthy, will delete all the node's relations prior to deleting the node.
+* `force` (optional - default = false) -  if truthy, will delete all the node's 
+  relations prior to deleting the node.
+* `property` (optional) - if specified, delete only the property with this name
+  on the object. **note that you can either specify `property` or `force`, not
+  both, as force is meaningless when deleting a property**
 * `callback` - function(err). if `err` is falsy, the node has been deleted.
 
 __Example__
