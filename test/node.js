@@ -155,6 +155,35 @@ describe('seraph#save, seraph#read', function() {
     });
   });
 
+  it('should read a single property from an array of objects', function(done) {
+    db.save([{name:'bob'}, {name:'james'}], function(err, nodes) {
+      assert(!err);
+      db.read(nodes, 'name', function(err, names) {
+        assert(!err);
+        assert(names.indexOf('bob') != -1);
+        assert(names.indexOf('james') != -1);
+        done();
+      });
+    });
+  });
+
+  it('should delete a single property from an array of objects', function(done) {
+    db.save([{name:'bob', b:5}, {name:'james', b:2}], function(err, nodes) {
+      assert(!err);
+      db.delete(nodes, 'b', function(err) {
+        assert(!err);
+        db.read(nodes, function(err, nodes) {
+          assert(!err);
+          nodes.forEach(function(node) {
+            assert(node.name);
+            assert(node.b == null);
+          });
+          done();
+        });
+      });
+    });
+  });
+
   it('should handle an empty array of objects to save', function(done) {
     db.save([], done);
   });
