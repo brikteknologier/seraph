@@ -289,6 +289,46 @@ describe('seraph#find', function() {
     async.series([createObjs, findObjs], done);
   })
 
+  it('should find some items based on an array of predicates', function(done) {
+    var uniqueKey = 'seraph_find_test' + uniqn();
+    function createObjs(done) {
+      var objs = [ {name: 'Jon', age: 23}, 
+                   {name: 'Neil', age: 60},
+                   {name: 'Katie', age: 29} ];
+      for (var index in objs) {
+        objs[index][uniqueKey] = true;
+      }
+      objs[3] = {name: 'Belinda', age: 26};
+      objs[3][uniqueKey] = false;
+
+      db.save(objs, function(err, users) {
+        done();
+      });
+    }
+
+    function findObjs(done) {
+      var predicate = {};
+      predicate[uniqueKey] = true;
+      var predicate2 = {};
+      predicate2[uniqueKey] = false;
+
+      db.find([predicate, predicate2], true, 'node(*)', function(err, objs) {
+        assert.ok(!err);
+        assert.equal(objs[0].length, 3);
+        assert.equal(objs[1].length, 1);
+        var names = objs[0].map(function(o) { return o.name });
+        assert.ok(names.indexOf('Jon') >= 0);
+        assert.ok(names.indexOf('Neil') >= 0);
+        assert.ok(names.indexOf('Katie') >= 0);
+        assert.ok(names.indexOf('Belinda') === -1);
+        var names2 = objs[1].map(function(o) { return o.name });
+        assert.ok(names2.indexOf('Belinda') >= 0);
+        done();
+      });
+    }
+
+    async.series([createObjs, findObjs], done);
+  })
   it('should find some items based on an OR predicate', function(done) {
     var uniqueKey = 'seraph_find_test' + uniqn();
     function createObjs(done) {
