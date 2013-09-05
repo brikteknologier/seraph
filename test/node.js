@@ -122,6 +122,25 @@ describe('seraph#save, seraph#read', function() {
     });
   });
 
+  it('should save a single property of an object, specifying only id', function(done) {
+    db.save({name: 'bob', age: 46}, function(err, node) {
+      assert(!err)
+      assert.equal(node.name, 'bob');
+      assert.equal(node.age, 46);
+      node.name = 'hidden name man';
+      db.save(node.id, 'age', 47, function(err, node) {
+        assert(!err);
+        assert.equal(node.age, 47);
+        db.read(node, function(err, node) {
+          assert(!err);
+          assert.equal(node.age, 47);
+          assert.equal(node.name, 'bob');
+          done();
+        });
+      });
+    });
+  });
+
   it('should delete a single property of an object', function(done) {
     db.save({name: 'bob', age: 46}, function(err, node) {
       assert(!err)
@@ -131,6 +150,28 @@ describe('seraph#save, seraph#read', function() {
       db.save(node, 'age', 47, function(err, node) {
         assert(!err);
         db.delete(node, 'age', function(err, node) {
+          assert(!err);
+          assert(node.age == null);
+          db.read(node, function(err, node) {
+            assert(!err);
+            assert(node.age == null);
+            assert(node.name == 'bob');
+            done();
+          });
+        });
+      });
+    });
+  });
+
+  it('should delete a single property of an object, specifying only id', function(done) {
+    db.save({name: 'bob', age: 46}, function(err, node) {
+      assert(!err)
+      assert.equal(node.name, 'bob');
+      assert.equal(node.age, 46);
+      node.name = 'hidden name man';
+      db.save(node, 'age', 47, function(err, node) {
+        assert(!err);
+        db.delete(node.id, 'age', function(err, node) {
           assert(!err);
           assert(node.age == null);
           db.read(node, function(err, node) {
