@@ -289,6 +289,43 @@ describe('seraph#find', function() {
     async.series([createObjs, findObjs], done);
   })
 
+  it('should reject nodes missing properties from the predicate', function(done) {
+    var uniqueKey = 'seraph_find_test' + uniqn();
+    function createObjs(done) {
+      var objs = [ {name: 'Jon', age: 23}, 
+                   {name: 'Neil', age: 60},
+                   {name: 'Katie', age: 29} ];
+      for (var index in objs) {
+        objs[index][uniqueKey] = true;
+      }
+      objs[3] = {name: 'Belinda', age: 26};
+
+      db.save(objs, function(err, users) {
+        db.index(uniqueKey, users, 'some_thing', 'perhaps', function() {
+          done();
+        })
+      });
+    }
+
+    function findObjs(done) {
+      var predicate = {};
+      predicate[uniqueKey] = true;
+      var startPoint = 'node:' + uniqueKey + '(some_thing="perhaps")';
+      db.find(predicate, false, startPoint, function(err, objs) {
+        assert.ok(!err);
+        assert.equal(objs.length, 3);
+        var names = objs.map(function(o) { return o.name });
+        assert.ok(names.indexOf('Jon') >= 0);
+        assert.ok(names.indexOf('Neil') >= 0);
+        assert.ok(names.indexOf('Katie') >= 0);
+        assert.ok(names.indexOf('Belinda') === -1);
+        done();
+      });
+    }
+
+    async.series([createObjs, findObjs], done);
+  })
+
   it('should find some items based on an array of predicates', function(done) {
     var uniqueKey = 'seraph_find_test' + uniqn();
     function createObjs(done) {
@@ -391,6 +428,7 @@ describe('seraph#find', function() {
       predicate[uniqueKey] = true;
       var startPoint = 'node:' + uniqueKey + '(some_thing="perhaps")';
       db.find(predicate, false, startPoint, function(err, objs) {
+        console.log(err);
         assert.ok(!err);
         assert.equal(objs.length, 2);
         var names = objs.map(function(o) { return o.name });
