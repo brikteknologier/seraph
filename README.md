@@ -75,7 +75,9 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 
 ## Compatibility
 
-Seraph requires a Neo4j version >= 2.0.0.
+Seraph 0.6.7 has been tested with Neo4j 2.0.0-M06. If you would like to test 
+compatibility with another version of neo4j, change the version values stored in 
+`test/util/database.js`.
 
 ## Testing
 
