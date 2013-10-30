@@ -147,4 +147,23 @@ describe('seraph#label', function() {
       done();
     });
   });
+
+  it('should delete a label from a node', function(done) {
+    var label = uniqn();
+    db.save({ name: 'Jon' }, function(err, node) {
+      assert(!err);
+      assert(node.id);
+      db.label(node, label, function(err) {
+        assert(!err, err);
+        db.removeLabel(node, label, function(err) {
+          assert(!err);
+          db.nodesWithLabel(label, function(err, results) {
+            assert(!err);
+            assert(results.length == 0);
+            done();
+          });
+        });
+      });
+    });   
+  });
 });
