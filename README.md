@@ -604,19 +604,19 @@ db.relationships(452, 'out', 'knows', function(err, relationships) {
 ---------------------------------------
 
 <a name="node.label" />
-### read(id|object(s), label(s), [replace,] callback)
-*Aliases: __node.read__*
+### label(id|object(s), label(s), [replace,] callback)
+*Aliases: __node.label__*
 
-Read a node.
+Add a label to a node.
 
 __Arguments__
 
 * `id|object(s)` - either the id of the node to label, or an object containing an
   id property of the node to label. can be an array of objects/ids.
-* `label(s)` - the labels to apply.
+* `label(s)` - the label(s) to apply. can be an array of labels.
 * `replace` (optional) - if set to true, this label will replace any previous 
   labels.
-* `callback` - function(err). 
+* `callback` - function(err). if err is falsy, the operation succeeded.
 
 __Example__
 
@@ -630,6 +630,33 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
 
 ---------------------------------------
 
+<a name="node.removeLabel" />
+### removeLabel(id|object(s), label, callback)
+*Aliases: __node.removeLabel__*
+
+Remove a label from a node.
+
+__Arguments__
+
+* `id|object(s)` - either the id of the node to delabel, or an object containing 
+  an id property of the node to delabel. can be an array of objects/ids.
+* `label` - the label to remove. cannot be an array.
+* `callback` - function(err). if err is falsy, the operation succeeded.
+
+__Example__
+
+```javascript
+db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
+  db.label(node, ['Car', 'Hatchback'], function(err) {
+    // `node` is now labelled with "Car" and "Hatchback"!
+    db.removeLabel(node, 'Hatchback', function(err) {
+      // `node` is now only labelled with "Car".
+    });
+  });
+})
+```
+
+---------------------------------------
 
 ## Relationship Operations
 
