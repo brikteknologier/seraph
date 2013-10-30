@@ -601,6 +601,36 @@ db.relationships(452, 'out', 'knows', function(err, relationships) {
 })
 ```
 
+---------------------------------------
+
+<a name="node.label" />
+### read(id|object(s), label(s), [replace,] callback)
+*Aliases: __node.read__*
+
+Read a node.
+
+__Arguments__
+
+* `id|object(s)` - either the id of the node to label, or an object containing an
+  id property of the node to label. can be an array of objects/ids.
+* `label(s)` - the labels to apply.
+* `replace` (optional) - if set to true, this label will replace any previous 
+  labels.
+* `callback` - function(err). 
+
+__Example__
+
+```javascript
+db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
+  db.label(node, ['Car', 'Hatchback'], function(err) {
+    // `node` is now labelled with "Car" and "Hatchback"!
+  });
+})
+```
+
+---------------------------------------
+
+
 ## Relationship Operations
 
 <a name="rel.create" />
