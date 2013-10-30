@@ -98,4 +98,23 @@ describe('seraph#label', function() {
       });
     });   
   });
+
+  it('should read all labels for a node', function(done) {
+    var label = uniqn(), label1 = uniqn(), label2 = uniqn();
+    db.save({ name: 'Jon' }, function(err, node) {
+      assert(!err);
+      assert(node.id);
+      db.label(node, [label,label1,label2], function(err) {
+        assert(!err);
+        db.readLabels(node, function(err, labels) {
+          assert(!err);
+          assert(Array.isArray(labels));
+          assert(~labels.indexOf(label));
+          assert(~labels.indexOf(label1));
+          assert(~labels.indexOf(label2));
+          done();
+        });
+      });
+    });
+  });
 });
