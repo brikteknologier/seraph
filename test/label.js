@@ -21,10 +21,11 @@ describe('seraph#label', function() {
       assert(!err);
       assert(node.id);
       db.label(node, label, function(err) {
-        assert(!err);
+        assert(!err, err);
         db.nodesWithLabel(label, function(err, results) {
-          assert(!err);
+          assert(!err, err);
           assert.deepEqual(results[0], node);
+          done();
         });
       });
     });   
