@@ -685,6 +685,32 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
 
 ---------------------------------------
 
+<a name="node.readLabels" />
+### readLabels([node(s),] callback)
+*Aliases: __node.readLabels__*
+
+Read the labels of a node, or all labels in the database.
+
+__Arguments__
+
+* `node(s)` (optional) - the node to return the labels of. if not specified, every
+  label in the database is returned. can be an array of nodes.
+* `callback` - function(err, labels). labels is an array of labels.
+
+__Example__
+
+```javascript
+db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
+  db.label(node, ['Car', 'Hatchback'], function(err) {
+    db.readLabels(node, function(err, labels) {
+      //labels -> ['Car', 'Hatchback']
+    });
+  });
+})
+```
+
+---------------------------------------
+
 ## Relationship Operations
 
 <a name="rel.create" />
