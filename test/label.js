@@ -117,4 +117,24 @@ describe('seraph#label', function() {
       });
     });
   });
+
+  it('should read all labels for some nodes', function(done) {
+    var label = uniqn(), label1 = uniqn(), label2 = uniqn();
+    var txn = db.batch();
+    var neil = txn.save({name:'Neil'});
+    var jon = txn.save({name:'Jon'});
+    txn.label([neil, jon], label1);
+    txn.label(neil, label);
+    txn.label(jon, label2);
+    var all = txn.readLabels([neil, jon]);
+    txn.commit(function(err, result) {
+      assert(!err);
+      var labels = result[all];
+      assert(labels.length == 3);
+      assert(~labels.indexOf(label));
+      assert(~labels.indexOf(label1));
+      assert(~labels.indexOf(label2));
+      done();
+    });
+  });
 });
