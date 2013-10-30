@@ -53,6 +53,13 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [relationships (node.relationships)](#node.relationships) - read the 
   relationships of a node
 * [index (node.index)](#node.index) - add a node to an index
+* [label (node.label)](#node.label) - add a label to a node
+* [removeLabel (node.removeLabel)](#node.removeLabel) - remove a label from a 
+  node
+* [nodesWithLabel (node.nodesWithLabel)](#node.nodesWithLabel) - fetch all nodes
+  with a label
+* [readLabels (node.readLabels)](#node.readLabels) - read the labels of a node
+  or all available labels.
 
 ### Relationship Operations
 * [rel.create](#rel.create) - create a relationship
