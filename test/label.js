@@ -137,4 +137,14 @@ describe('seraph#label', function() {
       done();
     });
   });
+
+  it('should read all labels', function(done) {
+    //can hardly test this one very well...
+    db.readLabels(function(err, result) { 
+      assert(!err);
+      // assume we've made this many by now from the previous tests.
+      assert(result.length > 6);
+      done();
+    });
+  });
 });
