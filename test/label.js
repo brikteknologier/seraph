@@ -22,7 +22,7 @@ describe('seraph#label', function() {
       assert(node.id);
       db.label(node, label, function(err) {
         assert(!err);
-        db.readLabel(label, function(err, results) {
+        db.nodesWithLabel(label, function(err, results) {
           assert(!err);
           assert.deepEqual(results[0], node);
         });
