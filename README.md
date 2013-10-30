@@ -658,6 +658,33 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
 
 ---------------------------------------
 
+<a name="node.nodesWithLabel" />
+### nodesWithLabel(label, callback)
+*Aliases: __node.nodesWithLabel__*
+
+Fetch all of the nodes that are labelled with a specific label.
+
+__Arguments__
+
+* `label` - the label.
+* `callback` - function(err, results). results is always an array (assuming no
+  error), containing the nodes that were labelled with `label`. if no nodes were
+  labelled with `label`, `results` is an empty array.
+
+__Example__
+
+```javascript
+db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
+  db.label(node, ['Car', 'Hatchback'], function(err) {
+    db.nodesWithLabel('Car', function(err, results) {
+      results[0].model // -> 'DS4'
+    });
+  });
+})
+```
+
+---------------------------------------
+
 ## Relationship Operations
 
 <a name="rel.create" />
