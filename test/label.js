@@ -75,4 +75,27 @@ describe('seraph#label', function() {
       });
     });   
   });
+
+  it('should replace labels on a node', function(done) {
+    var label = uniqn(), label1 = uniqn(), label2 = uniqn();
+    db.save({ name: 'Jon' }, function(err, node) {
+      assert(!err);
+      assert(node.id);
+      db.label(node, label, function(err) {
+        assert(!err);
+        db.label(node, [label1, label2], true, function(err) {
+          assert(!err);
+          db.nodesWithLabel(label2, function(err, results) {
+            assert(!err);
+            assert.deepEqual(results[0], node);
+            db.nodesWithLabel(label, function(err, results) {
+              assert(!err);
+              assert(results.length == 0);
+              done();
+            });
+          });
+        });
+      });
+    });   
+  });
 });
