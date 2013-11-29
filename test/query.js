@@ -240,7 +240,7 @@ describe('seraph#query, seraph#queryRaw', function() {
 
     function query(user, done) {
       var cypher = "start x = node(" + user.id + ") ";
-      cypher    += "match x -[?]-> n ";
+      cypher    += "optional match x --> n ";
       cypher    += "return x, n ";
       db.query(cypher, function(err, result) {
         assert.ok(!err);
