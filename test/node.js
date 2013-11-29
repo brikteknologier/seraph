@@ -173,7 +173,6 @@ describe('seraph#save, seraph#read', function() {
         db.delete(node.id, 'age', function(err) {
           assert(!err);
           db.read(node, function(err, node) {
-            console.log(err)
             assert(!err);
             assert(node.age == null);
             assert(node.name == 'bob');
