@@ -9,14 +9,14 @@ var async = require('async');
 
 describe('seraph.index', function() {
   it('should create an index with inferred type', function(done) {
-    db.index.create(uniqn(), function(err) {
+    db.legacyindex.create(uniqn(), function(err) {
       assert.ok(!err);
       done();
     });
   });
 
   it('should create an index with a config', function(done) {
-    db.index.create(uniqn(), {
+    db.legacyindex.create(uniqn(), {
       type: 'fulltext',
       provider: 'lucene'
     }, function(err) {
@@ -26,14 +26,14 @@ describe('seraph.index', function() {
   });
 
   it('should create an index for a relationship', function(done) {
-    db.rel.index.create(uniqn(), function(err) {
+    db.rel.legacyindex.create(uniqn(), function(err) {
       assert.ok(!err);
       done();
     });
   });
 
   it('should create in index with config and inferred type', function(done) {
-    db.index.create(uniqn(), {
+    db.legacyindex.create(uniqn(), {
       type: 'fulltext',
       provider: 'lucene'
     }, function(err) {
@@ -43,7 +43,7 @@ describe('seraph.index', function() {
   });
 
   it('should accept an array of indexes to create', function(done) {
-    db.rel.index.create([uniqn(), uniqn(), uniqn()],
+    db.rel.legacyindex.create([uniqn(), uniqn(), uniqn()],
                         function(err) {
       assert.ok(!err);
       done();
@@ -51,14 +51,14 @@ describe('seraph.index', function() {
   });
 
   it('should be aliased on `seraph.node`', function(done) {
-    db.node.index.create(uniqn(), function(err) {
+    db.node.legacyindex.create(uniqn(), function(err) {
       assert.ok(!err);
       done();
     })
   });
 
   it('should be aliased on `seraph.rel`', function(done) {
-    db.rel.index.create(uniqn(), function(err) {
+    db.rel.legacyindex.create(uniqn(), function(err) {
       assert.ok(!err);
       done();
     })
@@ -66,7 +66,7 @@ describe('seraph.index', function() {
 
   it('should add a ndoe to an index', function(done) {
     db.save({name: 'Jon'}, function(err, node) {
-      db.node.index.add(uniqn(), node, 'test', 'sannelig', function(err) {
+      db.node.legacyindex.add(uniqn(), node, 'test', 'sannelig', function(err) {
         assert.ok(!err);
         done();
       });
@@ -75,7 +75,7 @@ describe('seraph.index', function() {
   
   it('should alias seraph.index.add as seraph.node.index', function(done) {
     db.save({name: 'Jon'}, function(err, node) {
-      db.node.index(uniqn(), node, 'test', 'sannelig', function(err) {
+      db.node.legacyindex(uniqn(), node, 'test', 'sannelig', function(err) {
         assert.ok(!err);
         done();
       });
@@ -87,14 +87,14 @@ describe('seraph.index', function() {
 
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
-        db.node.index(iname, node, 'person', 'true', function(err) {
+        db.node.legacyindex(iname, node, 'person', 'true', function(err) {
           done();
         });
       });
     }
 
     function readIndex(done) {
-      db.index.read(iname, 'person', 'false', function(err, results) {
+      db.legacyindex.read(iname, 'person', 'false', function(err, results) {
         assert.ok(!err);
         assert.equal(results, false);
         done();
@@ -109,14 +109,14 @@ describe('seraph.index', function() {
 
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
-        db.node.index(iname, node, 'person', 'true', function(err) {
+        db.node.legacyindex(iname, node, 'person', 'true', function(err) {
           done();
         });
       });
     }
 
     function readIndex(done) {
-      db.index.read(iname, 'person', 'true', function(err, node) {
+      db.legacyindex.read(iname, 'person', 'true', function(err, node) {
         assert.ok(!err);
         assert.equal(node.name, 'Helge');
         done();
@@ -131,14 +131,14 @@ describe('seraph.index', function() {
 
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
-        db.node.index(iname, node, 'person', 'has a space', function(err) {
+        db.node.legacyindex(iname, node, 'person', 'has a space', function(err) {
           done();
         });
       });
     }
 
     function readIndex(done) {
-      db.index.read(iname, 'person', 'has a space', function(err, node) {
+      db.legacyindex.read(iname, 'person', 'has a space', function(err, node) {
         assert.ok(!err);
         assert.equal(node.name, 'Helge');
         done();
@@ -154,14 +154,14 @@ describe('seraph.index', function() {
 
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
-        db.node.index(iname, node, 'person', 'has a space', function(err) {
+        db.node.legacyindex(iname, node, 'person', 'has a space', function(err) {
           done();
         });
       });
     }
 
     function readIndex(done) {
-      db.index.read(iname, 'person', 'has a space', function(err, node) {
+      db.legacyindex.read(iname, 'person', 'has a space', function(err, node) {
         assert.ok(!err);
         assert.equal(node.name, 'Helge');
         done();
@@ -176,14 +176,14 @@ describe('seraph.index', function() {
 
     function createAndIndex(done) {
       db.save([{ name: 'Helge' }, { name: 'Erlend' }], function(err, nodes) {
-        db.node.index(iname, nodes, 'company', 'brik', function(err) {
+        db.node.legacyindex(iname, nodes, 'company', 'brik', function(err) {
           done();
         });
       });
     }
 
     function readIndex(done) {
-      db.index.read(iname, 'company', 'brik', function(err, nodes) {
+      db.legacyindex.read(iname, 'company', 'brik', function(err, nodes) {
         assert.ok(!err);
         var names = nodes.map(function(node) { return node.name });
         assert.ok(names.indexOf("Helge") !== -1);
@@ -201,7 +201,7 @@ describe('seraph.index', function() {
     function createAndIndex(done) {
       db.save([{ name: 'Helge' }, { name: 'Erlend' }], function(err, nodes) {
         db.relate(nodes[0], 'knows', nodes[1], function(err, rel) {
-          db.rel.index(iname, rel, 'company', 'brik', function(err) {
+          db.rel.legacyindex(iname, rel, 'company', 'brik', function(err) {
             done(null, nodes);   
           });
         })
@@ -209,7 +209,7 @@ describe('seraph.index', function() {
     }
 
     function readIndex(nodes, done) {
-      db.rel.index.read(iname, 'company', 'brik', function(err, rel) {
+      db.rel.legacyindex.read(iname, 'company', 'brik', function(err, rel) {
         assert.ok(!err);
         assert.equal(rel.start, nodes[0].id);
         assert.equal(rel.end, nodes[1].id);
@@ -226,14 +226,14 @@ describe('seraph.index', function() {
 
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
-        db.node.index(iname, node, 'person', 'true', function(err) {
+        db.node.legacyindex(iname, node, 'person', 'true', function(err) {
           done();
         });
       });
     }
 
     function readIndex(done) {
-      db.index.readAsList(iname, 'person', 'false', function(err, results) {
+      db.legacyindex.readAsList(iname, 'person', 'false', function(err, results) {
         assert.ok(!err);
         assert.deepEqual(results, []);
         done();
@@ -248,14 +248,14 @@ describe('seraph.index', function() {
 
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
-        db.node.index(iname, node, 'person', 'true', function(err) {
+        db.node.legacyindex(iname, node, 'person', 'true', function(err) {
           done();
         });
       });
     }
 
     function readIndex(done) {
-      db.index.readAsList(iname, 'person', 'true', function(err, results) {
+      db.legacyindex.readAsList(iname, 'person', 'true', function(err, results) {
         assert.ok(!err);
         assert.equal(results.length, 1);
         assert.equal(results[0].name, 'Helge');
@@ -271,14 +271,14 @@ describe('seraph.index', function() {
 
     function createAndIndex(done) {
       db.save([{ name: 'Helge' }, { name: 'Erlend' }], function(err, nodes) {
-        db.node.index(iname, nodes, 'company', 'brik', function(err) {
+        db.node.legacyindex(iname, nodes, 'company', 'brik', function(err) {
           done();
         });
       });
     }
 
     function readIndex(done) {
-      db.index.readAsList(iname, 'company', 'brik', function(err, nodes) {
+      db.legacyindex.readAsList(iname, 'company', 'brik', function(err, nodes) {
         assert.ok(!err);
         var names = nodes.map(function(node) { return node.name });
         assert.ok(names.indexOf("Helge") !== -1);
@@ -295,18 +295,18 @@ describe('seraph.index', function() {
 
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
-        db.node.index(iname, node, 'person', 'true', function(err) {
+        db.node.legacyindex(iname, node, 'person', 'true', function(err) {
           done();
         });
       });
     }
 
     function readIndex(done) {
-      db.index.read(iname, 'person', 'true', function(err, node) {
+      db.legacyindex.read(iname, 'person', 'true', function(err, node) {
         assert.equal(node.name, "Helge");
-        db.index.remove(iname, node, 'person', 'true', function(err) {
+        db.legacyindex.remove(iname, node, 'person', 'true', function(err) {
           assert.ok(!err)
-          db.index.read(iname, 'person', 'true', function(err, nodes) {
+          db.legacyindex.read(iname, 'person', 'true', function(err, nodes) {
             assert.ok(!err);
             assert.ok(!nodes);
             done();
@@ -323,8 +323,8 @@ describe('seraph.index', function() {
 
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
-        db.node.index(iname, node, 'person', 'true', function(err) {
-          db.node.index(iname, node, 'person', 'false', function(err) {
+        db.node.legacyindex(iname, node, 'person', 'true', function(err) {
+          db.node.legacyindex(iname, node, 'person', 'false', function(err) {
             done();
           });
         });
@@ -332,14 +332,14 @@ describe('seraph.index', function() {
     }
 
     function readIndex(done) {
-      db.index.read(iname, 'person', 'true', function(err, node) {
+      db.legacyindex.read(iname, 'person', 'true', function(err, node) {
         assert.equal(node.name, "Helge");
-        db.index.remove(iname, node, 'person', function(err) {
+        db.legacyindex.remove(iname, node, 'person', function(err) {
           assert.ok(!err)
-          db.index.read(iname, 'person', 'true', function(err, nodes) {
+          db.legacyindex.read(iname, 'person', 'true', function(err, nodes) {
             assert.ok(!err);
             assert.ok(!nodes);
-            db.index.read(iname, 'person', 'false', function(err, nodes) {
+            db.legacyindex.read(iname, 'person', 'false', function(err, nodes) {
               assert.ok(!err);
               assert.ok(!nodes);
               done();
@@ -357,8 +357,8 @@ describe('seraph.index', function() {
 
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
-        db.node.index(iname, node, 'person', 'true', function(err) {
-          db.node.index(iname, node, 'otherkey', 'false', function(err) {
+        db.node.legacyindex(iname, node, 'person', 'true', function(err) {
+          db.node.legacyindex(iname, node, 'otherkey', 'false', function(err) {
             done();
           });
         });
@@ -366,14 +366,14 @@ describe('seraph.index', function() {
     }
 
     function readIndex(done) {
-      db.index.read(iname, 'person', 'true', function(err, node) {
+      db.legacyindex.read(iname, 'person', 'true', function(err, node) {
         assert.equal(node.name, "Helge");
-        db.index.remove(iname, node, function(err) {
+        db.legacyindex.remove(iname, node, function(err) {
           assert.ok(!err)
-          db.index.read(iname, 'person', 'true', function(err, nodes) {
+          db.legacyindex.read(iname, 'person', 'true', function(err, nodes) {
             assert.ok(!err);
             assert.ok(!nodes);
-            db.index.read(iname, 'otherkey', 'false', function(err, nodes) {
+            db.legacyindex.read(iname, 'otherkey', 'false', function(err, nodes) {
               assert.ok(!err);
               assert.ok(!nodes);
               done();
@@ -391,8 +391,8 @@ describe('seraph.index', function() {
 
     function createAndIndex(done) {
       db.save({ name: 'Helge' }, function(err, node) {
-        db.node.index(iname, node, 'person', 'true', function(err) {
-          db.node.index(iname, node, 'otherkey', 'false', function(err) {
+        db.node.legacyindex(iname, node, 'person', 'true', function(err) {
+          db.node.legacyindex(iname, node, 'otherkey', 'false', function(err) {
             done();
           });
         });
@@ -400,14 +400,14 @@ describe('seraph.index', function() {
     }
 
     function readIndex(done) {
-      db.index.read(iname, 'person', 'true', function(err, node) {
+      db.legacyindex.read(iname, 'person', 'true', function(err, node) {
         assert.equal(node.name, "Helge");
-        db.index.delete(iname, function(err) {
+        db.legacyindex.delete(iname, function(err) {
           assert.ok(!err)
-          db.index.read(iname, 'person', 'true', function(err, nodes) {
+          db.legacyindex.read(iname, 'person', 'true', function(err, nodes) {
             assert.ok(err);
             assert.ok(!nodes);
-            db.index.read(iname, 'otherkey', 'false', function(err, nodes) {
+            db.legacyindex.read(iname, 'otherkey', 'false', function(err, nodes) {
               assert.ok(err);
               assert.ok(!nodes);
               done();
@@ -425,7 +425,7 @@ describe('seraph.index', function() {
       var index = uniqn();
       var node = { name: 'Johanna' };
 
-      db.index.getOrSaveUnique(node, index, 'name', 'johanna', 
+      db.legacyindex.getOrSaveUnique(node, index, 'name', 'johanna', 
       function(err, node) {
         assert(!err);
         assert.equal(node.name, 'Johanna');
@@ -438,14 +438,14 @@ describe('seraph.index', function() {
       var index = uniqn();
       var node = { name: 'Johanna' };
 
-      db.index.getOrSaveUnique(node, index, 'name', 'johanna', 
+      db.legacyindex.getOrSaveUnique(node, index, 'name', 'johanna', 
       function(err, originalNode) {
         assert(!err);
-        db.index.getOrSaveUnique(node, index, 'name', 'johanna',
+        db.legacyindex.getOrSaveUnique(node, index, 'name', 'johanna',
         function(err, newNode) {
           assert(!err);
           assert.equal(newNode.id, originalNode.id);
-          db.index.read(index, 'name', 'johanna', function(err, node) {
+          db.legacyindex.read(index, 'name', 'johanna', function(err, node) {
             assert(!err);
             assert(node);
             assert.equal(node.id, originalNode.id);
@@ -469,7 +469,7 @@ describe('seraph.index', function() {
       }
 
       setupNodes(function(node, node2) {
-        db.rel.index.getOrSaveUnique(node, 'sings', node2, index, 'name', 
+        db.rel.legacyindex.getOrSaveUnique(node, 'sings', node2, index, 'name', 
           'johanna', function(err, rel) {
           assert(!err);
           assert(rel.id);
@@ -498,7 +498,7 @@ describe('seraph.index', function() {
       var props = { original: true };
 
       setupNodes(function(node, node2) {
-        db.rel.index.getOrSaveUnique(node, 'sings', node2, props, index, 'name', 
+        db.rel.legacyindex.getOrSaveUnique(node, 'sings', node2, props, index, 'name', 
           'johanna', function(err, rel) {
           assert(!err);
           assert(rel.id);
@@ -527,14 +527,14 @@ describe('seraph.index', function() {
       }
 
       setupNodes(function(node, node2) {
-        db.rel.index.getOrSaveUnique(node, 'sings', node2, index, 'name', 
+        db.rel.legacyindex.getOrSaveUnique(node, 'sings', node2, index, 'name', 
           'johanna', function(err, rel) {
           assert(!err);
-          db.rel.index.getOrSaveUnique(node, 'sung', node2, index, 'name',
+          db.rel.legacyindex.getOrSaveUnique(node, 'sung', node2, index, 'name',
             'johanna', function(err, newRel) {
             assert(!err);
             assert.deepEqual(newRel, rel);
-            db.rel.index.read(index, 'name', 'johanna', function(err, irel) {
+            db.rel.legacyindex.read(index, 'name', 'johanna', function(err, irel) {
               assert.equal(rel.id, irel.id);
               done();
             });
@@ -547,12 +547,12 @@ describe('seraph.index', function() {
       var index = uniqn();
       var node = { name: 'Johanna' };
 
-      db.index.saveUniqueOrFail(node, index, 'name', 'johanna', 
+      db.legacyindex.saveUniqueOrFail(node, index, 'name', 'johanna', 
       function(err, node) {
         assert(!err);
         assert.equal(node.name, 'Johanna');
         assert(node.id);
-        db.index.read(index, 'name', 'johanna', function(err, inode) {
+        db.legacyindex.read(index, 'name', 'johanna', function(err, inode) {
           assert(!err);
           assert.equal(inode.id, node.id);
           done();
@@ -573,7 +573,7 @@ describe('seraph.index', function() {
       }
 
       setupNodes(function(node, node2) {
-        db.rel.index.saveUniqueOrFail(node, 'sings', node2, index, 'name', 
+        db.rel.legacyindex.saveUniqueOrFail(node, 'sings', node2, index, 'name', 
           'johanna', function(err, rel) {
           assert(!err);
           assert(rel.id);
@@ -582,7 +582,7 @@ describe('seraph.index', function() {
           assert(rel.end);
           assert.equal(rel.end, node2.id);
           assert.equal(rel.type, 'sings');
-          db.rel.index.read(index, 'name', 'johanna', function(err, irel) {
+          db.rel.legacyindex.read(index, 'name', 'johanna', function(err, irel) {
             assert(!err);
             assert.deepEqual(irel, rel);
             done();
@@ -607,7 +607,7 @@ describe('seraph.index', function() {
       var props = { original: true };
 
       setupNodes(function(node, node2) {
-        db.rel.index.saveUniqueOrFail(node, 'sings', node2, props, index, 'name', 
+        db.rel.legacyindex.saveUniqueOrFail(node, 'sings', node2, props, index, 'name', 
           'johanna', function(err, rel) {
           assert(!err);
           assert(rel.id);
@@ -617,7 +617,7 @@ describe('seraph.index', function() {
           assert.equal(rel.end, node2.id);
           assert.equal(rel.type, 'sings');
           assert.deepEqual(rel.properties, props);
-          db.rel.index.read(index, 'name', 'johanna', function(err, irel) {
+          db.rel.legacyindex.read(index, 'name', 'johanna', function(err, irel) {
             assert(!err);
             assert.deepEqual(rel, irel);
             done();
@@ -640,15 +640,15 @@ describe('seraph.index', function() {
       }
 
       setupNodes(function(node, node2) {
-        db.rel.index.saveUniqueOrFail(node, 'sings', node2, index, 'name', 
+        db.rel.legacyindex.saveUniqueOrFail(node, 'sings', node2, index, 'name', 
           'johanna', function(err, rel) {
           assert(!err);
-          db.rel.index.saveUniqueOrFail(node, 'sung', node2, index, 'name',
+          db.rel.legacyindex.saveUniqueOrFail(node, 'sung', node2, index, 'name',
             'johanna', function(err, newRel) {
             assert(err);
             assert(err.statusCode == 409);
             assert(!newRel);
-            db.rel.index.read(index, 'name', 'johanna', function(err, irel) {
+            db.rel.legacyindex.read(index, 'name', 'johanna', function(err, irel) {
               assert(!err);
               assert.deepEqual(irel, rel);
               done();
@@ -663,10 +663,10 @@ describe('seraph.index', function() {
       var index = uniqn();
       var node = { name: 'Johanna' };
 
-      db.index.saveUniqueOrFail(node, index, 'name', 'johanna', 
+      db.legacyindex.saveUniqueOrFail(node, index, 'name', 'johanna', 
       function(err, originalNode) {
         assert(!err);
-        db.index.saveUniqueOrFail(node, index, 'name', 'johanna',
+        db.legacyindex.saveUniqueOrFail(node, index, 'name', 'johanna',
         function(err, newNode) {
           assert(err);
           assert(err.statusCode == 409);
@@ -699,7 +699,7 @@ describe('seraph.index', function() {
             assert(err);
             assert(err.statusCode == 409);
             assert(!newRel);
-            db.rel.index.read(index, 'name', 'johanna', function(err, irel) {
+            db.rel.legacyindex.read(index, 'name', 'johanna', function(err, irel) {
               assert(!err);
               assert.deepEqual(rel, irel);
               done();
@@ -714,14 +714,14 @@ describe('seraph.index', function() {
       var index = uniqn();
       var node = { name: 'Johanna' };
 
-      db.saveUnique(node, index, 'name', 'johanna', 
+      db.legacyindex.saveUnique(node, index, 'name', 'johanna', 
       function(err, originalNode) {
         assert(!err);
-        db.saveUnique(node, index, 'name', 'johanna', function(err, newNode) {
+        db.legacyindex.saveUnique(node, index, 'name', 'johanna', function(err, newNode) {
           assert(err);
           assert(err.statusCode == 409);
           assert(!newNode);
-          db.index.read(index, 'name', 'johanna', function(err, inode) {
+          db.legacyindex.read(index, 'name', 'johanna', function(err, inode) {
             assert(!err);
             assert.deepEqual(inode, originalNode);
             done();
@@ -762,14 +762,14 @@ describe('seraph.index', function() {
       var index = uniqn();
       var node = { name: 'Johanna' };
 
-      db.saveUnique(node, index, 'name', 'johanna', true,
+      db.legacyindex.saveUnique(node, index, 'name', 'johanna', true,
       function(err, originalNode) {
         assert(!err);
-        db.saveUnique(node, index, 'name', 'johanna', true,
+        db.legacyindex.saveUnique(node, index, 'name', 'johanna', true,
         function(err, newNode) {
           assert(!err);
           assert.equal(newNode.id, originalNode.id);
-          db.index.read(index, 'name', 'johanna', function(err, node) {
+          db.legacyindex.read(index, 'name', 'johanna', function(err, node) {
             assert(!err);
             assert(node);
             assert.equal(node.id, originalNode.id);
