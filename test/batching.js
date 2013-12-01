@@ -87,10 +87,10 @@ describe('seraph#batch', function() {
     var iname = uniqn();
     db.save({person:'indexable'}, function(err, user) {
       db.batch(function(db) {
-        db.index(iname, user, 'something', 'magical');
+        db.legacyindex(iname, user, 'something', 'magical');
       }, function(err, results) {
         assert(!err);
-        db.index.read(iname, 'something', 'magical', function(err, node) {
+        db.legacyindex.read(iname, 'something', 'magical', function(err, node) {
           assert(!err);
           assert(node.person == 'indexable');
           done();
@@ -265,11 +265,11 @@ describe('seraph#batch', function() {
       var idx = uniqn();
 
       var person = txn.save({name:'Jon'});
-      txn.index(idx, person, 'thing', 'stuff');
+      txn.legacyindex(idx, person, 'thing', 'stuff');
 
       txn.commit(function(err, results) {
         assert(!err);
-        db.index.read(idx, 'thing', 'stuff', function(err, person1) {
+        db.legacyindex.read(idx, 'thing', 'stuff', function(err, person1) {
           assert(!err);
           assert.deepEqual(person1, results[person]);
           done();
@@ -282,11 +282,11 @@ describe('seraph#batch', function() {
       var idx = uniqn();
 
       var person = txn.save({name:'Jon'});
-      txn.index(idx, person, 'thing', 'stuff');
+      txn.legacyindex(idx, person, 'thing', 'stuff');
 
       txn.commit(function(err, txnResults) {
         assert(!err);
-        db.index.readAsList(idx, 'thing', 'stuff', function(err, readResults) {
+        db.legacyindex.readAsList(idx, 'thing', 'stuff', function(err, readResults) {
           assert(!err);
           assert.equal(readResults.length, 1);
           assert.deepEqual(readResults[0], txnResults[person]);
