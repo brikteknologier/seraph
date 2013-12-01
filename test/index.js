@@ -1,0 +1,19 @@
+var testDatabase = require('./util/database');
+var db = require('../')(testDatabase.url);
+var uniqn = require('./util/ponies').uniqn;
+
+var assert = require('assert');
+var async = require('async');
+
+describe('seraph#index', function() {
+  it('should create an index on a key', function(done) {
+    var labelname = uniqn();
+    db.index.create(labelname, 'name', function(err, index) {
+      assert(!err);
+      assert.equal(label.name, labelname);
+      assert.equal(label.property_keys.length, 1);
+      assert.equal(label.property_keys[0], 'name');
+      done();
+    });
+  });
+});
