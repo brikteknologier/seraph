@@ -380,7 +380,7 @@ describe('seraph#find', function() {
 
       db.save(objs, function(err, users) {
         users = users.slice(1);
-        db.index(uniqueKey, users, 'some_thing', 'perhaps', function() {
+        db.legacyindex(uniqueKey, users, 'some_thing', 'perhaps', function() {
           done();
         })
       });
