@@ -691,10 +691,10 @@ describe('seraph.index', function() {
       }
 
       setupNodes(function(node, node2) {
-        db.rel.legacyindex.saveUnique(node, 'sings', node2, index, 'name', 
+        db.rel.legacyindex.saveUniqueOrFail(node, 'sings', node2, index, 'name', 
           'johanna', function(err, rel) {
           assert(!err);
-          db.rel.legacyindex.saveUnique(node, 'sung', node2, index, 'name',
+          db.rel.legacyindex.saveUniqueOrFail(node, 'sung', node2, index, 'name',
             'johanna', function(err, newRel) {
             assert(err);
             assert(err.statusCode == 409);
@@ -714,10 +714,10 @@ describe('seraph.index', function() {
       var index = uniqn();
       var node = { name: 'Johanna' };
 
-      db.legacyindex.saveUnique(node, index, 'name', 'johanna', 
+      db.legacyindex.saveUniqueOrFail(node, index, 'name', 'johanna', 
       function(err, originalNode) {
         assert(!err);
-        db.legacyindex.saveUnique(node, index, 'name', 'johanna', function(err, newNode) {
+        db.legacyindex.saveUniqueOrFail(node, index, 'name', 'johanna', function(err, newNode) {
           assert(err);
           assert(err.statusCode == 409);
           assert(!newNode);
@@ -744,11 +744,11 @@ describe('seraph.index', function() {
       }
 
       setupNodes(function(node, node2) {
-        db.rel.legacyindex.saveUnique(node, 'sings', node2, index, 'name', 
-          'johanna', true, function(err, rel) {
+        db.rel.legacyindex.getOrSaveUnique(node, 'sings', node2, index, 'name', 
+          'johanna', function(err, rel) {
           assert(!err);
-          db.rel.legacyindex.saveUnique(node, 'sung', node2, index, 'name',
-            'johanna', true, function(err, newRel) {
+          db.rel.legacyindex.getOrSaveUnique(node, 'sung', node2, index, 'name',
+            'johanna', function(err, newRel) {
             assert(!err);
             assert.deepEqual(newRel, rel);
             done();
@@ -762,10 +762,10 @@ describe('seraph.index', function() {
       var index = uniqn();
       var node = { name: 'Johanna' };
 
-      db.legacyindex.saveUnique(node, index, 'name', 'johanna', true,
+      db.legacyindex.getOrSaveUnique(node, index, 'name', 'johanna', 
       function(err, originalNode) {
         assert(!err);
-        db.legacyindex.saveUnique(node, index, 'name', 'johanna', true,
+        db.legacyindex.getOrSaveUnique(node, index, 'name', 'johanna', 
         function(err, newNode) {
           assert(!err);
           assert.equal(newNode.id, originalNode.id);
