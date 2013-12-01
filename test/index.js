@@ -16,4 +16,19 @@ describe('seraph#index', function() {
       done();
     });
   });
+
+  it('should list indexes for a label', function(done) {
+    var labelname = uniqn();
+    db.index.create(labelname, 'name', function(err, index) {
+      assert(!err);
+      db.index.indexes(labelname, function(err, indexes) {
+        assert(!err);
+        assert.equal(indexes.length, 1);
+        assert.equal(indexes[0].label, labelname);
+        assert.equal(indexes[0].property_keys.length, 1);
+        assert.equal(indexes[0].property_keys[0], 'name');
+        done();
+      });
+    });
+  });
 });
