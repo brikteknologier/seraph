@@ -21,10 +21,10 @@ describe('configuration', function() {
         db.save(origNode, done);
       }
       function mkIdx(node, done) {
-        db.index(idxName, node.id, 'application', node.jelly, done);
+        db.legacyindex(idxName, node.id, 'application', node.jelly, done);
       }
       function readIdx(done) {
-        db.node.index.read(idxName, 'application',
+        db.node.legacyindex.read(idxName, 'application',
                            origNode.jelly, done);
       }
       function check(nodeFromIndex, done) {
