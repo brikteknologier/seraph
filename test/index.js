@@ -17,6 +17,23 @@ describe('seraph#index', function() {
     });
   });
 
+  it('should create an index and not return an error if it exists', function(done) {
+    var labelname = uniqn();
+    db.index.createIfNone(labelname, 'name', function(err, index) {
+      assert(!err);
+      assert.equal(index.label, labelname);
+      assert.equal(index.property_keys.length, 1);
+      assert.equal(index.property_keys[0], 'name');
+      db.index.createIfNone(labelname, 'name', function(err, index) {
+        assert(!err);
+        assert.equal(index.label, labelname);
+        assert.equal(index.property_keys.length, 1);
+        assert.equal(index.property_keys[0], 'name');
+        done();
+      });
+    });
+  });
+
   it('should list indexes for a label', function(done) {
     var labelname = uniqn();
     db.index.create(labelname, 'name', function(err, index) {
