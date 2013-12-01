@@ -811,7 +811,7 @@ __Arguments__
   index that was created, i.e. `{ label: 'Person', { property_keys: ['name'] }`.
   Note that if you've already created the index, you'll get a conflict error. You
   can check this by checking `err`'s `statusCode` property. `409` indicates a 
-  conflict.
+  conflict. You can avoid this by using [index.createIfNone](#index.createIfNone)
 
 __Example__
 
@@ -822,6 +822,73 @@ db.index.create('Person', 'name', function(err, index) {
 ```
 
 ---------------------------------------
+
+<a name="index.createIfNone" />
+### index.createIfNone(label, key, callback)
+
+Create an index on `label` with `key`. Exactly the same as
+[index.create](#index.create) except it will not throw an error if it encounters
+a conflict.
+
+__Arguments__
+
+* `label` - the label to create an index on
+* `key` - the key to index, i.e. `'name'`. Note that compound indexes are not
+  yet supported by neo4j-2
+* `callback` - function(err, index). `index` is an object that reflects the
+  index that was created, i.e. `{ label: 'Person', { property_keys: ['name'] }`.
+
+__Example__
+
+```javascript
+db.index.createIfNone('Person', 'name', function(err, index) {
+  console.log(index); // -> { label: 'Person', { property_keys: ['name'] }
+});
+```
+
+---------------------------------------
+
+<a name="index.indexes" />
+### index.indexes(label, callback)
+
+Retrieve a listing of the indexes on a label.
+
+__Arguments__
+
+* `label` - the label to retrieve indexes for
+* `callback` - function(err, indexes). `indexes` is an array of objects that
+  reflect the indexes on this label, i.e. 
+  `[{ label: 'Person', { property_keys: ['name'] }]`.
+
+__Example__
+
+```javascript
+db.index.indexes('Person', function(err, index) {
+  console.log(index); // -> [ { label: 'Person', { property_keys: ['name'] } ]
+});
+```
+
+---------------------------------------
+
+<a name="index.drop" />
+### index.drop(label, key, callback)
+
+Drop an index from a label
+
+__Arguments__
+
+* `label` - the label to drop the index from
+* `key` - the key to drop the index from 
+* `callback` - function(err). if `err` is falsy, the index was dropped 
+  successfully.
+
+__Example__
+
+```javascript
+db.index.drop('Person', 'name' function(err) {
+  if (!err) console.log('Index dropped!');
+});
+```
 
 
 ## Legacy Index Operations
