@@ -31,4 +31,19 @@ describe('seraph#index', function() {
       });
     });
   });
+
+  it('should drop an index', function(done) {
+    var labelname = uniqn();
+    db.index.create(labelname, 'name', function(err, index) {
+      assert(!err);
+      db.index.drop(labelname, 'name', function(err) {
+        assert(!err);
+        db.index.indexes(labelname, function(err, indexes) {
+          assert(!err);
+          assert(indexes.length == 0);
+          done();
+        });
+      });
+    });
+  });
 });
