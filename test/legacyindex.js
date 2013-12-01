@@ -7,7 +7,7 @@ var db = require('../')(testDatabase.url);
 var assert = require('assert');
 var async = require('async');
 
-describe('seraph.index', function() {
+describe('seraph.legacyindex', function() {
   it('should create an index with inferred type', function(done) {
     db.legacyindex.create(uniqn(), function(err) {
       assert.ok(!err);
