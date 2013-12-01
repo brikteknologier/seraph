@@ -44,15 +44,14 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 
 ### Node Operations
 * [save (node.save)](#node.save) - create or update a node
-* [saveUnique (node.saveUnique)](#node.saveUnique) - save a node using an index 
-  to enforce uniqueness
 * [read (node.read)](#node.read) - read a node
 * [find (node.find)](#node.find) - find a node using a predicate
 * [delete (node.delete)](#node.delete) - delete a node
 * [relate (node.relate)](#node.relate) - relate two nodes
 * [relationships (node.relationships)](#node.relationships) - read the 
   relationships of a node
-* [index (node.index)](#node.index) - add a node to an index
+* [legacyindex (node.legacyindex)](#node.legacyindex) - add a node to a legacy 
+  index
 * [label (node.label)](#node.label) - add a label to a node
 * [removeLabel (node.removeLabel)](#node.removeLabel) - remove a label from a 
   node
@@ -63,22 +62,20 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 
 ### Relationship Operations
 * [rel.create](#rel.create) - create a relationship
-* [rel.createUnique](#rel.createUnique) - create a relationship using an index
-  to enforce uniqueness
 * [rel.update](#rel.update) - update the properties of a relationship
 * [rel.read](#rel.read) - read a relationship
 * [rel.delete](#rel.delete) - delete a relationship
 
-### Index Operations
-* [index.create](#index.create) - create an index
-* [index.add](#index.add) - add a nodes/rels to an index
-* [index.read](#index.read) - read nodes/rels from an index
-* [index.remove](#index.remove) - remove nodes/rels from an index
-* [index.delete](#index.delete) - delete an index
-* [index.getOrSaveUnique](#index.getOrSaveUnique) - get or save a node using an 
-  index for uniqueness
-* [index.saveUniqueOrFail](#index.saveUniqueOrFail) - save a node using an index
-  to enforce uniqueness
+### Legacy Index Operations
+* [legacyindex.create](#legacyindex.create) - create an index
+* [legacyindex.add](#legacyindex.add) - add a nodes/rels to an index
+* [legacyindex.read](#legacyindex.read) - read nodes/rels from an index
+* [legacyindex.remove](#legacyindex.remove) - remove nodes/rels from an index
+* [legacyindex.delete](#legacyindex.delete) - delete an index
+* [legacyindex.getOrSaveUnique](#legacyindex.getOrSaveUnique) - get or save a node 
+  using an index for uniqueness
+* [legacyindex.saveUniqueOrFail](#legacyindex.saveUniqueOrFail) - save a node 
+  using an index to enforce uniqueness
 
 ## Compatibility
 
@@ -330,7 +327,7 @@ var txn = db.batch();
 var singer = txn.save({name: 'Johanna Kurkela'});
 var album = txn.save({title: 'Kauriinsilmät', year: 2008});
 var performance = txn.relate(singer, 'performs_on', album, {role: 'Primary Artist'});
-txn.rel.index('performances', performance, 'year', '2008');
+txn.rel.legacyindex('performances', performance, 'year', '2008');
 
 txn.commit(function(err, results) {});
 ```
@@ -429,48 +426,6 @@ db.save({ name: 'Jon', age: 22, likes: 'Beer' }, function(err, node) {
 
 ---------------------------------------
 
-<a name="node.saveUnique" />
-### node.saveUnique(node, index, key, value, [returnExistingOnConflict = false,] callback)
-
-Save a node, using an index to enforce uniqueness.
-
-See also [node.index.saveUniqueOrFail](#index.saveUniqueOrFail) &
-[node.index.getOrSaveUnique](#index.getOrSaveUnique).
-
-__Arguments__
-
-* `node` - an object to create or update
-* `index` - the index in which `key` and `value` are relevant
-* `key` - the key under which to index this node and enforce uniqueness
-* `value` - the value under which to index this node and enforce uniqueness
-* `returnExistingOnConflict` (optional, default=`false`) - what to do when there is
-  a conflict (when the index you specified already refers to a node). If set to 
-  `true`, the node that the index currently refers to is returned.  Otherwise, 
-  an error is return indicating that there was a conflict (you can check this by 
-  testing `err.statusCode == 409`.
-* `callback` - function(err, node) - `node` is the newly created node or the node 
-  that was in the specified index, depending on `returnExistingOnConflict`.
-
-__Example__
-
-```javascript
-db.saveUnique({name: 'jon'}, 'people', 'name', 'jon', function(err, node) {
-  //node = { name: 'jon', id: 1 }
-  db.saveUnique({age: 24}, 'people', 'name', 'jon', function(err, node) {
-    //err.statusCode == 409, because there was already a node indexed under
-    //people(name="jon").
-  });
-  
-  db.saveUnique({location:'Bergen'}, 'people', 'name', 'jon', true, function(err, node) {
-    // node = {name: 'jon', id: 1}
-    // because there was node already indexed under people(name="jon") and we 
-    // specified that we wanted that node returned on the event of a conflict.
-  });
-});
-```
-
----------------------------------------
-
 <a name="node.read" />
 ### read(id|object, [property,] callback)
 *Aliases: __node.read__*
@@ -480,8 +435,8 @@ Read a node.
 **Note**: If the node doesn't exist, Neo4j will return an exception. You can 
 check if this is indicating that your node doesn't exist because
 `err.statusCode` will equal `404`. This is inconsistent with behaviour of
-[node.index.read](#index.read), but it is justified because the Neo4j REST api
-behaviour is inconsistent in this way as well. 
+[node.legacyindex.read](#legacyindex.read), but it is justified because the 
+Neo4j REST api behaviour is inconsistent in this way as well. 
 
 __Arguments__
 
@@ -745,56 +700,6 @@ db.relate(1, 'knows', 2, { for: '2 months' }, function(err, relationship) {
 
 ---------------------------------------
 
-<a name="rel.createUnique" />
-### rel.createUnique(firstId|firstObj, type, secondId|secondObj, [properties,] index, key, value, [returnExistingOnConflict = false,] callback)
-
-Create a relationship between two nodes, using an index to enforce uniqueness.
-
-See also [rel.index.saveUniqueOrFail](#index.saveUniqueOrFail) &
-[rel.index.getOrSaveUnique](#index.getOrSaveUnique).
-
-__Arguments__
-
-* `firstId | firstObject` - id of the start node or an object with an id property
-  for the start node
-* `type` - the name of the relationship
-* `secondId | secondObject` - id of the end node or an object with an id property
-  for the end node
-* `properties` (optional, default=`{}`) - properties of the relationship
-* `index` - the index in which `key` and `value` are relevant
-* `key` - the key under which to index this relationship and enforce uniqueness
-* `value` - the value under which to index this relationship and enforce uniqueness
-* `returnExistingOnConflict` (optional, default=`false`) - what to do when there is
-  a conflict (when the index you specified already refers to a relationship). If
-  set to `true`, the relationship that the index currently refers to is returned.
-  Otherwise, an error is return indicating that there was a conflict (you can 
-  check this by testing `err.statusCode == 409`.
-* `callback` - function(err, relationship) - `relationship` is the newly created
-  relationship or the relationship that was in the specified index, depending
-  on `returnExistingOnConflict`
-
-__Example__
-
-```javascript
-db.rel.createUnique(1, 'knows', 2, 'friendships', 'type', 'super', function(err, rel) {
-  // rel = {start: 1, end: 2, type: 'knows', properties: {}, id = 1}
-  db.rel.createUnique(1, 'knows', 2, 'friendships', 'type', 'super', function(err, node) {
-    //err.statusCode == 409, because there was already a relationship indexed under
-    //friendships(type="super").
-  });
-  
-  db.rel.createUnique(1, 'knows', 2, 'friendships', 'type', 'super', true, function(err, node) {
-    // rel = {start: 1, end: 2, type: 'knows', properties: {}, id = 1}
-    // no new index was created, the first one was returned - because there was
-    // already a relationship indexed under friendships(type="super") and we
-    // specified that on the event of a conflict we wanted the indexed rel to 
-    // be returned
-  });
-});
-```
-
----------------------------------------
-
 <a name="rel.update" />
 ### rel.update(relationship, [key, value,] callback)
 
@@ -879,61 +784,68 @@ db.rel.create(1, 'knows', 2, { for: '2 months' }, function(err, rel) {
 });
 ```
 
-## Index Operations
+## Legacy Index Operations
 
-<a name="index.create" />
-### node.index.create(name, [config,] callback)
-### rel.index.create(name, [config,] callback)
+**Note that as of Neo4j-2.0.0 legacy indexes are no longer the preferred way to
+handle indexing**
 
-Create a new index. If you're using the default index configuration, this
-method is not necessary - you can just start using the index with
-[index.add](#index.add) as if it already existed.
+<a name="legacyindex.create" />
+### node.legacyindex.create(name, [config,] callback)
+### rel.legacyindex.create(name, [config,] callback)
 
-__NOTE for index functions:__ there are two different types on index in neo4j - 
-__node__ indexes and __relationship__ indexes. When you're working with __node__
-indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `rel.index`. Most of the
-functions on both of these are identical (excluding the uniqueness functions),
-but one acts upon node indexes, and the other upon relationship indexes.
+Create a new legacy index. If you're using the default legacy index configuration, 
+this method is not necessary - you can just start using the legacy index with
+[legacyindex.add](#legacyindex.add) as if it already existed.
+
+__NOTE for legacy index functions:__ there are two different types of legacy 
+index in neo4j - __node__ legacy indexes and __relationship__ legacy indexes. 
+When you're working with __node__ legacy indexes, you use the functions on 
+`node.legacyindex`.  Similarly, when you're working on __relationship__ legacy 
+indexes you use the functions on `rel.legacyindex`. Most of the functions on 
+both of these are identical (excluding the uniqueness functions), but one acts 
+upon node legacy indexes, and the other upon relationship legacy indexes.
 
 __Arguments__
 
-* `name` - the name of the index that is being created
-* `config` (optional, default=`{}`) - the configuration of the index. See the [neo4j docs](http://docs.neo4j.org/chunked/milestone/rest-api-indexes.html#rest-api-create-node-index-with-configuration)
+* `name` - the name of the legacy index that is being created
+* `config` (optional, default=`{}`) - the configuration of the legacy index. 
+See the [neo4j docs](http://docs.neo4j.org/chunked/milestone/rest-api-indexes.html#rest-api-create-node-index-with-configuration)
   for more information.
-* `callback` - function(err). If `err` is falsy, the index has been created.
+* `callback` - function(err). If `err` is falsy, the legacy index has been created.
 
 __Example__
 
 ```javascript
 var indexConfig = { type: 'fulltext', provider: 'lucene' };
-db.node.index.create('a_fulltext_index', indexConfig, function(err) {
-  if (!err) console.log('a fulltext index has been created!');
+db.node.legacyindex.create('a_fulltext_index', indexConfig, function(err) {
+  if (!err) console.log('a fulltext legacy index has been created!');
 });
 ```
 
 ---------------------------------------
 
-<a name="index.add" />
-<a name="node.index" />
-### node.index.add(indexName, id|object, key, value, callback);
-### rel.index.add(indexName, id|object, key, value, callback);
-*`node.index.add` is aliased as __node.index__ & __index__*
+<a name="legacyindex.add" />
+<a name="node.legacyindex" />
+### node.legacyindex.add(indexName, id|object, key, value, callback);
+### rel.legacyindex.add(indexName, id|object, key, value, callback);
+*`node.legacyindex.add` is aliased as __node.legacyindex__ & __legacyindex__*
 
-Add a node/relationship to an index.
+Add a node/relationship to a legacy index.
 
-__NOTE for index functions:__ there are two different types on index in neo4j - 
-__node__ indexes and __relationship__ indexes. When you're working with __node__
-indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `rel.index`. Most of the
-functions on both of these are identical (excluding the uniqueness functions),
-but one acts upon node indexes, and the other upon relationship indexes.
+__NOTE for legacy index functions:__ there are two different types of legacy 
+index in neo4j - __node__ legacy indexes and __relationship__ legacy indexes. 
+When you're working with __node__ legacy indexes, you use the functions on 
+`node.legacyindex`.  Similarly, when you're working on __relationship__ legacy 
+indexes you use the functions on `rel.legacyindex`. Most of the functions on 
+both of these are identical (excluding the uniqueness functions), but one acts 
+upon node legacy indexes, and the other upon relationship legacy indexes.
 
 __Arguments__
 
-* `indexName` - the name of the index to add the node/relationship to.
-* `id | object` - the id of the node/relationship to add to the index or an object 
-  with an id property of the node/relationship to add to the index.
+* `indexName` - the name of the legacy index to add the node/relationship to.
+* `id | object` - the id of the node/relationship to add to the legacy index or 
+  an object with an id property of the node/relationship to add to the legacy 
+  index.
 * `key` - the key to index the node/relationship with
 * `value` - the value to index the node/relationship with
 * `callback` - function(err). If `err` is falsy, the node/relationship has 
@@ -943,7 +855,7 @@ __Example__
 
 ```javascript
 db.save({ name: 'Jon', }, function(err, node) {
-  db.index('people', node, 'name', node.name, function(err) {
+  db.legacyindex('people', node, 'name', node.name, function(err) {
     if (!err) console.log('Jon has been indexed!');
   });
 });
@@ -951,35 +863,37 @@ db.save({ name: 'Jon', }, function(err, node) {
 
 ---------------------------------------
 
-<a name="index.read" />
-### node.index.read(indexName, key, value, callback);
-### rel.index.read(indexName, key, value, callback);
+<a name="legacyindex.read" />
+### node.legacyindex.read(indexName, key, value, callback);
+### rel.legacyindex.read(indexName, key, value, callback);
 
-Read the object(s) from an index that match a key-value pair. See also
-[index.readAsList](#index.readAsList).
+Read the object(s) from a legacy index that match a key-value pair. See also
+[legacyindex.readAsList](#legacyindex.readAsList).
 
-__NOTE for index functions:__ there are two different types on index in neo4j - 
-__node__ indexes and __relationship__ indexes. When you're working with __node__
-indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `rel.index`. Most of the
-functions on both of these are identical (excluding the uniqueness functions),
-but one acts upon node indexes, and the other upon relationship indexes.
+__NOTE for legacy index functions:__ there are two different types of legacy 
+index in neo4j - __node__ legacy indexes and __relationship__ legacy indexes. 
+When you're working with __node__ legacy indexes, you use the functions on 
+`node.legacyindex`.  Similarly, when you're working on __relationship__ legacy 
+indexes you use the functions on `rel.legacyindex`. Most of the functions on 
+both of these are identical (excluding the uniqueness functions), but one acts 
+upon node legacy indexes, and the other upon relationship legacy indexes.
 
 __Arguments__
 
-* `indexName` - the index to read from
+* `indexName` - the legacy index to read from
 * `key` - the key to match
 * `value` - the value to match
 * `callback` - function(err, results). `results` is a node or relationship object
   (or an array of them if there was more than one) that matched the given 
-  key-value pair in the given index. If nothing matched, `results === false`.
-  [index.readAsList](#index.readAsList) is similar, but always gives `results` as
-  an array, with zero, one or more elements.
+  key-value pair in the given legacy index. If nothing matched, 
+  `results === false`. [legacyindex.readAsList](#legacyindex.readAsList) is 
+  similar, but always gives `results` as an array, with zero, one or more 
+  elements.
 
 __Example__
 
 ```javascript
-db.rel.index.read('friendships', 'location', 'Norway', function(err, rels) {
+db.rel.legacyindex.read('friendships', 'location', 'Norway', function(err, rels) {
   // `rels` is an array of all relationships indexed in the `friendships`
   // index, with a value `Norway` for the key `location`.
 });
@@ -987,62 +901,65 @@ db.rel.index.read('friendships', 'location', 'Norway', function(err, rels) {
 
 ---------------------------------------
 
-<a name="index.readAsList" />
-### node.index.readAsList(indexName, key, value, callback);
-### rel.index.readAsList(indexName, key, value, callback);
+<a name="legacyindex.readAsList" />
+### node.legacyindex.readAsList(indexName, key, value, callback);
+### rel.legacyindex.readAsList(indexName, key, value, callback);
 
-Read the object(s) from an index that match a key-value pair. See also
-[index.read](#index.read).
+Read the object(s) from a legacy index that match a key-value pair. See also
+[legacyindex.read](#legacyindex.read).
 
-__NOTE for index functions:__ there are two different types on index in neo4j - 
-__node__ indexes and __relationship__ indexes. When you're working with __node__
-indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `rel.index`. Most of the
-functions on both of these are identical (excluding the uniqueness functions),
-but one acts upon node indexes, and the other upon relationship indexes.
+__NOTE for legacy index functions:__ there are two different types of legacy 
+index in neo4j - __node__ legacy indexes and __relationship__ legacy indexes. 
+When you're working with __node__ legacy indexes, you use the functions on 
+`node.legacyindex`.  Similarly, when you're working on __relationship__ legacy 
+indexes you use the functions on `rel.legacyindex`. Most of the functions on 
+both of these are identical (excluding the uniqueness functions), but one acts 
+upon node legacy indexes, and the other upon relationship legacy indexes.
 
 __Arguments__
 
-* `indexName` - the index to read from
+* `indexName` - the legacy index to read from
 * `key` - the key to match
 * `value` - the value to match
 * `callback` - function(err, results). `results` is an array of node or
-  relationship objects that matched the given key-value pair in the given index.
-  [index.read](#index.read) is similar, but gives `results` as `false`, an object
-  or an array of objects depending on the number of hits.
+  relationship objects that matched the given key-value pair in the given legacy 
+  index.  [legacyindex.read](#legacyindex.read) is similar, but gives `results` 
+  as `false`, an object or an array of objects depending on the number of hits.
 
 __Example__
 
 ```javascript
-db.rel.index.readAsList('friendships', 'location', 'Norway', function(err, rels) {
+db.rel.legacyindex.readAsList('friendships', 'location', 'Norway', function(err, rels) {
   // `rels` is an array of all relationships indexed in the `friendships`
-  // index, with a value `Norway` for the key `location`.
+  // legacy index, with a value `Norway` for the key `location`.
 });
 ```
 
 ---------------------------------------
 
-<a name="index.remove" />
-### node.index.remove(indexName, id|object, [key, [value,]] callback);
-### rel.index.remove(indexName, id|object, [key, [value,]] callback);
+<a name="legacyindex.remove" />
+### node.legacyindex.remove(indexName, id|object, [key, [value,]] callback);
+### rel.legacyindex.remove(indexName, id|object, [key, [value,]] callback);
 
-Remove a node/relationship from an index. 
+Remove a node/relationship from a legacy index. 
 
-__NOTE for index functions:__ there are two different types on index in neo4j - 
-__node__ indexes and __relationship__ indexes. When you're working with __node__
-indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `rel.index`. Most of the
-functions on both of these are identical (excluding the uniqueness functions),
-but one acts upon node indexes, and the other upon relationship indexes.
+__NOTE for legacy index functions:__ there are two different types of legacy 
+index in neo4j - __node__ legacy indexes and __relationship__ legacy indexes. 
+When you're working with __node__ legacy indexes, you use the functions on 
+`node.legacyindex`.  Similarly, when you're working on __relationship__ legacy 
+indexes you use the functions on `rel.legacyindex`. Most of the functions on 
+both of these are identical (excluding the uniqueness functions), but one acts 
+upon node legacy indexes, and the other upon relationship legacy indexes.
 
 __Arguments__
 
-* `indexName` - the index to remove the node/relationship from.
-* `id | object` - the id of the node/relationship to remove from the index or an 
-  object with an id property of the node/relationship to remove from the index.
+* `indexName` - the legacy index to remove the node/relationship from.
+* `id | object` - the id of the node/relationship to remove from the legacy 
+  index or an object with an id property of the node/relationship to remove from
+  the legacy index.
 * `key` (optional) - the key from which to remove the node/relationship. If none
   is specified, every reference to the node/relationship is deleted from the
-  index.
+  legacy index.
 * `value` (optional) - the value from which to remove the node/relationship. If
   none is specified, every reference to the node/relationship is deleted for the
   given key.
@@ -1052,66 +969,68 @@ __Arguments__
 __Example__
 
 ```javascript
-db.node.index.remove('people', 6821, function(err) {
+db.node.legacyindex.remove('people', 6821, function(err) {
   if (!err) console.log("Every reference of node 6821 has been removed from the people index");
 });
 
-db.rel.index.remove('friendships', 351, 'in', 'Australia', function(err) {
+db.rel.legacyindex.remove('friendships', 351, 'in', 'Australia', function(err) {
   if (!err) console.log("Relationship 351 is no longer indexed as a friendship in Australia");
 })
 ```
 
 ---------------------------------------
 
-<a name="index.delete" />
-### node.index.delete(name, callback);
-### rel.index.delete(name, callback);
+<a name="legacyindex.delete" />
+### node.legacyindex.delete(name, callback);
+### rel.legacyindex.delete(name, callback);
 
-Delete an index.
+Delete a legacy index.
 
-__NOTE for index functions:__ there are two different types on index in neo4j - 
-__node__ indexes and __relationship__ indexes. When you're working with __node__
-indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `rel.index`. Most of the
-functions on both of these are identical (excluding the uniqueness functions),
-but one acts upon node indexes, and the other upon relationship indexes.
+__NOTE for legacy index functions:__ there are two different types of legacy 
+index in neo4j - __node__ legacy indexes and __relationship__ legacy indexes. 
+When you're working with __node__ legacy indexes, you use the functions on 
+`node.legacyindex`.  Similarly, when you're working on __relationship__ legacy 
+indexes you use the functions on `rel.legacyindex`. Most of the functions on 
+both of these are identical (excluding the uniqueness functions), but one acts 
+upon node legacy indexes, and the other upon relationship legacy indexes.
 
 __Arguments__
 
-* `name` - the name of the index to delete
-* `callback` - function(err). if `err` is falsy, the index has been deleted.
+* `name` - the name of the legacy index to delete
+* `callback` - function(err). if `err` is falsy, the legacy index has been deleted.
 
 __Example__
 
 ```javascript
-db.rel.index.delete('friendships', function(err) {
+db.rel.legacyindex.delete('friendships', function(err) {
   if (!err) console.log('The `friendships` index has been deleted');
 })
 ```
 
 ---------------------------------------
 
-<a name="index.getOrSaveUnique" />
-### node.index.getOrSaveUnique(node, index, key, value, callback);
-### rel.index.getOrSaveUnique(startNode, relName, endNode, [properties,] index, key, value, callback);
+<a name="legacyindex.getOrSaveUnique" />
+### node.legacyindex.getOrSaveUnique(node, index, key, value, callback);
+### rel.legacyindex.getOrSaveUnique(startNode, relName, endNode, [properties,] index, key, value, callback);
 
-Save a node or relationship, using an index to enforce uniqueness. If there is
-already a node or relationship saved under the specified `key` and `value` in 
-the specified `index`, that node or relationship will be returned.
+Save a node or relationship, using a legacy index to enforce uniqueness. If 
+there is already a node or relationship saved under the specified `key` and 
+`value` in the specified `index`, that node or relationship will be returned.
 
 Note that you cannot use this function to update nodes.
 
-__NOTE for index functions:__ there are two different types on index in neo4j - 
-__node__ indexes and __relationship__ indexes. When you're working with __node__
-indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `rel.index`. Most of the
-functions on both of these are identical (excluding the uniqueness functions),
-but one acts upon node indexes, and the other upon relationship indexes.
+__NOTE for legacy index functions:__ there are two different types of legacy 
+index in neo4j - __node__ legacy indexes and __relationship__ legacy indexes. 
+When you're working with __node__ legacy indexes, you use the functions on 
+`node.legacyindex`.  Similarly, when you're working on __relationship__ legacy 
+indexes you use the functions on `rel.legacyindex`. Most of the functions on 
+both of these are identical (excluding the uniqueness functions), but one acts 
+upon node legacy indexes, and the other upon relationship legacy indexes.
 
 __Arguments (node)__
 
 * `node` - the node to save
-* `index` - the name of the index in which `key` and `value` are relevant
+* `index` - the name of the legacy index in which `key` and `value` are relevant
 * `key` - the key to check or store under
 * `value` - the value to check or store under
 * `callback` - function(err, node) - returns your saved node, or the node that
@@ -1123,7 +1042,7 @@ __Arguments (relationship)__
 * `endNode` - the end point of the relationship (object containing id or id)
 * `properties` (optional) - an object containing properties to store on the
   created relationship.
-* `index` - the name of the index in which `key` and `value` are relevant
+* `index` - the name of the legacy index in which `key` and `value` are relevant
 * `key` - the key to check or store under
 * `value` - the value to check or store under
 * `callback` - function(err, rel) - returns your created relationship, or the 
@@ -1134,11 +1053,11 @@ __Example__
 
 ```javascript
 var tag = { name: 'finnish' };
-db.node.index.getOrSaveUnique(tag, 'tags', 'name', tag.name, function(err, tag) {
+db.node.legacyindex.getOrSaveUnique(tag, 'tags', 'name', tag.name, function(err, tag) {
   // tag == { id: 1, name: 'finnish' }
 
   // save another new object with the same properties
-  db.node.index.getOrSaveUnique({name: 'finnish'}, 'tags', 'name', 'finnish', function(err, newTag) {
+  db.node.legacyindex.getOrSaveUnique({name: 'finnish'}, 'tags', 'name', 'finnish', function(err, newTag) {
     // newTag == { id: 1, name: 'finnish' }
     // no save was performed because there was already an object at that index
   });
@@ -1147,31 +1066,32 @@ db.node.index.getOrSaveUnique(tag, 'tags', 'name', tag.name, function(err, tag) 
 
 ---------------------------------------
 
-<a name="index.saveUniqueOrFail" />
-### node.index.saveUniqueOrFail(node, index, key, value, callback);
-### rel.index.saveUniqueOrFail(startNode, relName, endNode, [properties,] index, key, value, callback);
+<a name="legacyindex.saveUniqueOrFail" />
+### node.legacyindex.saveUniqueOrFail(node, index, key, value, callback);
+### rel.legacyindex.saveUniqueOrFail(startNode, relName, endNode, [properties,] index, key, value, callback);
 
-Save a node or relationship, using an index to enforce uniqueness. If there is
-already a node or relationship saved under the specified `key` and `value` in 
-the specified `index`, an error is returned indicating that there as a conflict.
-You can check if the result was a conflict by checking if 
+Save a node or relationship, using a legacy index to enforce uniqueness. If 
+there is already a node or relationship saved under the specified `key` and 
+`value` in the specified `index`, an error is returned indicating that there 
+as a conflict. You can check if the result was a conflict by checking if 
 `err.statusCode == 409`.
 
-__NOTE for index functions:__ there are two different types on index in neo4j - 
-__node__ indexes and __relationship__ indexes. When you're working with __node__
-indexes, you use the functions on `node.index`. Similarly, when you're working
-on __relationship__ indexes you use the functions on `rel.index`. Most of the
-functions on both of these are identical (excluding the uniqueness functions),
-but one acts upon node indexes, and the other upon relationship indexes.
+__NOTE for legacy index functions:__ there are two different types of legacy 
+index in neo4j - __node__ legacy indexes and __relationship__ legacy indexes. 
+When you're working with __node__ legacy indexes, you use the functions on 
+`node.legacyindex`.  Similarly, when you're working on __relationship__ legacy 
+indexes you use the functions on `rel.legacyindex`. Most of the functions on 
+both of these are identical (excluding the uniqueness functions), but one acts 
+upon node legacy indexes, and the other upon relationship legacy indexes.
 
 __Arguments (node)__
 
 * `node` - the node to save
-* `index` - the name of the index in which `key` and `value` are relevant
+* `index` - the name of the legacy index in which `key` and `value` are relevant
 * `key` - the key to check or store under
 * `value` - the value to check or store under
 * `callback` - function(err, node) - returns your created node, or an err with 
-  `statusCode == 409` if a node already existed at that index
+  `statusCode == 409` if a node already existed at that legacy index
 
 __Arguments (relationship)__ 
 * `startNode` - the start point of the relationship (object containing id or id)
@@ -1179,21 +1099,22 @@ __Arguments (relationship)__
 * `endNode` - the end point of the relationship (object containing id or id)
 * `properties` (optional) - an object containing properties to store on the
   created relationship.
-* `index` - the name of the index in which `key` and `value` are relevant
+* `index` - the name of the legacy index in which `key` and `value` are relevant
 * `key` - the key to check or store under
 * `value` - the value to check or store under
 * `callback` - function(err, rel) - returns your created relationship, or an 
-  err with `statusCode == 409` if a relationship already existed at that index
+  err with `statusCode == 409` if a relationship already existed at that legacy 
+  index
 
 __Example__
 
 ```javascript
 var tag = { name: 'finnish' };
-db.node.index.saveUniqueOrFail(tag, 'tags', 'name', tag.name, function(err, tag) {
+db.node.legacyindex.saveUniqueOrFail(tag, 'tags', 'name', tag.name, function(err, tag) {
   // tag == { id: 1, name: 'finnish' }
 
   // save another new object with the same properties
-  db.node.index.saveUniqueOrFail({name: 'finnish'}, 'tags', 'name', 'finnish', function(err, newTag) {
+  db.node.legacyindex.saveUniqueOrFail({name: 'finnish'}, 'tags', 'name', 'finnish', function(err, newTag) {
     // newTag == undefined
     // err.statusCode == 409 (conflict)
     // an error was thrown because there was already a node at that index.
