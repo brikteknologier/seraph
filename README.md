@@ -66,6 +66,13 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [rel.read](#rel.read) - read a relationship
 * [rel.delete](#rel.delete) - delete a relationship
 
+### Indexing operations
+* [index.create](#index.create) - create an index on a label and property name
+* [index.createIfNone(#index.createIfNone) - create an index or return the old 
+  one
+* [index.indexes](#index.indexes) - read out the indexes for a label
+* [index.drop](#index.drop) - drop an index
+
 ### Legacy Index Operations
 * [legacyindex.create](#legacyindex.create) - create an index
 * [legacyindex.add](#legacyindex.add) - add a nodes/rels to an index
@@ -783,6 +790,39 @@ db.rel.create(1, 'knows', 2, { for: '2 months' }, function(err, rel) {
   });
 });
 ```
+
+## Indexing Operations
+
+**For more of an overview on schema-based indexing, check out the [neo4j docs
+on the subject](http://docs.neo4j.org/chunked/milestone/graphdb-neo4j-schema.html#graphdb-neo4j-schema-indexes).**
+
+<a name="index.create" />
+### index.create(label, key, callback)
+
+Create an index on `label` with `key`. Note that schema-based indexes are
+performance-boosting only and do not imply any uniqueness constraints.
+
+__Arguments__
+
+* `label` - the label to create an index on
+* `key` - the key to index, i.e. `'name'`. Note that compound indexes are not
+  yet supported by neo4j-2
+* `callback` - function(err, index). `index` is an object that reflects the
+  index that was created, i.e. `{ label: 'Person', { property_keys: ['name'] }`.
+  Note that if you've already created the index, you'll get a conflict error. You
+  can check this by checking `err`'s `statusCode` property. `409` indicates a 
+  conflict.
+
+__Example__
+
+```javascript
+db.index.create('Person', 'name', function(err, index) {
+  console.log(index); // -> { label: 'Person', { property_keys: ['name'] }
+});
+```
+
+---------------------------------------
+
 
 ## Legacy Index Operations
 
