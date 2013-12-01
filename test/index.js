@@ -10,9 +10,9 @@ describe('seraph#index', function() {
     var labelname = uniqn();
     db.index.create(labelname, 'name', function(err, index) {
       assert(!err);
-      assert.equal(label.name, labelname);
-      assert.equal(label.property_keys.length, 1);
-      assert.equal(label.property_keys[0], 'name');
+      assert.equal(index.label, labelname);
+      assert.equal(index.property_keys.length, 1);
+      assert.equal(index.property_keys[0], 'name');
       done();
     });
   });
