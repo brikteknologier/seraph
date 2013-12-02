@@ -54,4 +54,19 @@ describe('seraph#constraints', function() {
       });
     });
   });
+
+  it('should retrieve all uniqueness constraints', function(done) {
+    var label = uniqn();
+    db.constraints.uniqueness.create(label, 'name', function(err, constraint) {
+      assert(!err);
+      db.constraints.uniqueness.create(label, 'age', function(err, constraint) {
+        assert(!err);
+        db.constraints.uniqueness.list(label, function(err, constraints) {
+          assert(!err);
+          assert.equal(constraints.length, 2);
+          done();
+        });
+      });
+    });
+  });
 });
