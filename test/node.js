@@ -1,12 +1,11 @@
-/* -*- Mode: Javascript; js-indent-level: 2 -*- */
-
 var testDatabase = require('./util/database');
 var db = require('../')(testDatabase.url);
+var uniqn = require('./util/ponies').uniqn;
 
 var assert = require('assert');
 var async = require('async');
 
-describe('seraph#save, seraph#read', function() {
+describe('seraph#node', function() {
   it('should accept id of 0 on read', function(done) {
     db.read(0, function(err, data) {
       if (err)
@@ -20,6 +19,19 @@ describe('seraph#save, seraph#read', function() {
       if (err)
         assert.ok(err.statusCode); // not seraph error
       done();
+    });
+  });
+
+  it('should save with a label', function(done) {
+    var label = uniqn();
+    db.save({name: 'Jon'}, label, function(err, node) {
+      assert(!err);
+      assert.equal(node.name, 'Jon');
+      db.nodesWithLabel(label, function(err, nodes) {
+        assert(!err);
+        assert.deepEqual(nodes[0], node);
+        done();
+      });
     });
   });
 
