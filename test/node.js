@@ -68,6 +68,16 @@ describe('seraph#node', function() {
     });
   });
 
+  it('should throw an error if attempting to save nodes with a label in batch mode', function(done) {
+    var label = uniqn();
+    var txn = db.batch();
+    txn.save({name:'Jon'}, label);
+    txn.commit(function(err, res) {
+      assert(err);
+      done();
+    });
+  });
+
   it('should handle alternative id property name', function(done) {
     function create(done) {
       db.save({ name: 'Jon', age: 23 }, function(err, user) {
