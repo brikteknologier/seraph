@@ -415,13 +415,20 @@ Create or update a node. If `object` has an id property, the node with that id
 is updated. Otherwise, a new node is created. Returns the newly created/updated
 node to the callback.
 
+** Note: using `node.save` with a `label` *does not* work in a batch. If you
+want to create a node with label in a batch, you should call `node.save` without
+a label, followed by `node.label` with a reference to the created node. **
+
 __Arguments__
 
 * `node` - an object to create or update
 * `label` - a label to label this node with. this is performed atomically, so if
   labelling the node fails, the node is not saved/updated. supplying `label` is 
   exclusive with `key` and `value`. You may either specify a `label`, or a `key`
-  and a `value`, but all three.
+  and a `value`, but all three. ** Note: using `node.save` with a `label` 
+  *does not* work in a batch. If you want to create a node with label in a batch,
+  you should call `node.save` without a label, followed by `node.label` with a 
+  reference to the created node. **
 * `key`, `value` (optional) - a property key and a value to update it with. This
   allows you to only update a single property of the node, without touching any
   others. If `key` is specified, `value` must also be. 
