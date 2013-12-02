@@ -81,7 +81,7 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [index.create](#index.create) - create an index on a label and property name
 * [index.createIfNone(#index.createIfNone) - create an index or return the old 
   one
-* [index.indexes](#index.indexes) - read out the indexes for a label
+* [index.list](#index.list) - read out the indexes for a label
 * [index.drop](#index.drop) - drop an index
 
 ### Legacy Index Operations
@@ -1001,8 +1001,8 @@ db.index.createIfNone('Person', 'name', function(err, index) {
 
 ---------------------------------------
 
-<a name="index.indexes" />
-### index.indexes(label, callback)
+<a name="index.list" />
+### index.list(label, callback)
 
 Retrieve a listing of the indexes on a label.
 
@@ -1016,7 +1016,7 @@ __Arguments__
 __Example__
 
 ```javascript
-db.index.indexes('Person', function(err, index) {
+db.index.list('Person', function(err, index) {
   console.log(index); // -> [ { label: 'Person', { property_keys: ['name'] } ]
 });
 ```

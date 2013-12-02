@@ -38,7 +38,7 @@ describe('seraph#index', function() {
     var labelname = uniqn();
     db.index.create(labelname, 'name', function(err, index) {
       assert(!err);
-      db.index.indexes(labelname, function(err, indexes) {
+      db.index.list(labelname, function(err, indexes) {
         assert(!err);
         assert.equal(indexes.length, 1);
         assert.equal(indexes[0].label, labelname);
@@ -55,7 +55,7 @@ describe('seraph#index', function() {
       assert(!err);
       db.index.drop(labelname, 'name', function(err) {
         assert(!err);
-        db.index.indexes(labelname, function(err, indexes) {
+        db.index.list(labelname, function(err, indexes) {
           assert(!err);
           assert(indexes.length == 0);
           done();
