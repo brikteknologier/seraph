@@ -34,6 +34,20 @@ describe('seraph#node', function() {
       });
     });
   });
+  
+  it('should save multiple nodes with a label', function(done) {
+    var label = uniqn();
+    db.save([{name: 'Jon'}, {name: 'Helge'}], label, function(err, nodes) {
+      assert(!err);
+      assert(nodes.length == 2);
+      db.nodesWithLabel(label, function(err, nodes) {
+        assert(!err);
+        assert(nodes[0].name == 'Jon' || nodes[0].name == 'Helge');
+        assert(nodes[1].name == 'Jon' || nodes[1].name == 'Helge');
+        done();
+      });
+    });
+  });
 
   it('should handle alternative id property name', function(done) {
     function create(done) {
