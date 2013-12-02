@@ -66,6 +66,15 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [rel.read](#rel.read) - read a relationship
 * [rel.delete](#rel.delete) - delete a relationship
 
+### Constraint operations
+* [constraints.list](#constraints.list) - list constraints
+* [constraints.uniqueness.create](#constraints.uniqueness.create) - create a
+  uniqueness constraint
+* [constraints.uniqueness.list](#constraints.uniqueness.list) - list uniqueness
+  constraints
+* [constraints.uniqueness.drop](#constraints.uniqueness.drop) - drop a uniqueness
+  constraint
+
 ### Indexing operations
 * [index.create](#index.create) - create an index on a label and property name
 * [index.createIfNone(#index.createIfNone) - create an index or return the old 
