@@ -70,6 +70,8 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [constraints.list](#constraints.list) - list constraints
 * [constraints.uniqueness.create](#constraints.uniqueness.create) - create a
   uniqueness constraint
+* [constraints.uniqueness.createIfNone](#constraints.uniquness.createIfNone) - 
+  create a uniqueness constraint if it doesn't already exist
 * [constraints.uniqueness.list](#constraints.uniqueness.list) - list uniqueness
   constraints
 * [constraints.uniqueness.drop](#constraints.uniqueness.drop) - drop a uniqueness
@@ -818,8 +820,8 @@ __Example__
 
 ```javascript
 db.constraints.list('Person', function(err, constraints) {
-  console.log(index); 
-  // -> { type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }
+  console.log(constraints); 
+  // -> [{ type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }]
 });
 ```
 
@@ -845,7 +847,38 @@ __Example__
 
 ```javascript
 db.constraints.uniqueness.list('Person', 'name', function(err, constraints) {
-  console.log(index); 
+  console.log(constraints); 
+  // -> [{ type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }]
+});
+```
+
+---------------------------------------
+
+<a name="constraints.uniqueness.create" />
+### constraints.uniqueness.create(label, key, callback)
+
+Create a uniqueness constraint on the given label. Any node labelled with `label`
+will be constrained to having a unique value for the given `key`. If it doesn't,
+attempting to label that node with `label` will return an error (unfortunately
+due to the way neo4j handles these errors, the statusCode is 400 instead of 409,
+but you can check with 
+`err.neo4jCause.exception == 'ConstraintViolationException'`.
+
+__Arguments__
+
+* `label` - the label to create a uniqueness constraint for
+* `key` - the key that should be unique on nodes labelled with `label`
+* `callback` - function(err, constraint). `constraint` is a constraint object
+  representing the constraint that was created, e.g. 
+  `[{type:'UNIQUENESS', label:'Person', property_keys['name']}]`. If the
+  constraint already existed, `err.statusCode == 409`.
+
+__Example__
+
+```javascript
+// any node labelled Person should have a unique `name`
+db.constraints.uniqueness.create('Person', 'name', function(err, constraint) {
+  console.log(constraint); 
   // -> { type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }
 });
 ```
