@@ -917,6 +917,32 @@ db.constraints.uniqueness.createIfNone('Person', 'name', function(err, constrain
 
 ---------------------------------------
 
+<a name="constraints.uniqueness.drop" />
+### constraints.uniqueness.drop(label, key, callback)
+
+Drop (remove) a uniqueness constraint.
+
+__Arguments__
+
+* `label` - the label to remove a uniqueness constraint from
+* `key` - the key on which to remove the uniqueness constraint
+* `callback` - function(err). if `err` is falsy, the constraint was successfully
+  dropped
+
+__Example__
+
+```javascript
+// any node labelled Person should have a unique `name`
+db.constraints.uniqueness.create('Person', 'name', function(err, constraint) {
+  console.log(constraint); 
+  // -> { type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }
+  db.constraints.uniqueness.drop('Person', 'name', function(err) {
+    console.log(err);
+    // -> undefined
+    // the constraint has been dropped
+  });
+});
+```
 
 ## Indexing Operations
 
