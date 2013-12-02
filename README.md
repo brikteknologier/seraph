@@ -885,6 +885,38 @@ db.constraints.uniqueness.create('Person', 'name', function(err, constraint) {
 
 ---------------------------------------
 
+<a name="constraints.uniqueness.createIfNone" />
+### constraints.uniqueness.createIfNone(label, key, callback)
+
+Create a uniqueness constraint on the given label. If the constraint exists,
+don't return an error, just return the existing constraint.
+
+__Arguments__
+
+* `label` - the label to create a uniqueness constraint for
+* `key` - the key that should be unique on nodes labelled with `label`
+* `callback` - function(err, constraint). `constraint` is a constraint object
+  representing the constraint that was created, e.g. 
+  `[{type:'UNIQUENESS', label:'Person', property_keys['name']}]`. 
+
+__Example__
+
+```javascript
+// any node labelled Person should have a unique `name`
+db.constraints.uniqueness.createIfNone('Person', 'name', function(err, constraint) {
+  console.log(constraint); 
+  // -> { type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }
+  db.constraints.uniqueness.createIfNone('Person', 'name', function(err, constraint) {
+    console.log(err);
+    // -> undefined
+    console.log(constraint); 
+    // -> { type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }
+  });
+});
+```
+
+---------------------------------------
+
 
 ## Indexing Operations
 
