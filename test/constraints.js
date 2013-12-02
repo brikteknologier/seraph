@@ -94,7 +94,7 @@ describe('seraph#constraints', function() {
         assert(!err);
         db.label(node, label, function(err) {
           assert(!err);
-          db.save({name:'jon'}, function(err) {
+          db.save({name:'jon'}, function(err, node) {
             assert(!err);
             db.label(node, label, function(err) {
               assert(err);
