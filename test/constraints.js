@@ -17,4 +17,25 @@ describe('seraph#constraints', function() {
       done();
     });
   });
+
+  it('should make effective uniqueness constraints', function(done) {
+    var label = uniqn();
+    db.constraints.uniqueness.create(label, 'name', function(err) {
+      assert(!err);
+      db.save({name:'jon'}, function(err, node) {
+        assert(!err);
+        db.label(node, label, function(err) {
+          assert(!err);
+          db.save({name:'jon'}, function(err, node) {
+            assert(!err);
+            db.label(node, label, function(err) {
+              assert(err);
+              assert(err.neo4jCause.exception == 'ConstraintViolationException');
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
 });
