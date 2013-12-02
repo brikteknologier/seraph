@@ -49,6 +49,25 @@ describe('seraph#node', function() {
     });
   });
 
+  it('should save nodes and labels atomically', function(done) {
+    var label = uniqn();
+    db.constraints.uniqueness.create(label, 'name', function(err) {
+      assert(!err);
+      db.save({name:'Jon',lol:'omgwtf'}, label, function(err, node) {
+        assert(!err);
+        db.save({name:'Jon', label: label}, label, function(err, node) {
+          assert(err);
+          assert(!node);
+          db.query("match (node {props}) return node", {props: {label: label}}, function(err, res) {
+            assert(!err, err);
+            assert(res.length == 0);
+            done();
+          });
+        });
+      });
+    });
+  });
+
   it('should handle alternative id property name', function(done) {
     function create(done) {
       db.save({ name: 'Jon', age: 23 }, function(err, user) {
