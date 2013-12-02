@@ -800,6 +800,59 @@ db.rel.create(1, 'knows', 2, { for: '2 months' }, function(err, rel) {
 });
 ```
 
+## Constraints Operations
+
+<a name="constraints.list" />
+### constraints.list([label,] callback)
+
+List all constraints, or optionally all constraints for a label.
+
+__Arguments__
+
+* `label` (optional) - the label to list constraints for
+* `callback` - function(err, constraints). `constraints` is an array of
+  constraint objects. For example, 
+  `[{type:'UNIQUENESS', label:'Person', property_keys['name']}]`
+
+__Example__
+
+```javascript
+db.constraints.list('Person', function(err, constraints) {
+  console.log(index); 
+  // -> { type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }
+});
+```
+
+---------------------------------------
+
+<a name="constraints.uniqueness.list" />
+### constraints.uniqueness.list(label, [key,] callback)
+
+List all uniqueness constraints, or optionally fetch a uniqueness constraint for
+`key`.
+
+__Arguments__
+
+* `label` - the label to list uniqueness constraints for
+* `key` (optional) - if specified, retrieve any uniqueness constraint for this
+  property key.
+* `callback` - function(err, constraints). `constraints` is an array of
+  constraint objects. For example, 
+  `[{type:'UNIQUENESS', label:'Person', property_keys['name']}]`. If none
+  existed, it is an empty array.
+
+__Example__
+
+```javascript
+db.constraints.uniqueness.list('Person', 'name', function(err, constraints) {
+  console.log(index); 
+  // -> { type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }
+});
+```
+
+---------------------------------------
+
+
 ## Indexing Operations
 
 **For more of an overview on schema-based indexing, check out the [neo4j docs
