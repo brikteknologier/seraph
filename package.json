@@ -3,7 +3,7 @@
   "contributors": [
     "Jon Packer <contact@jonpacker.com>",
     "Helge Holm <helge.holm@brik.no>",
-    "Magnus Hoff <magnus.hoff@brik.no"
+    "Magnus Hoff <magnus.hoff@brik.no>"
   ],
   "main": "lib/seraph.js",
   "name": "seraph",
