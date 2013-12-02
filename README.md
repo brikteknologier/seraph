@@ -408,7 +408,7 @@ if (txn.isBatch) // Woo! I'm in a batch.
 ## Node Operations
 
 <a name="node.save" />
-### save(object, [key, value,] callback)
+### save(object, [label,]|[key, value,] callback)
 *Aliases: __node.save__*
 
 Create or update a node. If `object` has an id property, the node with that id
@@ -418,6 +418,10 @@ node to the callback.
 __Arguments__
 
 * `node` - an object to create or update
+* `label` - a label to label this node with. this is performed atomically, so if
+  labelling the node fails, the node is not saved/updated. supplying `label` is 
+  exclusive with `key` and `value`. You may either specify a `label`, or a `key`
+  and a `value`, but all three.
 * `key`, `value` (optional) - a property key and a value to update it with. This
   allows you to only update a single property of the node, without touching any
   others. If `key` is specified, `value` must also be. 
@@ -427,6 +431,8 @@ __Arguments__
   never be altered).
 
 __Example__
+
+** Creating and updating a node **
 
 ```javascript
 // Create a node
@@ -440,6 +446,23 @@ db.save({ name: 'Jon', age: 22, likes: 'Beer' }, function(err, node) {
     console.log(node); // -> { name: 'Jon', age: 23, id: 1 }
   })
 })
+```
+
+** Creating a node with a label **
+
+```javascript
+db.save({ name: 'Jon' }, 'Person', function(err, node) {
+  
+});
+```
+
+** Update a single property on a node **
+
+```javascript
+db.save({ name: 'Jon', age: 23 }, 'Person', function(err, node) {
+  db.save(node, 'age', 24, function(err) {
+  });
+});
 ```
 
 ---------------------------------------
