@@ -72,6 +72,23 @@ describe('seraph#constraints', function() {
     });
   });
 
+  it('should not complain about conflicting uniqueness constraints when using createIfNone', function(done) {
+    var label = uniqn();
+    db.constraints.uniqueness.createIfNone(label, 'name', function(err, constraint) {
+      assert(!err);
+      db.constraints.uniqueness.createIfNone(label, 'name', function(err, constraint) {
+        assert(!err);
+        assert.equal(constraint.label, label);
+        assert.equal(constraint.property_keys[0], 'name');
+        db.constraints.uniqueness.list(label, 'name', function(err, constraints) {
+          assert(!err);
+          assert(constraints.length == 1);
+          done();
+        });
+      });
+    });
+  });
+
   it('should handle labels with no constraints', function(done) {
     var label = uniqn();
     db.constraints.uniqueness.list(label, function(err, constraints) {
