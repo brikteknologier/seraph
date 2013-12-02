@@ -55,6 +55,15 @@ describe('seraph#constraints', function() {
     });
   });
 
+  it('should handle labels with no constraints', function(done) {
+    var label = uniqn();
+    db.constraints.uniqueness.list(label, function(err, constraints) {
+      assert(!err);
+      assert(constraints.length == 0);
+      done();
+    });
+  });
+
   it('should retrieve a specific uniqueness constraint', function(done) {
     var label = uniqn();
     db.constraints.uniqueness.create(label, 'name', function(err, constraint) {
