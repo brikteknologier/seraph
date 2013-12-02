@@ -55,6 +55,23 @@ describe('seraph#constraints', function() {
     });
   });
 
+  it('should not add the same constraint twice', function(done) {
+    var label = uniqn();
+    db.constraints.uniqueness.create(label, 'name', function(err, constraint) {
+      assert(!err);
+      db.constraints.uniqueness.create(label, 'name', function(err, constraint) {
+        assert(err);
+        assert(err.statusCode == 409);
+        assert(!constraint);
+        db.constraints.uniqueness.list(label, 'name', function(err, constraints) {
+          assert(!err);
+          assert(constraints.length == 1);
+          done();
+        });
+      });
+    });
+  });
+
   it('should handle labels with no constraints', function(done) {
     var label = uniqn();
     db.constraints.uniqueness.list(label, function(err, constraints) {
