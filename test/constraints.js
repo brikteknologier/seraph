@@ -85,4 +85,30 @@ describe('seraph#constraints', function() {
       });
     });
   });
+
+  it('should drop a uniqueness constraint', function(done) {
+    var label = uniqn();
+    db.constraints.uniqueness.create(label, 'name', function(err, constraint) {
+      assert(!err);
+      db.save({name:'jon'}, function(err, node) {
+        assert(!err);
+        db.label(node, label, function(err) {
+          assert(!err);
+          db.save({name:'jon'}, function(err) {
+            assert(!err);
+            db.label(node, label, function(err) {
+              assert(err);
+              db.constraints.uniqueness.drop(label, 'name', function(err) {
+                assert(!err);
+                db.label(node, label, function(err) {
+                  assert(!err);
+                  done();
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
 });
