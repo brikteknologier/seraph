@@ -79,7 +79,7 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 
 ### Indexing operations
 * [index.create](#index.create) - create an index on a label and property name
-* [index.createIfNone(#index.createIfNone) - create an index or return the old 
+* [index.createIfNone](#index.createIfNone) - create an index or return the old 
   one
 * [index.list](#index.list) - read out the indexes for a label
 * [index.drop](#index.drop) - drop an index
