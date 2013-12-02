@@ -125,4 +125,23 @@ describe('seraph#constraints', function() {
       });
     });
   });
+
+  it('should list all constraints', function(done) {
+    var label = uniqn();
+    db.constraints.uniqueness.create(label, 'name', function(err, constraint) {
+      assert(!err);
+      db.constraints.list(function(err, constraints) {
+        assert(!err);
+        assert(constraints.length > 1);
+        var found = false;
+        constraints.forEach(function(constraint) {
+          if (constraint.label == label) found = constraint;
+        });
+        assert(found);
+        assert.equal(found.type, 'UNIQUENESS');
+        assert.equal(found.property_keys[0], 'name');
+        done();
+      });
+    });
+  });
 });
