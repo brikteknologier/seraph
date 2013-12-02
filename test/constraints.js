@@ -45,7 +45,7 @@ describe('seraph#constraints', function() {
       assert(!err);
       db.constraints.uniqueness.list(label, 'name', function(err, constraints) {
         assert(!err);
-        assert.equal(constraints.length, 0);
+        assert.equal(constraints.length, 1);
         assert.equal(constraints[0].label, label);
         assert.equal(constraints[0].type, 'UNIQUENESS');
         assert.equal(constraints[0].property_keys.length, 1);
