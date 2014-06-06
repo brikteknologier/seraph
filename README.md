@@ -537,7 +537,7 @@ db.save({ name: 'Jon' }, function(err, node) {
 ---------------------------------------
 
 <a name="node.find" />
-### find(predicate, [any, [start,]] callback)
+### find(predicate, [any, [start, [label,]] callback)
 *Aliases: __node.find__*
 
 Perform a query based on a predicate. The predicate is translated to a
@@ -551,6 +551,7 @@ __Arguments__
   attribute. If false, elements must match on all attributes.
 * `start` (optional, default=`'node(*)'`) - The scope of the search. For alternate
   values, check the [neo4j docs on the cypher START command](http://docs.neo4j.org/chunked/stable/query-start.html).
+* `label` (optional, default=`null`) - If not `null`, it will only return elements with the given label ([neo4j docs on labels](http://docs.neo4j.org/chunked/stable/graphdb-neo4j-labels.html))
 * `callback` - function(err, results) - `results` is an array of the resulting
   nodes.
 
