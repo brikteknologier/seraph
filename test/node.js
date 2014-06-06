@@ -58,7 +58,7 @@ describe('seraph#node', function() {
         db.save({name:'Jon', label: label}, label, function(err, node) {
           assert(err);
           assert(!node);
-          db.query("match (node {props}) return node", {props: {label: label}}, function(err, res) {
+          db.query("match (node {label: {label}}) return node", {label: label}, function(err, res) {
             assert(!err, err);
             assert(res.length == 0);
             done();
