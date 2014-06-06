@@ -9,15 +9,14 @@ describe('seraph#node', function() {
   it('should accept id of 0 on read', function(done) {
     db.read(0, function(err, data) {
       if (err)
-        assert.equal(err.statusCode, 404); // neo4j gives 204 no content
+        assert.equal(err.statusCode, 404);
       done();
     });
   });
 
   it('should accept id of 0 on save', function(done) {
-    db.save({ id: 0, herp: "DERP" }, function(err, data) {
-      if (err)
-        assert.ok(err.statusCode); // not seraph error
+    db.save({ id: 0, test: "value" }, function(err, data) {
+      assert(!err);
       done();
     });
   });
