@@ -306,7 +306,7 @@ describe('seraph#find', function() {
     function findObjs(done) {
       var predicate = {};
       var label = uniqueLabel;
-      db.find(predicate, false, 'node(*)', label, function(err, objs) {
+      db.find(predicate, label, function(err, objs) {
         assert.ok(!err);
         assert.equal(objs.length, 2);
         var names = objs.map(function(o) { return o.name });
@@ -344,7 +344,7 @@ describe('seraph#find', function() {
       var predicate = {};
       predicate[uniqueKey] = true;
       var label = uniqueLabel;
-      db.find(predicate, false, 'node(*)', label, function(err, objs) {
+      db.find(predicate, label, function(err, objs) {
         assert.ok(!err);
         assert.equal(objs.length, 1);
         var names = objs.map(function(o) { return o.name });
@@ -382,7 +382,7 @@ describe('seraph#find', function() {
       var predicate2 = {};
       predicate2[uniqueKey] = false;
 
-      db.find([predicate, predicate2], true, 'node(*)', function(err, objs) {
+      db.find([predicate, predicate2], true, function(err, objs) {
         assert.ok(!err);
         assert.equal(objs[0].length, 3);
         assert.equal(objs[1].length, 1);
@@ -435,45 +435,6 @@ describe('seraph#find', function() {
 
     async.series([createObjs, findObjs], done);
   })
-
-  it('should find some items based on a predicate with a custom starting point', function(done) {
-    var uniqueKey = 'seraph_find_test' + uniqn();
-    function createObjs(done) {
-      var objs = [ {name: 'Jon', age: 23}, 
-                   {name: 'Neil', age: 60},
-                   {name: 'Katie', age: 29} ];
-      for (var index in objs) {
-        objs[index][uniqueKey] = true;
-      }
-      objs[3] = {name: 'Belinda', age: 26};
-      objs[3][uniqueKey] = false;
-
-      db.save(objs, function(err, users) {
-        users = users.slice(1);
-        db.legacyindex(uniqueKey, users, 'some_thing', 'perhaps', function() {
-          done();
-        })
-      });
-    }
-
-    function findObjs(done) {
-      var predicate = {};
-      predicate[uniqueKey] = true;
-      var startPoint = 'node:' + uniqueKey + '(some_thing="perhaps")';
-      db.find(predicate, false, startPoint, function(err, objs) {
-        assert.ok(!err);
-        assert.equal(objs.length, 2);
-        var names = objs.map(function(o) { return o.name });
-        assert.ok(names.indexOf('Jon') === -1);
-        assert.ok(names.indexOf('Neil') >= 0);
-        assert.ok(names.indexOf('Katie') >= 0);
-        assert.ok(names.indexOf('Belinda') === -1);
-        done();
-      });
-    }
-
-    async.series([createObjs, findObjs], done);
-  });
 
   it('should properly align count columns', function(done) {
     db.query("start n=node(*) return count(n) as totalNodes", function(e, res) {
