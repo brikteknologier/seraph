@@ -537,7 +537,7 @@ db.save({ name: 'Jon' }, function(err, node) {
 ---------------------------------------
 
 <a name="node.find" />
-### find(predicate, [any, [start, [label,]] callback)
+### find(predicate, [any, [label,] callback)
 *Aliases: __node.find__*
 
 Perform a query based on a predicate. The predicate is translated to a
