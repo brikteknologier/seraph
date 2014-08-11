@@ -359,6 +359,45 @@ describe('seraph#find', function() {
     async.series([createObjs, findObjs], done);
   })
 
+  it('should not break when labels contain abnormal characters', function(done) {
+    var uniqueLabel = uniqn() + '-' + uniqn();
+    var uniqueKey = 'seraph_find_test' + uniqn();
+    function createObjs(done) {
+      var objs = [ {name: 'Jon', age: 23}, 
+                   {name: 'Neil', age: 60},
+                   {name: 'Katie', age: 29},
+                   {name: 'Belinda', age: 26} ];
+      for (var index in objs) {
+        objs[index][uniqueKey] = true;
+      }
+      objs[3][uniqueKey] = false;
+
+      db.save(objs, function(err, users) {
+        assert(!err);
+        db.label([users[1],users[3]], uniqueLabel, done);
+      });
+    }
+
+    function findObjs(done) {
+      var predicate = {};
+      predicate[uniqueKey] = true;
+      var label = uniqueLabel;
+      db.find(predicate, label, function(err, objs) {
+        assert.ok(!err);
+        assert.equal(objs.length, 1);
+        var names = objs.map(function(o) { return o.name });
+        assert.ok(names.indexOf('Jon') === -1);
+        assert.ok(names.indexOf('Neil') >= 0);
+        assert.ok(names.indexOf('Katie') === -1);
+        assert.ok(names.indexOf('Belinda') === -1);
+        done();
+      });
+    }
+
+    async.series([createObjs, findObjs], done);
+  });
+
+
   it('should find some items based on an array of predicates', function(done) {
     var uniqueKey = 'seraph_find_test' + uniqn();
     function createObjs(done) {
