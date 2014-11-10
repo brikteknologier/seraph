@@ -28,7 +28,7 @@
     "underscore": "~1.5.1"
   },
   "devDependencies": {
-    "mocha": "~1.2.0",
-    "disposable-seraph": "~0.2.3-neo4j-2.0.0-M03"
+    "disposable-seraph": "^0.3.2",
+    "mocha": "~1.2.0"
   }
 }
