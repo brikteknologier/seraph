@@ -161,7 +161,9 @@ __Arguments__
   cypher documentation for details. **note** that if you want to send a list of
   ids as a parameter, you should send them as an array, rather than a string
   representing them (`[2,3]` rather than `"2,3"`).
-* `callback` - (err, result).  Result is an array of objects.
+* `callback` - (err, result).  Result is an array of objects, if the number of
+  objects is more than one. If the result is a single object, it is returned
+  **(not an array)**.
 
 __Example__
 
