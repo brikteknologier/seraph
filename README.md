@@ -97,7 +97,7 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 
 ## Compatibility
 
-Seraph `~0.9.0` only works with Neo4j 2.0.0 and later. Tested up to 2.1.5.
+Seraph `~0.9.0` only works with Neo4j 2.0.0 and later. Tested up to 2.1.7.
 
 ## Testing
 
