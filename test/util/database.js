@@ -15,9 +15,10 @@ var refreshDb = function(done) {
       edition: 'community', 
       port: TEST_INSTANCE_PORT 
     },
-    function(err, _, nsv) {
+    function(err, db, nsv) {
       _nsv = nsv;
-      done(err);
+      if (err) return done(err);
+      db.changePassword('test', done);
     });
 };
 
@@ -28,6 +29,13 @@ var stopDb = function(done) {
 module.exports = {
   port: TEST_INSTANCE_PORT,
   url: 'http://localhost:' + TEST_INSTANCE_PORT,
+  db: function() {
+    return require('../../')({
+      server: module.exports.url,
+      user: 'neo4j',
+      pass: 'test'
+    });
+  },
   refreshDb: refreshDb,
   stopDb: stopDb
 };
