@@ -18,7 +18,16 @@ var refreshDb = function(done) {
       if (err) return done(err);
       var db = module.exports.db();
       db.options.pass = 'neo4j';
-      db.changePassword('test', done);
+      db.changePassword('test', function(err) {
+        if (err) {
+          if (err.code == 401) 
+            done();
+          else
+            done(err);
+          return;
+        }
+        done()
+      });
     });
 };
 
