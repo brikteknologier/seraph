@@ -124,15 +124,24 @@ __Arguments__
   * `id` (default = `"id"`): the name of the attribute seraph will add to new nodes when they are created and that it will use to find nodes when performing updates with `node.save` and the like.
 * `server` (string) - Short form to specify server parameter only. `"http://localhorse:4747"` is equivalent to `{ server: "http://localhorse:4747" }`.
 
+**Note** that as of Neo4j 2.2.0, user authentication is required. You will not
+be able to access resources before supplying a username or password that is not
+the default. You can change the password using [`seraph#changePassword`](#changePassword).
+
 __Example__
 
 ```javascript
-// To http://localhost:7474/db/data
-var dbLocal = require("seraph")();
+// To http://localhost:7474/db/data with user "local" and pass "test"
+var dbLocal = require("seraph")({
+  user: 'local',
+  pass: 'test'
+});
 
-// To http://example.com:53280/neo
+// To http://example.com:53280/neo with user "root" and pass "jf8%kLs#!"
 var dbRemote = require("seraph")({ server: "http://example.com:53280",
-                                   endpoint: "/neo" });
+                                   endpoint: "/neo",
+                                   user: "root",
+                                   pass: "jf8%kLs#!" });
 
 // Copy node#13 from remote server
 dbRemote.read({ id: 13 }, function(err, node) {
