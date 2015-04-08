@@ -13,9 +13,10 @@ var refreshDb = function(done) {
       edition: 'community', 
       port: TEST_INSTANCE_PORT 
     },
-    function(err, db, nsv) {
+    function(err, _, nsv) {
       _nsv = nsv;
       if (err) return done(err);
+      var db = module.exports.db();
       db.changePassword('test', done);
     });
 };
