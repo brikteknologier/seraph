@@ -30,6 +30,7 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 <a name="seraph.db_list" />
 ### Initialization
 * [seraph](#seraph) - initialize the seraph client
+* [changePassword](#changePassword) - change the db user's password
 
 ### Generic Operations
 
@@ -152,6 +153,27 @@ dbRemote.read({ id: 13 }, function(err, node) {
     console.log("Copied remote node#13 to " +
                 "local node#" + nodeL.id.toString() + ".");
   });
+});
+```
+
+<a name="changePassword" />
+### changePassword(newPassword, callback)
+
+Change's the current database user's password. This will automatically update
+seraph's options to contain the new password if it is successful
+
+__Arguments__
+
+* `newPassword` (string) - the new password to set.
+* `callback` (function(err){}) - callback to call when the password has been changed.
+
+__Example__
+
+```javascript
+// connect to a local neo4j instance with default settings (user/pass is "neo4j" by default).
+var db = require("seraph")();
+db.changePassword('b2(jk:4@#', function(err) {
+  //password is now changed, and `db`'s options have been updated with the new password
 });
 ```
 
