@@ -116,7 +116,12 @@ assumes the Neo4J REST API is running locally at the default location
 
 __Arguments__
 
-* `options` (default=`{ server: "http://localhost:7474", endpoint: "/db/data", id: "id" }` - `server` is protocol and authority part of Neo4J REST API URI, and `endpoint` should be the path segment of the URI. `id` is the name of the attribute seraph will add to new nodes when they are created and that it will use to find nodes when performing updates with `node.save`.
+* `options`: an options object. You can use the following options:
+  * `server` (default = `"http://localhost:7474"`): the server to connect to (with protocol and port, not path).
+  * `endpoint` (default = `"/db/data"`): the path to Neo4j's rest API. You can leave this as the default if you have not changed it yourself in the neo4j settings.
+  * `user` (default = `"neo4j"`): the username to authenticate with.
+  * `pass` (default = `"neo4j"`): the password to authenticate with.
+  * `id` (default = `"id"`): the name of the attribute seraph will add to new nodes when they are created and that it will use to find nodes when performing updates with `node.save` and the like.
 * `server` (string) - Short form to specify server parameter only. `"http://localhorse:4747"` is equivalent to `{ server: "http://localhorse:4747" }`.
 
 __Example__
