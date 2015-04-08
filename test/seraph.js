@@ -12,7 +12,11 @@ describe('configuration', function() {
   it('should understand ids when ref the server by alias', function(done) {
     function testWithServerName(serverName, done) {
       var alias = 'http://' + serverName + ':' + testDatabase.port;
-      var db = seraph(alias);
+      var db = seraph({
+        server: alias,
+        user: 'neo4j',
+        pass: 'test'
+      });
       var idxName = uniqn();
       var origNode = { jelly: "belly" };
       function mkNode(done) {
@@ -39,7 +43,11 @@ describe('configuration', function() {
   });
 
   it('should work with a trailing slash on the server url', function(done) {
-    var db = seraph('http://127.0.0.1:' + testDatabase.port + '/');
+    var db = seraph({
+      server: 'http://127.0.0.1:' + testDatabase.port + '/',
+      user: 'neo4j',
+      pass: 'test'
+    });
     db.save({name:'mr potato'}, function(err,node) {
       assert(!err);
       done();
@@ -49,7 +57,9 @@ describe('configuration', function() {
   it('should work with a trailing slash on the server endpoint', function(done) {
     var db = seraph({
       server: 'http://127.0.0.1:' + testDatabase.port + '/',
-      endpoint: '/db/data/'
+      endpoint: '/db/data/',
+      user: 'neo4j',
+      pass: 'test'
     });
     db.save({name:'mr potato'}, function(err,node) {
       assert(!err);
