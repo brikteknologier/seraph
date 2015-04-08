@@ -1,5 +1,4 @@
-var testDatabase = require('./util/database');
-var db = require('../')(testDatabase.url);
+var db = require('./util/database').db();
 var uniqn = require('./util/ponies').uniqn;
 
 var assert = require('assert');

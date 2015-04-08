@@ -1,7 +1,6 @@
 /* -*- Mode: Javascript; js-indent-level: 2 -*- */
 
-var testDatabase = require('./util/database');
-var db = require('../')(testDatabase.url);
+var db = require('./util/database').db();
 var assert = require('assert');
 
 describe('errors', function() {

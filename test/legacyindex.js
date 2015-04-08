@@ -1,8 +1,7 @@
 /* -*- Mode: Javascript; js-indent-level: 2 -*- */
 
-var testDatabase = require('./util/database');
+var db = require('./util/database').db();
 var uniqn = require('./util/ponies').uniqn;
-var db = require('../')(testDatabase.url);
 
 var assert = require('assert');
 var async = require('async');
