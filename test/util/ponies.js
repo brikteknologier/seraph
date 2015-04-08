@@ -1,5 +1,3 @@
-/* -*- Mode: Javascript; js-indent-level: 2 -*- */
-
 var counter = (function() {
   var count = Date.now();
   return function() {

@@ -1,5 +1,3 @@
-/* -*- Mode: Javascript; js-indent-level: 2 -*- */
-
 /* Handles environment variables, all optional:
  * - TEST_INSTANCE_PORT : run neo4j test instance off specific port
  */

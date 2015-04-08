@@ -1,5 +1,3 @@
-/* -*- Mode: Javascript; js-indent-level: 2 -*- */
-
 var testDatabase = require('./util/database');
 var uniqn = require('./util/ponies').uniqn;
 var seraph = require('../'), _seraph = seraph;
