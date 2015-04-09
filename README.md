@@ -35,7 +35,7 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 ### Generic Operations
 
 * [query](#query) - perform a cypher query and parse the results
-* [rawQuery](#rawQuery) - perform a cypher query and return unparsed results
+* [queryRaw](#queryRaw) - perform a cypher query and return unparsed results
 
 ### API Communication Operations
 
@@ -179,10 +179,10 @@ db.changePassword('b2(jk:4@#', function(err) {
 
 ## Generic Operations
 
-<a name="query" /><a name="rawQuery"/>
-### query(query, [params,] callback), rawQuery(query, [params,] callback)
+<a name="query" /><a name="queryRaw"/>
+### query(query, [params,] callback), queryRaw(query, [params,] callback)
 
-`rawQuery` performs a cypher query and returns the results directly from the
+`queryRaw` performs a cypher query and returns the results directly from the
 REST API.  
 `query` performs a cypher query and map the columns and results together.
 
@@ -229,7 +229,7 @@ db.query(cypher, {id: 1}, function(err, result) {
   ]);
 };
 
-db.rawQuery(cypher, {id: 3}, function(err, result) {
+db.queryRaw(cypher, {id: 3}, function(err, result) {
   if (err) throw err;
   // result contains the raw response from neo4j's rest API. See
   // http://docs.neo4j.org/chunked/milestone/rest-api-cypher.html
