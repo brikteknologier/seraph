@@ -24,7 +24,7 @@
     "async": "~0.2.9",
     "naan": "~1.3.11",
     "request": "^2.36.0",
-    "underscore": "~1.5.1"
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "disposable-seraph": "^0.3.3",
