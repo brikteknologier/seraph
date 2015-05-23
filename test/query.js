@@ -1,6 +1,6 @@
 var db = require('./util/database').db();
 var uniqn = require('./util/ponies').uniqn;
-
+var _ = require('underscore');
 var assert = require('assert');
 var async = require('async');
 
@@ -122,6 +122,28 @@ describe('seraph#query, seraph#queryRaw', function() {
     }
   
     async.waterfall([createObjs, linkObjs, query], done);
+  });
+
+  it("should not convert nested arrays to objects", function(done) {
+    function createObjs(done) {
+      db.save([{name: 'Jon', age: 23}, 
+               {name: 'Neil', age: 60},
+               {name: 'Katie', age: 29}], done);
+    }
+    
+    function query(users, done) {
+      var query = [
+        "START nodes = node(" + _.pluck(users, 'id').join(',') + ")",
+        "RETURN { names: collect(nodes.name) }"
+      ].join(' ');
+      db.query(query, function(err, result) {
+        assert.ok(!err);
+        assert.deepEqual(result, [{names:['Jon', 'Neil', 'Katie']}]);
+        done();
+      });
+    }
+  
+    async.waterfall([createObjs, query], done);
   });
   
   it('should perform a cypher query and return whole objects', function(done) {
