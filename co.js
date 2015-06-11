@@ -5,16 +5,19 @@ var excludes = [
   'operation'
 ];
 
-module.exports = function() {
-  var db = seraph.apply(null, [].slice.call(arguments));
+module.exports = function(opts) {
+  var db = seraph(opts);
   return function wrapObject(obj) {
+    var copy = {};
     Object.keys(obj).forEach(function(key) {
       if (typeof obj[key] == 'function' && excludes.indexOf(key) == -1 && key[0] != '_') {
-        obj[key] = thunkify(obj[key]);
+        copy[key] = thunkify(obj[key]);
       } else if (typeof obj[key] == 'object') {
-        obj[key] = wrapObject(obj[key]);
+        copy[key] = wrapObject(obj[key]);
+      } else {
+        copy[key] = obj[key];
       }
     }); 
-    return obj;
+    return copy;
   }(db);
 };
