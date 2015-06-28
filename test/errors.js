@@ -10,10 +10,4 @@ describe('errors', function() {
     });
   });
 
-  it('should decorate errors originating from neo4j', function(done) {
-    db.query("herp derp;", function(err, data) {
-      assert.ok(err.neo4jException);
-      done();
-    });
-  });
 });
