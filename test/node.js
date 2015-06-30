@@ -32,6 +32,25 @@ describe('seraph#node', function() {
       });
     });
   });
+
+  it('should update with a label', function(done) {
+    var label = uniqn();
+    var label2 = uniqn();
+    db.save({name: 'Jon'}, label, function(err, node) {
+      assert(!err);
+      assert.equal(node.name, 'Jon');
+      db.save({name: 'Jon', location: 'Landås'}, label2, function(err, node) {
+        assert(!err);
+        assert(node.location == 'Landås');
+        db.readLabels(node, function(err, labels) {
+          assert(!err);
+          assert(labels.indexOf(label) != -1);
+          assert(labels.indexOf(label2) != -1);
+          done();
+        });
+      });
+    });
+  });
   
   it('should save multiple nodes with a label', function(done) {
     var label = uniqn();
