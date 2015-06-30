@@ -44,7 +44,7 @@ describe('seraph#node', function() {
         assert(node.location == 'Landås');
         db.readLabels(node, function(err, labels) {
           assert(!err);
-          assert(labels.indexOf(label) != -1);
+          assert(labels.indexOf(label) == -1);
           assert(labels.indexOf(label2) != -1);
           done();
         });
