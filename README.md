@@ -123,7 +123,9 @@ __Arguments__
   * `user` (default = `"neo4j"`): the username to authenticate with.
   * `pass` (default = `"neo4j"`): the password to authenticate with.
   * `id` (default = `"id"`): the name of the attribute seraph will add to new nodes when they are created and that it will use to find nodes when performing updates with `node.save` and the like.
-* `server` (string) - Short form to specify server parameter only. `"http://localhorse:4747"` is equivalent to `{ server: "http://localhorse:4747" }`.
+  * `agent` (default = null): the http agent for requests to neo4j server. The same can be used for keep-alive connections to server. Can use [agentkeepalive](https://github.com/node-modules/agentkeepalive "agentkeepalive") module to create a keep-alive agent. It's a recommended option for high performance and low latency client.
+  * `xstream` (default = false): if true, passes new X-Stream option to neo4j server. It's a recommended option for high performance and low latency client.
+* `server` (string) - Short form to specify server parameter only. `"http://localhost:4747"` is equivalent to `{ server: "http://localhost:4747" }`.
 
 **Note** that as of Neo4j 2.2.0, user authentication is required. You will not
 be able to access resources before supplying a username or password that is not
