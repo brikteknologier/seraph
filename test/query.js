@@ -527,8 +527,8 @@ describe('seraph#find', function() {
   it('should properly align count columns', function(done) {
     db.query("start n=node(*) return count(n) as totalNodes", function(e, res) {
       assert(!e);
-      assert(!Array.isArray(res));
-      assert(res.totalNodes);
+      assert(Array.isArray(res));
+      assert(res[0].totalNodes);
       done()
     });
   });
