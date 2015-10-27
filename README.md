@@ -605,7 +605,7 @@ Retrieve all australians:
 
 ```javascript
 var predicate = { australian: true };
-var people = db.find(predicate, function (err, objs) {
+var people = db.find(predicate, function (err, people) {
     if (err) throw err;
     assert.equals(3, people.length);
 };
