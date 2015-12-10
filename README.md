@@ -232,7 +232,7 @@ db.queryRaw(cypher, {id: 3}, function(err, result) {
   // result contains the raw response from neo4j's rest API. See
   // http://docs.neo4j.org/chunked/milestone/rest-api-cypher.html
   // for more info
-})
+});
 ```
 
 ---------------------------------------
@@ -255,7 +255,7 @@ __Example__
 ```javascript
 var operation = db.operation('node/4285/properties', 'PUT', { name: 'Jon' });
 db.call(operation, function(err) {
-  if (!err) console.log('Set `name` to `Jon` on node 4285!')
+  if (!err) console.log('Set `name` to `Jon` on node 4285!');
 });
 ```
 
@@ -283,7 +283,6 @@ __Example__
 var operation = db.operation('node/4285/properties');
 db.call(operation, function(err, properties) {
   if (err) throw err;
-
   // `properties` is an object containing the properties from node 4285
 });
 ```
@@ -487,8 +486,8 @@ db.save({ name: 'Jon', age: 22, likes: 'Beer' }, function(err, node) {
   node.age++;
   db.save(node, function(err, node) {
     console.log(node); // -> { name: 'Jon', age: 23, id: 1 }
-  })
-})
+  });
+});
 ```
 
 ** Creating a node with a label **
@@ -537,8 +536,8 @@ __Example__
 db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
   db.read(node.id, function(err, node) {
     console.log(node) // -> { make: 'Citroen', model: 'DS4', id: 1 }
-  })
-})
+  });
+});
 ```
 
 ---------------------------------------
@@ -566,8 +565,8 @@ __Example__
 db.save({ name: 'Jon' }, function(err, node) {
   db.delete(node, function(err) {
     if (!err) console.log('Jon has been deleted!');
-  })
-})
+  });
+});
 ```
 
 ---------------------------------------
@@ -608,7 +607,7 @@ var predicate = { australian: true };
 var people = db.find(predicate, function (err, people) {
     if (err) throw err;
     assert.equals(3, people.length);
-};
+});
 ```
 
 ---------------------------------------
@@ -635,7 +634,7 @@ __Example__
 ```javascript
 db.relationships(452, 'out', 'knows', function(err, relationships) {
   // relationships = all outgoing `knows` relationships from node 452
-})
+});
 ```
 
 ---------------------------------------
@@ -662,7 +661,7 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
   db.label(node, ['Car', 'Hatchback'], function(err) {
     // `node` is now labelled with "Car" and "Hatchback"!
   });
-})
+});
 ```
 
 ---------------------------------------
@@ -690,7 +689,7 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
       // `node` is now only labelled with "Car".
     });
   });
-})
+});
 ```
 
 ---------------------------------------
@@ -717,7 +716,7 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
       results[0].model // -> 'DS4'
     });
   });
-})
+});
 ```
 
 ---------------------------------------
@@ -743,7 +742,7 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
       //labels -> ['Car', 'Hatchback']
     });
   });
-})
+});
 ```
 
 ---------------------------------------
@@ -803,6 +802,7 @@ __Example__
 
 ```javascript
 var props = { for: '2 months', location: 'Bergen' };
+
 db.rel.create(1, 'knows', 2, props, function(err, relationship) {
   delete relationship.properties.location;
   relationship.properties.for = '3 months';
@@ -887,7 +887,7 @@ __Example__
 ```javascript
 db.constraints.list('Person', function(err, constraints) {
   console.log(constraints); 
-  // -> [{ type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }]
+  // -> [{ type: 'UNIQUENESS', label: 'Person', property_keys: ['name'] }]
 });
 ```
 
@@ -906,7 +906,7 @@ __Arguments__
   property key.
 * `callback` - function(err, constraints). `constraints` is an array of
   constraint objects. For example, 
-  `[{type:'UNIQUENESS', label:'Person', property_keys['name']}]`. If none
+  `[{type:'UNIQUENESS', label:'Person', property_keys: ['name']}]`. If none
   existed, it is an empty array.
 
 __Example__
@@ -914,7 +914,7 @@ __Example__
 ```javascript
 db.constraints.uniqueness.list('Person', 'name', function(err, constraints) {
   console.log(constraints); 
-  // -> [{ type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }]
+  // -> [{ type: 'UNIQUENESS', label: 'Person',  property_keys: ['name'] }]
 });
 ```
 
@@ -945,7 +945,7 @@ __Example__
 // any node labelled Person should have a unique `name`
 db.constraints.uniqueness.create('Person', 'name', function(err, constraint) {
   console.log(constraint); 
-  // -> { type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }
+  // -> { type: 'UNIQUENESS', label: 'Person', property_keys: ['name'] }
 });
 ```
 
@@ -963,7 +963,7 @@ __Arguments__
 * `key` - the key that should be unique on nodes labelled with `label`
 * `callback` - function(err, constraint). `constraint` is a constraint object
   representing the constraint that was created, e.g. 
-  `[{type:'UNIQUENESS', label:'Person', property_keys['name']}]`. 
+  `[{type:'UNIQUENESS', label:'Person', property_keys: ['name']}]`. 
 
 __Example__
 
@@ -971,12 +971,12 @@ __Example__
 // any node labelled Person should have a unique `name`
 db.constraints.uniqueness.createIfNone('Person', 'name', function(err, constraint) {
   console.log(constraint); 
-  // -> { type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }
+  // -> { type: 'UNIQUENESS', label: 'Person',  property_keys: ['name'] }
   db.constraints.uniqueness.createIfNone('Person', 'name', function(err, constraint) {
     console.log(err);
     // -> undefined
     console.log(constraint); 
-    // -> { type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }
+    // -> { type: 'UNIQUENESS', label: 'Person',  property_keys: ['name'] }
   });
 });
 ```
@@ -1001,7 +1001,7 @@ __Example__
 // any node labelled Person should have a unique `name`
 db.constraints.uniqueness.create('Person', 'name', function(err, constraint) {
   console.log(constraint); 
-  // -> { type: 'UNIQUENESS', label: 'Person', { property_keys: ['name'] }
+  // -> { type: 'UNIQUENESS', label: 'Person',  property_keys: ['name'] }
   db.constraints.uniqueness.drop('Person', 'name', function(err) {
     console.log(err);
     // -> undefined
@@ -1027,7 +1027,7 @@ __Arguments__
 * `key` - the key to index, i.e. `'name'`. Note that compound indexes are not
   yet supported by neo4j-2
 * `callback` - function(err, index). `index` is an object that reflects the
-  index that was created, i.e. `{ label: 'Person', { property_keys: ['name'] }`.
+  index that was created, i.e. `{ label: 'Person', property_keys: ['name'] }`.
   Note that if you've already created the index, you'll get a conflict error. You
   can check this by checking `err`'s `statusCode` property. `409` indicates a 
   conflict. You can avoid this by using [index.createIfNone](#index.createIfNone)
@@ -1036,7 +1036,7 @@ __Example__
 
 ```javascript
 db.index.create('Person', 'name', function(err, index) {
-  console.log(index); // -> { label: 'Person', { property_keys: ['name'] }
+  console.log(index); // -> { label: 'Person', property_keys: ['name'] }
 });
 ```
 
@@ -1055,13 +1055,13 @@ __Arguments__
 * `key` - the key to index, i.e. `'name'`. Note that compound indexes are not
   yet supported by neo4j-2
 * `callback` - function(err, index). `index` is an object that reflects the
-  index that was created, i.e. `{ label: 'Person', { property_keys: ['name'] }`.
+  index that was created, i.e. `{ label: 'Person', property_keys: ['name'] }`.
 
 __Example__
 
 ```javascript
 db.index.createIfNone('Person', 'name', function(err, index) {
-  console.log(index); // -> { label: 'Person', { property_keys: ['name'] }
+  console.log(index); // -> { label: 'Person', property_keys: ['name'] }
 });
 ```
 
@@ -1077,13 +1077,13 @@ __Arguments__
 * `label` - the label to retrieve indexes for
 * `callback` - function(err, indexes). `indexes` is an array of objects that
   reflect the indexes on this label, i.e. 
-  `[{ label: 'Person', { property_keys: ['name'] }]`.
+  `[{ label: 'Person', property_keys: ['name'] }]`.
 
 __Example__
 
 ```javascript
 db.index.list('Person', function(err, index) {
-  console.log(index); // -> [ { label: 'Person', { property_keys: ['name'] } ]
+  console.log(index); // -> [ { label: 'Person', property_keys: ['name'] } ]
 });
 ```
 
@@ -1180,7 +1180,7 @@ __Arguments__
 __Example__
 
 ```javascript
-db.save({ name: 'Jon', }, function(err, node) {
+db.save({ name: 'Jon' }, function(err, node) {
   db.legacyindex('people', node, 'name', node.name, function(err) {
     if (!err) console.log('Jon has been indexed!');
   });
@@ -1330,7 +1330,7 @@ __Example__
 ```javascript
 db.rel.legacyindex.delete('friendships', function(err) {
   if (!err) console.log('The `friendships` index has been deleted');
-})
+});
 ```
 
 ---------------------------------------
@@ -1379,11 +1379,12 @@ __Example__
 
 ```javascript
 var tag = { name: 'finnish' };
+
 db.node.legacyindex.getOrSaveUnique(tag, 'tags', 'name', tag.name, function(err, tag) {
   // tag == { id: 1, name: 'finnish' }
 
   // save another new object with the same properties
-  db.node.legacyindex.getOrSaveUnique({name: 'finnish'}, 'tags', 'name', 'finnish', function(err, newTag) {
+  db.node.legacyindex.getOrSaveUnique({ name: 'finnish' }, 'tags', 'name', 'finnish', function(err, newTag) {
     // newTag == { id: 1, name: 'finnish' }
     // no save was performed because there was already an object at that index
   });
@@ -1440,7 +1441,7 @@ db.node.legacyindex.saveUniqueOrFail(tag, 'tags', 'name', tag.name, function(err
   // tag == { id: 1, name: 'finnish' }
 
   // save another new object with the same properties
-  db.node.legacyindex.saveUniqueOrFail({name: 'finnish'}, 'tags', 'name', 'finnish', function(err, newTag) {
+  db.node.legacyindex.saveUniqueOrFail({ name: 'finnish' }, 'tags', 'name', 'finnish', function(err, newTag) {
     // newTag == undefined
     // err.statusCode == 409 (conflict)
     // an error was thrown because there was already a node at that index.
