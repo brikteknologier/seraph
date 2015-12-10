@@ -487,7 +487,7 @@ db.save({ name: 'Jon', age: 22, likes: 'Beer' }, function(err, node) {
   db.save(node, function(err, node) {
     console.log(node); // -> { name: 'Jon', age: 23, id: 1 }
   });
-}});
+});
 ```
 
 ** Creating a node with a label **
@@ -495,7 +495,7 @@ db.save({ name: 'Jon', age: 22, likes: 'Beer' }, function(err, node) {
 ```javascript
 db.save({ name: 'Jon' }, 'Person', function(err, node) {
   
-}});
+});
 ```
 
 ** Update a single property on a node **
