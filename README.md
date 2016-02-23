@@ -585,7 +585,7 @@ __Arguments__
 * `any` (optional, default=`false`) - If true, elements need only match on one 
   attribute. If false, elements must match on all attributes.
 * `label` (optional, default=`null`) - Find only nodes with the given label.
-  ([neo4j docs on labels](http://docs.neo4j.org/chunked/stable/graphdb-neo4j-labels.html))
+  ([neo4j docs on labels](http://neo4j.com/docs/stable/rest-api-node-labels.html))
 * `callback` - function(err, results) - `results` is an array of the resulting
   nodes.
 
