@@ -22,7 +22,7 @@ describe('seraph#query, seraph#queryRaw', function() {
 
     function query(user, done) {
       var cypher = "start x = node(" + user.id + ") ";
-      cypher    += "match x -[r]-> n ";
+      cypher    += "match (x)-[r]->(n) ";
       cypher    += "return type(r), n.name, n.age ";
       cypher    += "order by n.name";
       db.query(cypher, function(err, result) {
@@ -62,7 +62,7 @@ describe('seraph#query, seraph#queryRaw', function() {
 
     function query(tools, done) {
       var cypher = "start x = node(" + tools + ") ";
-      cypher    += "match x -[:ruins]-> y ";
+      cypher    += "match (x) -[:ruins]-> (y) ";
       cypher    += "return x.tool, y.tool ";
       cypher    += "order by x.tool";
       db.query(cypher, function(err, result) {
@@ -99,7 +99,7 @@ describe('seraph#query, seraph#queryRaw', function() {
     
     function query(user, done) {
       var cypher = "start x = node(" + user.id + ") ";
-      cypher    += "match x -[r]-> n ";
+      cypher    += "match (x) -[r]-> (n) ";
       cypher    += "return x, collect(n)";
       db.query(cypher, function(err, result) {
         assert.ok(!err);
@@ -163,7 +163,7 @@ describe('seraph#query, seraph#queryRaw', function() {
 
     function query(user, users, done) {
       var cypher = "start x = node(" + user.id + ") ";
-      cypher    += "match x -[r]-> n ";
+      cypher    += "match (x) -[r]-> (n) ";
       cypher    += "return n ";
       cypher    += "order by n.name";
       db.query(cypher, function(err, result) {
@@ -193,7 +193,7 @@ describe('seraph#query, seraph#queryRaw', function() {
 
     function query(user, users, done) {
       var cypher = "start x = node(" + user.id + ") ";
-      cypher    += "match x -[r]-> n ";
+      cypher    += "match (x) -[r]-> (n) ";
       cypher    += "return {data: n} as user ";
       cypher    += "order by user.data.name";
       db.query(cypher, function(err, result) {
@@ -223,7 +223,7 @@ describe('seraph#query, seraph#queryRaw', function() {
 
     function query(user, users, links, done) {
       var cypher = "start x = node(" + user.id + ") ";
-      cypher    += "match x -[r]-> n ";
+      cypher    += "match (x) -[r]-> (n) ";
       cypher    += "return r ";
       cypher    += "order by n.name";
       db.query(cypher, function(err, result) {
@@ -264,7 +264,7 @@ describe('seraph#query, seraph#queryRaw', function() {
 
     function queryRaw(user, done) {
       var cypher = "start x = node(" + user.id + ") ";
-      cypher    += "match x -[r]-> n ";
+      cypher    += "match (x) -[r]-> (n) ";
       cypher    += "return type(r), n.name, n.age ";
       cypher    += "order by n.name";
       db.queryRaw(cypher, function(err, result) {
@@ -289,7 +289,7 @@ describe('seraph#query, seraph#queryRaw', function() {
 
     function query(user, done) {
       var cypher = "start x = node(" + user.id + ") ";
-      cypher    += "optional match x --> n ";
+      cypher    += "optional match (x) --> (n) ";
       cypher    += "return x, n ";
       db.query(cypher, function(err, result) {
         assert.ok(!err);
