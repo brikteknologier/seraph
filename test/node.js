@@ -8,7 +8,7 @@ describe('seraph#node', function() {
   it('should accept id of 0 on read', function(done) {
     db.read(0, function(err, data) {
       if (err)
-        assert.equal(err.statusCode, 404);
+        assert(err);
       done();
     });
   });
