@@ -385,8 +385,8 @@ describe('seraph#delete', function() {
     function del(user, done) {
       db.delete(user, function(err) {
          assert.ok(!err);
-        db.read(user, function(err) {
-          assert.ok(!!err);
+        db.read(user, function(err, node) {
+          assert.ok(err || !node);
           done();
         });
       });
