@@ -15,6 +15,7 @@ describe('seraph#node', function() {
 
   it('should accept id of 0 on save', function(done) {
     db.save({ id: 0, test: "value" }, function(err, data) {
+      console.log(err);
       assert(!err);
       done();
     });
@@ -82,16 +83,6 @@ describe('seraph#node', function() {
           });
         });
       });
-    });
-  });
-
-  it('should throw an error if attempting to save nodes with a label in batch mode', function(done) {
-    var label = uniqn();
-    var txn = db.batch();
-    txn.save({name:'Jon'}, label);
-    txn.commit(function(err, res) {
-      assert(err);
-      done();
     });
   });
 
