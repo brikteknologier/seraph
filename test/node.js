@@ -295,7 +295,7 @@ describe('seraph#node', function() {
         db.save(thingamajig, function(err, thingamajiggy) {
           db.query('START n = node({id}) RETURN n.id as thingamajiggle',
                    thingamajiggy, function(err, thingamajoggle) {
-            assert.ok(thingamajoggle[0] === null);
+            assert.ok(thingamajoggle[0] == null);
             done();
           });
         });
