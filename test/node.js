@@ -15,7 +15,6 @@ describe('seraph#node', function() {
 
   it('should accept id of 0 on save', function(done) {
     db.save({ id: 0, test: "value" }, function(err, data) {
-      console.log(err);
       assert(!err);
       done();
     });
