@@ -1,6 +1,6 @@
 var db = require('./util/database').db();
 var uniqn = require('./util/ponies').uniqn;
-
+var _ = require('underscore');
 var assert = require('assert');
 var async = require('async');
 
@@ -170,6 +170,7 @@ describe('seraph#label', function() {
       assert(!err);
       // assume we've made this many by now from the previous tests.
       assert(result.length > 6);
+      assert.equal(_.uniq(result).length, result.length);
       done();
     });
   });
