@@ -479,8 +479,8 @@ describe('seraph#delete', function() {
     function delObjs(user1, user2, done) {
       db.delete([user1.id, user2.id], function(err) {
         assert.ok(!err);
-        db.read([user1.id, user2.id], function(err) {
-          assert.ok(!!err);
+        db.read([user1.id, user2.id], function(err, node) {
+          assert.ok(!!err || (!node[0] && !node[1]));
           done();
         });
       });
