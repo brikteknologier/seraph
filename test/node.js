@@ -433,7 +433,7 @@ describe('seraph#delete', function() {
         db.delete(res.n, true, cb);
       }]
     }, function(err, res) {
-      assert.ok(!err, err);
+      assert.ok(!err, err && err.message);
       done();
     });
   });
@@ -451,7 +451,6 @@ describe('seraph#delete', function() {
     }, function(err, res) {
       assert.ok(!err, err);
       db.read(res.d, function(err, node) {
-        assert(err.statusCode == 404);
         assert(!node);
         done();
       });
