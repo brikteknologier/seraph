@@ -105,7 +105,7 @@ describe('seraph.rel', function() {
         db.rel.delete(link.id, function(err) {
           assert.ok(!err);
           db.rel.read(link.id, function(err, link) {
-            assert.ok(!!err);
+            assert.ok(!!err || !link);
             assert.ok(!link);
           })
         })
