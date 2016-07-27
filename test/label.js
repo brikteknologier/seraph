@@ -136,16 +136,26 @@ describe('seraph#label', function() {
 
   it('should read all labels for some nodes', function(done) {
     var label = uniqn(), label1 = uniqn(), label2 = uniqn();
-    var txn = db.batch();
-    var neil = txn.save({name:'Neil'});
-    var jon = txn.save({name:'Jon'});
-    txn.label([neil, jon], label1);
-    txn.label(neil, label);
-    txn.label(jon, label2);
-    var all = txn.readLabels([neil, jon]);
-    txn.commit(function(err, result) {
+    async.auto({
+      nodes: function(cb) {
+        async.parallel({
+          neil: db.save.bind(db, {name:'Neil'}),
+          jon: db.save.bind(db, {name:'Jon'})
+        }, cb);
+      },
+      labels: ['nodes', function(cb, d) {
+        async.parallel([
+          db.label.bind(db, [d.nodes.neil, d.nodes.jon], label1),
+          db.label.bind(db, d.nodes.neil, label),
+          db.label.bind(db, d.nodes.jon, label2)
+        ], cb);
+      }],
+      all: ['labels', function(cb, d) {
+        db.readLabels([d.nodes.neil, d.nodes.jon], cb);
+      }]
+    }, function(err, result) {
       assert(!err);
-      var labels = result[all];
+      var labels = result.all;
       assert(labels.length == 3);
       assert(~labels.indexOf(label));
       assert(~labels.indexOf(label1));
