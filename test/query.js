@@ -247,39 +247,6 @@ describe('seraph#query, seraph#queryRaw', function() {
     async.waterfall([createObjs, linkObjs, query], done);
   });
 
-  it('should perform a cypher query w/o parsing the result', function(done) {
-    function createObjs(done) {
-      db.save([{name: 'Jon', age: 23}, 
-               {name: 'Neil', age: 60},
-               {name: 'Katie', age: 29}], function(err, users) {
-        done(null, users[0], users.slice(1));
-      });
-    }
-
-    function linkObjs(user1, users, done) {
-      db.relate(user1, 'knows', users, function(err, links) {
-        done(null, user1);
-      });
-    }
-
-    function queryRaw(user, done) {
-      var cypher = "start x = node(" + user.id + ") ";
-      cypher    += "match (x) -[r]-> (n) ";
-      cypher    += "return type(r), n.name, n.age ";
-      cypher    += "order by n.name";
-      db.queryRaw(cypher, function(err, result) {
-        assert.ok(!err);
-        assert.deepEqual({
-          data: [['knows', 'Katie', 29], ['knows', 'Neil', 60]],
-          columns: ['type(r)', 'n.name', 'n.age']
-        }, result);
-        done();
-      });
-    }
-
-    async.waterfall([createObjs, linkObjs, queryRaw], done);
-  });
-
   it('should handle optional entities', function(done) {
     function createObjs(done) {
       db.save({name: 'Jon', age: 23}, function(err, user) {
