@@ -14,6 +14,7 @@
   },
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha -R spec -t 10000 -s 2000",
+    "bolt-test": "TEST_MODE=bolt mocha -R spec -t 300000 -b test/root.js test/node.js test/relationship.js test/query.js test/label.js test/batching.js",
     "quick-test": "USE_DIRTY_DATABASE=true NO_STOP=true ./node_modules/mocha/bin/mocha -R spec -t 3000 -s 2000"
   },
   "engines": {

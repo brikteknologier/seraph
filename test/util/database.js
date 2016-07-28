@@ -35,13 +35,19 @@ module.exports = {
   port: TEST_INSTANCE_PORT,
   url: 'http://localhost:' + TEST_INSTANCE_PORT,
   db: function() {
-    // return require('../../')({
-      //server: module.exports.url,
-    var db =  (require('../../lib/bolt/seraph'))({
-      user: 'neo4j',
-      pass: 'test',
-      nodeify: true
-    });
+    if (process.env.TEST_MODE == 'bolt') {
+      return require('../../lib/bolt/seraph')({
+        user: 'neo4j',
+        pass: 'test',
+        nodeify: true
+      });
+    } else {
+      return require('../../lib/seraph')({
+        user: 'neo4j',
+        pass: 'test',
+        server: module.exports.url
+      });
+    }
     return db;
   },
   refreshDb: refreshDb,
