@@ -67,31 +67,15 @@ describe('seraph#batch', function() {
 
   it('should relate two nodes in a batch', function(done) {
     db.save([{person:'First'},{person:'Second'}], function(err, users) {
-      db.batch(function(db) {
-        db.relate(users[0], 'knows', users[1], {testprop:'test'});
-      }, function(err, result) {
+      var txn = db.batch();
+      txn.relate(users[0], 'knows', users[1], {testprop:'test'});
+      txn.commit(function(err, result) {
         db.relationships(users[0], function(err, rels) {
           assert(rels.length == 1);
           assert(rels[0].start == users[0].id);
           assert(rels[0].end == users[1].id);
           assert(rels[0].properties.testprop == 'test');
           assert(rels[0].type == 'knows');
-          done();
-        });
-      });
-    });
-  });
-
-  it('should index a node in a batch', function(done) {
-    var iname = uniqn();
-    db.save({person:'indexable'}, function(err, user) {
-      db.batch(function(db) {
-        db.legacyindex(iname, user, 'something', 'magical');
-      }, function(err, results) {
-        assert(!err);
-        db.legacyindex.read(iname, 'something', 'magical', function(err, node) {
-          assert(!err);
-          assert(node.person == 'indexable');
           done();
         });
       });

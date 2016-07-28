@@ -50,4 +50,23 @@ describe('legacy tests', function() {
     });
 
   })
+
+  describe('batching', function() {
+    it('should index a node in a batch', function(done) {
+      var iname = uniqn();
+      db.save({person:'indexable'}, function(err, user) {
+        db.batch(function(db) {
+          db.legacyindex(iname, user, 'something', 'magical');
+        }, function(err, results) {
+          assert(!err);
+          db.legacyindex.read(iname, 'something', 'magical', function(err, node) {
+            assert(!err);
+            assert(node.person == 'indexable');
+            done();
+          });
+        });
+      });
+    });
+
+  });
 });
