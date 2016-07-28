@@ -6,6 +6,7 @@ var nodeify = require('bluebird-nodeify');
 
 var TEST_INSTANCE_PORT = parseInt(process.env.TEST_INSTANCE_PORT || '10507', 10);
 var disposableSeraph = require('disposable-seraph');
+var seraph = require('../../lib/seraph');
 
 var _nsv;
 
@@ -18,7 +19,7 @@ var refreshDb = function(done) {
     function(err, _, nsv) {
       _nsv = nsv;
       if (err) return done(err);
-      var db = require('../../')({server:module.exports.url});
+      var db = seraph({server:module.exports.url});
       db.options.user = 'neo4j';
       db.options.pass = 'test';
       db.changePassword('test', function(err) {
@@ -36,13 +37,14 @@ module.exports = {
   url: 'http://localhost:' + TEST_INSTANCE_PORT,
   db: function() {
     if (process.env.TEST_MODE == 'bolt') {
-      return require('../../lib/bolt/seraph')({
+      return seraph({
         user: 'neo4j',
         pass: 'test',
-        nodeify: true
+        nodeify: true,
+        bolt: true
       });
     } else {
-      return require('../../lib/seraph')({
+      return seraph({
         user: 'neo4j',
         pass: 'test',
         server: module.exports.url
