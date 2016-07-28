@@ -22,11 +22,11 @@ describe('seraph#batch', function() {
 
     function readBatch(users, callback) {
       var ids = [];
-      db.batch(function(db) {
-        ids.push(db.read(users[0]));
-        ids.push(db.read(users[1]));
-        ids.push(db.read(users[2]));
-      }, function(err, results) {
+      var txn = db.batch();
+      ids.push(txn.read(users[0]));
+      ids.push(txn.read(users[1]));
+      ids.push(txn.read(users[2]));
+      txn.commit(function(err, results) {
         assert.deepEqual(results, users);
         callback();
       })
