@@ -36,10 +36,10 @@ describe('seraph#batch', function() {
   });
 
   it('should perform a series of saves in a batch', function(done) {
-    db.batch(function(db) {
-      db.save({ newPerson: 'bob' });
-      db.save([ {newPerson: 'orange'}, {newPerson: 'cat'} ]);
-    }, function(err, result) {
+    var txn = db.batch();
+    txn.save({ newPerson: 'bob' });
+    txn.save([ {newPerson: 'orange'}, {newPerson: 'cat'} ]);
+    txn.commit(function(err, result) {
       assert.equal(result[0].newPerson, 'bob');
       assert.equal(result[1][0].newPerson, 'orange');
       assert.equal(result[1][1].newPerson, 'cat');
