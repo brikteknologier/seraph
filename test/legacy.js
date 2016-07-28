@@ -68,5 +68,40 @@ describe('legacy tests', function() {
       });
     });
 
+
+    it('should support indexing', function(done) {
+      var txn = db.batch();
+      var idx = uniqn();
+
+      var person = txn.save({name:'Jon'});
+      txn.legacyindex(idx, person, 'thing', 'stuff');
+
+      txn.commit(function(err, results) {
+        assert(!err);
+        db.legacyindex.read(idx, 'thing', 'stuff', function(err, person1) {
+          assert(!err);
+          assert.deepEqual(person1, results[person]);
+          done();
+        });
+      });
+    });
+    it('should support indexing and index.readAsList', function(done) {
+      var txn = db.batch();
+      var idx = uniqn();
+
+      var person = txn.save({name:'Jon'});
+      txn.legacyindex(idx, person, 'thing', 'stuff');
+
+      txn.commit(function(err, txnResults) {
+        assert(!err);
+        db.legacyindex.readAsList(idx, 'thing', 'stuff', function(err, readResults) {
+          assert(!err);
+          assert.equal(readResults.length, 1);
+          assert.deepEqual(readResults[0], txnResults[person]);
+          done();
+        });
+      });
+    });
+
   });
 });
