@@ -9,6 +9,7 @@ describe('seraph#batch', function() {
     assert(!db.isBatch);
     var b = db.batch();
     assert(b.isBatch);
+    b.commit();
   });
 
   it('should perform a series of operations as expected', function(done) {
@@ -27,6 +28,7 @@ describe('seraph#batch', function() {
       ids.push(txn.read(users[1]));
       ids.push(txn.read(users[2]));
       txn.commit(function(err, results) {
+        assert(!err, err && err.message);
         assert.deepEqual(results, users);
         callback();
       })
@@ -51,10 +53,10 @@ describe('seraph#batch', function() {
 
   it('should perform an update in a batch', function(done) {
     db.save({name:'Jon', age: 23}, function(err, user) {
-      db.batch(function(db) {
-        user.name = 'Jellybean';
-        db.save(user);
-      }, function(err, result) {
+      var txn = db.batch();
+      user.name = 'Jellybean';
+      txn.save(user);
+      txn.commit(function(err, result) {
         db.read(user, function(err, user) {
           assert(user.name == 'Jellybean');
           done();
