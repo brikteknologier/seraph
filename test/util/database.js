@@ -37,7 +37,7 @@ module.exports = {
   db: function() {
     // return require('../../')({
       //server: module.exports.url,
-    var db =  new (require('../../lib/bolt/seraph'))({
+    var db =  (require('../../lib/bolt/seraph'))({
       user: 'neo4j',
       pass: 'test',
       nodeify: true
