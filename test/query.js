@@ -499,4 +499,17 @@ describe('seraph#find', function() {
       done()
     });
   });
+
+  it('should accept a node id as a parameter', function(done) {
+    var name = uniqn();
+    db.save({name: name}, function(err, result) {
+      if (err) return done(err);
+      db.query("MATCH (node) WHERE id(node) = {id} RETURN node", {id: result.id}, function(err, qresult) {
+        if (err) return done(err);
+        assert.equal(qresult.length, 1);
+        assert.deepEqual(qresult[0], result);
+        done();
+      });
+    });
+  });
 });
