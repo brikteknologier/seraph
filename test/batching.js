@@ -196,6 +196,19 @@ describe('seraph#batch', function() {
         });
       });
     });
+    
+    it('should allow escaping of references', function(done) {
+      var txn = db.batch();
+      var t0 = txn.save({name: 'Testy McTestpants'});
+      var t1 = txn.save({name: 'Test \\{0}Pants'});
+      
+      txn.commit(function(err, res) {
+        assert(!err);
+        assert.equal(res[t0].name, 'Testy McTestpants');
+        assert.equal(res[t1].name, 'Test \\{0}Pants');
+        done();
+      });
+    });
 
     it('should support group saves', function(done) {
       var txn = db.batch();
