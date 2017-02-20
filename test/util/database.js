@@ -12,7 +12,7 @@ var _nsv;
 
 var refreshDb = function(done) {
   disposableSeraph({
-      version: '3.0.3', 
+      version: '3.1.1', 
       edition: 'community', 
       port: TEST_INSTANCE_PORT 
     },
@@ -21,8 +21,8 @@ var refreshDb = function(done) {
       if (err) return done(err);
       var db = seraph({server:module.exports.url});
       db.options.user = 'neo4j';
-      db.options.pass = 'test';
       db.changePassword('test', function(err) {
+        db.options.pass = 'test';
         done();
       });
     });
