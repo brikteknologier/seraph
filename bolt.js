@@ -1,1 +1,1 @@
-module.exports = require('lib/bolt/seraph');
+module.exports = require('./lib/bolt/seraph');
