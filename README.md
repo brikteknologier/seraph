@@ -28,7 +28,9 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 ## Documentation
 
 <a name="seraph.db_list" />
+
 ### Initialization
+
 * [seraph](#seraph) - initialize the seraph client
 * [changePassword](#changePassword) - change the db user's password
 
@@ -44,6 +46,7 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [batch](#batch) - perform a series of atomic operations with one api call.
 
 ### Node Operations
+
 * [save (node.save)](#node.save) - create or update a node
 * [read (node.read)](#node.read) - read a node
 * [find (node.find)](#node.find) - find a node using a predicate
@@ -62,12 +65,14 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
   or all available labels.
 
 ### Relationship Operations
+
 * [rel.create](#rel.create) - create a relationship
 * [rel.update](#rel.update) - update the properties of a relationship
 * [rel.read](#rel.read) - read a relationship
 * [rel.delete](#rel.delete) - delete a relationship
 
 ### Constraint operations
+
 * [constraints.list](#constraints.list) - list constraints
 * [constraints.uniqueness.create](#constraints.uniqueness.create) - create a
   uniqueness constraint
@@ -79,6 +84,7 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
   constraint
 
 ### Indexing operations
+
 * [index.create](#index.create) - create an index on a label and property name
 * [index.createIfNone](#index.createIfNone) - create an index or return the old 
   one
@@ -86,6 +92,7 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 * [index.drop](#index.drop) - drop an index
 
 ### Legacy Index Operations
+
 * [legacyindex.create](#legacyindex.create) - create an index
 * [legacyindex.add](#legacyindex.add) - add a nodes/rels to an index
 * [legacyindex.read](#legacyindex.read) - read nodes/rels from an index
@@ -108,7 +115,9 @@ neo4j version), a new version of neo4j will need to be downloaded. That can,
 of course, take a little time.
 
 ## Initialization
+
 <a name="seraph" />
+
 ### seraph([server|options])
 
 Creates and returns the Seraph instance.  If no parameters are given,
@@ -159,6 +168,7 @@ dbRemote.read({ id: 13 }, function(err, node) {
 ```
 
 <a name="changePassword" />
+
 ### changePassword(newPassword, callback)
 
 Change's the current database user's password. This will automatically update
@@ -182,6 +192,7 @@ db.changePassword('b2(jk:4@#', function(err) {
 ## Generic Operations
 
 <a name="query" /><a name="queryRaw"/>
+
 ### query(query, [params,] callback), queryRaw(query, [params,] callback)
 
 `queryRaw` performs a cypher query and returns the results directly from the
@@ -240,6 +251,7 @@ db.queryRaw(cypher, {id: 3}, function(err, result) {
 ---------------------------------------
 
 <a name="operation" />
+
 ### operation(path, [method='get/post'], [data])
 
 Create an operation object that will be passed to [call](#call). 
@@ -264,6 +276,7 @@ db.call(operation, function(err) {
 ---------------------------------------
 
 <a name="call" />
+
 ### call(operation, callback)
 
 Perform an HTTP request to the server.
@@ -292,6 +305,7 @@ db.call(operation, function(err, properties) {
 ---------------------------------------
 
 <a name="batch" />
+
 ### Batching/transactions - `batch([operations, callback])`
 
 Batching provides a method of performing a series of operations atomically. You
@@ -445,7 +459,9 @@ if (txn.isBatch) // Woo! I'm in a batch.
 ## Node Operations
 
 <a name="node.save" />
+
 ### save(object, [label,]|[key, value,] callback)
+
 *Aliases: __node.save__*
 
 Create or update a node. If `object` has an id property, the node with that id
@@ -512,7 +528,9 @@ db.save({ name: 'Jon', age: 23 }, 'Person', function(err, node) {
 ---------------------------------------
 
 <a name="node.read" />
+
 ### read(id|object, [property,] callback)
+
 *Aliases: __node.read__*
 
 Read a node.
@@ -545,7 +563,9 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
 ---------------------------------------
 
 <a name="node.delete" />
+
 ### delete(id|object, [force | property], [callback])
+
 *Aliases: __node.delete__*
 
 Delete a node.
@@ -574,7 +594,9 @@ db.save({ name: 'Jon' }, function(err, node) {
 ---------------------------------------
 
 <a name="node.find" />
+
 ### find(predicate, [any, [label,] callback)
+
 *Aliases: __node.find__*
 
 Perform a query based on a predicate. The predicate is translated to a
@@ -615,7 +637,9 @@ var people = db.find(predicate, function (err, people) {
 ---------------------------------------
 
 <a name="node.relationships" />
+
 ### relationships(id|object, [direction, [type,]] callback)
+
 **Aliases: __node.relationships__*
 
 Read the relationships involving the specified node.
@@ -642,7 +666,9 @@ db.relationships(452, 'out', 'knows', function(err, relationships) {
 ---------------------------------------
 
 <a name="node.label" />
+
 ### label(id|object(s), label(s), [replace,] callback)
+
 *Aliases: __node.label__*
 
 Add a label to a node.
@@ -669,7 +695,9 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
 ---------------------------------------
 
 <a name="node.removeLabel" />
+
 ### removeLabel(id|object(s), label, callback)
+
 *Aliases: __node.removeLabel__*
 
 Remove a label from a node.
@@ -697,7 +725,9 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
 ---------------------------------------
 
 <a name="node.nodesWithLabel" />
+
 ### nodesWithLabel(label, callback)
+
 *Aliases: __node.nodesWithLabel__*
 
 Fetch all of the nodes that are labelled with a specific label.
@@ -724,7 +754,9 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
 ---------------------------------------
 
 <a name="node.readLabels" />
+
 ### readLabels([node(s),] callback)
+
 *Aliases: __node.readLabels__*
 
 Read the labels of a node, or all labels in the database.
@@ -753,7 +785,9 @@ db.save({ make: 'Citroen', model: 'DS4' }, function(err, node) {
 
 <a name="rel.create" />
 <a name="node.relate" />
+
 ### rel.create(firstId|firstObj, type, secondId|secondobj, [properties], callback)
+
 *Aliases: __relate__, __node.relate__*
 
 Create a relationship between two nodes.
@@ -786,6 +820,7 @@ db.relate(1, 'knows', 2, { for: '2 months' }, function(err, relationship) {
 ---------------------------------------
 
 <a name="rel.update" />
+
 ### rel.update(relationship, [key, value,] callback)
 
 Update the properties of a relationship. __Note__ that you cannot use this
@@ -818,6 +853,7 @@ db.rel.create(1, 'knows', 2, props, function(err, relationship) {
 ---------------------------------------
 
 <a name="rel.read" />
+
 ### rel.read(object|id, callback)
 
 Read a relationship.
@@ -849,6 +885,7 @@ db.rel.create(1, 'knows', 2, { for: '2 months' }, function(err, newRelationship)
 ---------------------------------------
 
 <a name="rel.delete" />
+
 ### rel.delete(object|id, [callback])
 
 Delete a relationship.
@@ -873,6 +910,7 @@ db.rel.create(1, 'knows', 2, { for: '2 months' }, function(err, rel) {
 ## Constraints Operations
 
 <a name="constraints.list" />
+
 ### constraints.list([label,] callback)
 
 List all constraints, or optionally all constraints for a label.
@@ -896,6 +934,7 @@ db.constraints.list('Person', function(err, constraints) {
 ---------------------------------------
 
 <a name="constraints.uniqueness.list" />
+
 ### constraints.uniqueness.list(label, [key,] callback)
 
 List all uniqueness constraints, or optionally fetch a uniqueness constraint for
@@ -923,6 +962,7 @@ db.constraints.uniqueness.list('Person', 'name', function(err, constraints) {
 ---------------------------------------
 
 <a name="constraints.uniqueness.create" />
+
 ### constraints.uniqueness.create(label, key, callback)
 
 Create a uniqueness constraint on the given label. Any node labelled with `label`
@@ -954,6 +994,7 @@ db.constraints.uniqueness.create('Person', 'name', function(err, constraint) {
 ---------------------------------------
 
 <a name="constraints.uniqueness.createIfNone" />
+
 ### constraints.uniqueness.createIfNone(label, key, callback)
 
 Create a uniqueness constraint on the given label. If the constraint exists,
@@ -986,6 +1027,7 @@ db.constraints.uniqueness.createIfNone('Person', 'name', function(err, constrain
 ---------------------------------------
 
 <a name="constraints.uniqueness.drop" />
+
 ### constraints.uniqueness.drop(label, key, callback)
 
 Drop (remove) a uniqueness constraint.
@@ -1018,6 +1060,7 @@ db.constraints.uniqueness.create('Person', 'name', function(err, constraint) {
 on the subject](http://docs.neo4j.org/chunked/milestone/graphdb-neo4j-schema.html#graphdb-neo4j-schema-indexes).**
 
 <a name="index.create" />
+
 ### index.create(label, key, callback)
 
 Create an index on `label` with `key`. Note that schema-based indexes are
@@ -1045,6 +1088,7 @@ db.index.create('Person', 'name', function(err, index) {
 ---------------------------------------
 
 <a name="index.createIfNone" />
+
 ### index.createIfNone(label, key, callback)
 
 Create an index on `label` with `key`. Exactly the same as
@@ -1070,6 +1114,7 @@ db.index.createIfNone('Person', 'name', function(err, index) {
 ---------------------------------------
 
 <a name="index.list" />
+
 ### index.list(label, callback)
 
 Retrieve a listing of the indexes on a label.
@@ -1092,6 +1137,7 @@ db.index.list('Person', function(err, index) {
 ---------------------------------------
 
 <a name="index.drop" />
+
 ### index.drop(label, key, callback)
 
 Drop an index from a label
@@ -1118,7 +1164,9 @@ db.index.drop('Person', 'name' function(err) {
 handle indexing**
 
 <a name="legacyindex.create" />
+
 ### node.legacyindex.create(name, [config,] callback)
+
 ### rel.legacyindex.create(name, [config,] callback)
 
 Create a new legacy index. If you're using the default legacy index configuration, 
@@ -1154,8 +1202,11 @@ db.node.legacyindex.create('a_fulltext_index', indexConfig, function(err) {
 
 <a name="legacyindex.add" />
 <a name="node.legacyindex" />
+
 ### node.legacyindex.add(indexName, id|object, key, value, callback);
+
 ### rel.legacyindex.add(indexName, id|object, key, value, callback);
+
 *`node.legacyindex.add` is aliased as __node.legacyindex__ & __legacyindex__*
 
 Add a node/relationship to a legacy index.
@@ -1192,7 +1243,9 @@ db.save({ name: 'Jon' }, function(err, node) {
 ---------------------------------------
 
 <a name="legacyindex.read" />
+
 ### node.legacyindex.read(indexName, key, value, callback);
+
 ### rel.legacyindex.read(indexName, key, value, callback);
 
 Read the object(s) from a legacy index that match a key-value pair. See also
@@ -1230,7 +1283,9 @@ db.rel.legacyindex.read('friendships', 'location', 'Norway', function(err, rels)
 ---------------------------------------
 
 <a name="legacyindex.readAsList" />
+
 ### node.legacyindex.readAsList(indexName, key, value, callback);
+
 ### rel.legacyindex.readAsList(indexName, key, value, callback);
 
 Read the object(s) from a legacy index that match a key-value pair. See also
@@ -1266,7 +1321,9 @@ db.rel.legacyindex.readAsList('friendships', 'location', 'Norway', function(err,
 ---------------------------------------
 
 <a name="legacyindex.remove" />
+
 ### node.legacyindex.remove(indexName, id|object, [key, [value,]] callback);
+
 ### rel.legacyindex.remove(indexName, id|object, [key, [value,]] callback);
 
 Remove a node/relationship from a legacy index. 
@@ -1309,7 +1366,9 @@ db.rel.legacyindex.remove('friendships', 351, 'in', 'Australia', function(err) {
 ---------------------------------------
 
 <a name="legacyindex.delete" />
+
 ### node.legacyindex.delete(name, callback);
+
 ### rel.legacyindex.delete(name, callback);
 
 Delete a legacy index.
@@ -1338,7 +1397,9 @@ db.rel.legacyindex.delete('friendships', function(err) {
 ---------------------------------------
 
 <a name="legacyindex.getOrSaveUnique" />
+
 ### node.legacyindex.getOrSaveUnique(node, index, key, value, callback);
+
 ### rel.legacyindex.getOrSaveUnique(startNode, relName, endNode, [properties,] index, key, value, callback);
 
 Save a node or relationship, using a legacy index to enforce uniqueness. If 
@@ -1396,7 +1457,9 @@ db.node.legacyindex.getOrSaveUnique(tag, 'tags', 'name', tag.name, function(err,
 ---------------------------------------
 
 <a name="legacyindex.saveUniqueOrFail" />
+
 ### node.legacyindex.saveUniqueOrFail(node, index, key, value, callback);
+
 ### rel.legacyindex.saveUniqueOrFail(startNode, relName, endNode, [properties,] index, key, value, callback);
 
 Save a node or relationship, using a legacy index to enforce uniqueness. If 
