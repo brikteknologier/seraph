@@ -12,7 +12,7 @@ var _nsv;
 
 var refreshDb = function(done) {
   disposableSeraph({
-      version: '3.1.1', 
+      version: '3.3.0', 
       edition: 'community', 
       port: TEST_INSTANCE_PORT 
     },

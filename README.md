@@ -105,7 +105,7 @@ db.save({ name: "Test-Man", age: 40 }, function(err, node) {
 
 ## Compatibility
 
-Seraph `~0.14.4` works with both Neo4j 2 and 3.
+Seraph `~0.15` has been tested with with Neo4j 3.
 
 ## Testing
 
