@@ -8,7 +8,7 @@
   "main": "lib/seraph.js",
   "name": "seraph",
   "description": "A thin and familiar layer between node and neo4j's REST api.",
-  "version": "0.15.2",
+  "version": "0.15.3",
   "repository": {
     "url": "https://github.com/brikteknologier/seraph"
   },
